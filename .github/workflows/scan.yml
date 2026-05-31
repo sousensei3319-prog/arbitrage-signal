@@ -1,0 +1,30 @@
+name: Cross-Exchange Arb Signal
+
+on:
+  schedule:
+    # 5分ごと。スプレッドは秒単位で動くが、シグナル(候補通知)目的なら5分で十分
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 依存なし(標準ライブラリのみ)。pip install 不要。
+
+      - name: Run arbitrage signal screener
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MENTION_EVERYONE: '0'
+          NET_SPREAD_MIN: '0.5'
+          MAX_SPREAD: '25'
+          TARGET_NOTIONAL: '200'
+          MIN_VOLUME_24H: '1000000'
+        run: python screener.py
