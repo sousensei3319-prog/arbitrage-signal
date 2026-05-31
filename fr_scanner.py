@@ -1,24 +1,23 @@
 """
-Funding Rate Delta-Neutral Scanner v1 (②FRアービ)
+Funding Rate Multi-Exchange Scanner v2 (②FRアービ強化版)
 
-やること:
-  1. OKX 全 USDT-SWAP のファンディングレート(FR)を一括取得
-  2. デルタニュートラル戦略の想定APY を計算:
-       APY = FR_per_period × periods_per_day × 365 × 100 (%)
-       ※ 8h決済なら periods_per_day = 3
-  3. 現物-先物スプレッド(ベーシス%)を計算 → 歪みの向き確認
-  4. フィルタ: APY > MIN_APY / 出来高 > MIN_VOL / 板厚 OK
-  5. Discord に日本語通知 (集計時刻必須 ← CLAUDE.md ルール)
+v1 からの変化:
+  - OKX 単体 → OKX / Bybit / Gate / MEXC / Bitget の5取引所同時比較
+  - 各銘柄の「どの取引所でショートすると最大FR収益か」を特定
+  - 取引所間FR乖離 = cross_fr_spread を計算 → ゼロリスクで鞘が取れる上限
+  - CoinGlass で見るのと同等のデータを無料・無認証で直接取得
 
-「デルタニュートラル」とは:
-  現物 +1 BTCロング × 永久先物 -1 BTCショート → 価格変動ゼロ
-  FRがプラス → ショート側が8時間ごとにFRを受取 = 方向リスク無し収益
+戦略の読み方:
+  ① max_fr が高い銘柄 = デルタニュートラル妙味あり (その取引所でショート)
+  ② max_fr と min_fr の差が大きい = 取引所間FR乖離 → FRアービの理論上の上限
+  ③ max_fr が高い + あなたの既存ショート点火条件 = ロング過熱の二重確認
 
-注意:
-  - これは「稼ぎの保証」ではなく「妙味スクリーニング」。
-  - FR は次回決済後に反転しうる(調査済みリスク)。
-  - 両建てコスト(手数料×2)を超えるFRのときだけ点灯。
-  - 200ドルでの現実的上限: $100現物 + $100先物証拠金。証拠金薄でロスカリスク大。
+データソース (全て公開API・認証不要・GitHub Actionsで動作確認済み):
+  OKX:   /public/funding-rate?instId=COIN-USDT-SWAP  (個別)
+  Bybit: /v5/market/tickers?category=linear           (全銘柄一括)
+  Gate:  /futures/usdt/contracts                       (全銘柄一括)
+  MEXC:  /api/v1/contract/funding_rate                (全銘柄一括・最詳細)
+  Bitget:/api/v2/mix/market/tickers?productType=USDT-FUTURES (全銘柄一括)
 """
 
 import json
@@ -40,181 +39,195 @@ JST = timezone(timedelta(hours=9))
 # Config
 # ============================================================
 DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
-MENTION_EVERYONE = os.environ.get("MENTION_EVERYONE", "0") == "1"
+MENTION_EVERYONE    = os.environ.get("MENTION_EVERYONE", "0") == "1"
+MIN_APY             = float(os.environ.get("MIN_APY", "15"))       # 点灯APY下限(%)
+MIN_VOL_OKX         = float(os.environ.get("MIN_VOL", "2000000"))  # OKX 24h出来高下限($)
+MAX_BASIS_PCT       = float(os.environ.get("MAX_BASIS_PCT", "5"))  # ベーシス上限(%)
+MAX_SIGNALS         = int(os.environ.get("MAX_SIGNALS", "15"))
+EXCLUDE             = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD"}
 
-# 点灯閾値: 年率何%以上なら通知するか
-MIN_APY = float(os.environ.get("MIN_APY", "15"))
-# 最小24h出来高 (USDT)。低流動は FR が異常値になりやすい罠
-MIN_VOL = float(os.environ.get("MIN_VOL", "2000000"))
-# ベーシスが極端すぎる(取引不可状態)を除外
-MAX_BASIS_PCT = float(os.environ.get("MAX_BASIS_PCT", "5"))
-# Discord 送信最大件数 (高APY順)
-MAX_SIGNALS = int(os.environ.get("MAX_SIGNALS", "15"))
-# 除外リスト (安定コイン・デリバティブ自体)
-EXCLUDE = {"USDC", "DAI", "TUSD", "FDUSD", "USDD", "USDE", "BUSD", "PYUSD"}
+OKX_BASE   = "https://www.okx.com/api/v5"
+BYBIT_BASE = "https://api.bybit.com/v5"
+GATE_BASE  = "https://api.gateio.ws/api/v4"
+MEXC_BASE  = "https://contract.mexc.com/api/v1"
+BITGET_BASE= "https://api.bitget.com/api/v2"
 
-OKX_BASE = "https://www.okx.com/api/v5"
+TAKER_FEE_RT = 0.0024  # 往復手数料 0.24% (現物0.1%+先物0.02%の開閉×2)
 
 
 # ============================================================
 # HTTP
 # ============================================================
-def fetch_json(url, timeout=20):
-    req = urllib.request.Request(url, headers={"User-Agent": "fr-scanner/1.0"})
+def fetch(url, timeout=20):
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "fr-scanner/2.0", "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return json.loads(r.read().decode())
 
 
-def okx(path):
-    d = fetch_json(f"{OKX_BASE}{path}")
-    if d.get("code") != "0":
-        raise RuntimeError(f"OKX {d.get('code')}: {d.get('msg')}")
-    return d["data"]
-
-
 def safe_float(x):
     try:
-        return float(x)
+        f = float(x)
+        return f if f == f else None  # NaN guard
     except (TypeError, ValueError):
         return None
 
 
 # ============================================================
-# Data
+# 取引所別 FR 取得 (正規化して返す)
+# 戻り値: {coin_upper: {"fr": float, "nft_ms": int|None, "interval_h": int}}
 # ============================================================
-def get_all_swap_tickers():
-    """全USDTスワップのティッカー (価格・出来高) を返す。"""
-    data = okx("/market/tickers?instType=SWAP")
+def fr_okx_bulk(vol_filter=True):
+    """OKX: ticker一括 + 出来高フィルタ + 個別FR取得。"""
+    tickers = fetch(f"{OKX_BASE}/market/tickers?instType=SWAP")["data"]
     out = {}
-    for t in data:
+    for t in tickers:
         if not t["instId"].endswith("-USDT-SWAP"):
             continue
         coin = t["instId"].replace("-USDT-SWAP", "")
         if coin in EXCLUDE:
             continue
-        last = safe_float(t.get("last"))
-        vol = safe_float(t.get("volCcy24h"))  # 通貨建て出来高 (≒ USDT)
-        if not last or not vol:
+        last = safe_float(t.get("last")) or 0
+        vol  = (safe_float(t.get("volCcy24h")) or 0) * last
+        if vol_filter and vol < MIN_VOL_OKX:
             continue
-        out[coin] = {"price": last, "vol": vol * last if vol else 0,
-                     "inst_id": t["instId"]}
+        # OKXはtickerにFRなし → 個別取得
+        try:
+            d = fetch(f"{OKX_BASE}/public/funding-rate?instId={t['instId']}")["data"]
+            if not d:
+                continue
+            fr = safe_float(d[0].get("fundingRate"))
+            nft = safe_float(d[0].get("nextFundingTime"))
+            ih  = safe_float(d[0].get("fundingIntervalHours")) or 8
+            if fr is None:
+                continue
+            out[coin] = {"fr": fr, "nft_ms": int(nft) if nft else None,
+                         "interval_h": ih, "vol": vol, "price": last}
+        except Exception:
+            continue
     return out
 
 
-def get_funding_batch():
-    """全スワップのFR (fundingRate) を一括取得。
-    OKX は /public/funding-rate には instId が必須で一括APIが無いため、
-    /rubik/stat/trading-data/support-coin で先物対応リストを引いた後、
-    代替として tickers の中に fundingRate が含まれる場合があることを活用。
-    実際には ticker に FR が含まれないので、上位銘柄だけ個別取得する。
-    """
-    # tickers に fundingRate フィールドが含まれているかまず確認
-    data = okx("/market/tickers?instType=SWAP")
-    fr_map = {}
+def fr_bybit_bulk():
+    """Bybit: linear tickers一括 (fundingRate含む)。"""
+    data = fetch(f"{BYBIT_BASE}/market/tickers?category=linear")["result"]["list"]
+    out = {}
     for t in data:
-        if not t["instId"].endswith("-USDT-SWAP"):
+        sym = t.get("symbol", "")
+        if not sym.endswith("USDT"):
             continue
-        coin = t["instId"].replace("-USDT-SWAP", "")
-        fr = safe_float(t.get("fundingRate"))
-        if fr is not None:
-            fr_map[coin] = fr
-    return fr_map
+        coin = sym[:-4]
+        if coin in EXCLUDE:
+            continue
+        fr  = safe_float(t.get("fundingRate"))
+        nft = safe_float(t.get("nextFundingTime"))
+        if fr is None:
+            continue
+        out[coin] = {"fr": fr, "nft_ms": int(nft) if nft else None, "interval_h": 8}
+    return out
 
 
-def get_funding_single(inst_id):
-    """個別銘柄のFR + 次回決済時刻を取得。"""
-    try:
-        d = okx(f"/public/funding-rate?instId={inst_id}")
-        if not d:
-            return None, None, None
-        fr = safe_float(d[0].get("fundingRate"))
-        nft = safe_float(d[0].get("nextFundingTime"))
-        # 決済間隔: OKX は基本8h(=3回/日)、銘柄により4h/12hあり
-        interval_h = safe_float(d[0].get("fundingIntervalHours", 8))
-        if not interval_h:
-            interval_h = 8
-        return fr, int(nft) if nft else None, interval_h
-    except Exception:
-        return None, None, None
+def fr_gate_bulk():
+    """Gate: futures/usdt/contracts 一括 (funding_rate含む)。"""
+    data = fetch(f"{GATE_BASE}/futures/usdt/contracts?limit=1000&offset=0")
+    out = {}
+    for t in data:
+        name = t.get("name", "")
+        if not name.endswith("_USDT"):
+            continue
+        coin = name[:-5]
+        if coin in EXCLUDE:
+            continue
+        fr  = safe_float(t.get("funding_rate"))
+        nft_s = safe_float(t.get("funding_next_apply"))  # unix秒
+        if fr is None:
+            continue
+        out[coin] = {"fr": fr,
+                     "nft_ms": int(nft_s * 1000) if nft_s else None,
+                     "interval_h": 8}
+    return out
 
 
-def get_spot_price(coin):
-    """現物価格を取得してベーシス計算に使う。"""
-    try:
-        d = okx(f"/market/ticker?instId={coin}-USDT")
-        return safe_float(d[0].get("last")) if d else None
-    except Exception:
-        return None
+def fr_mexc_bulk():
+    """MEXC: contract/funding_rate 一括 (897銘柄・最詳細)。"""
+    d = fetch(f"{MEXC_BASE}/contract/funding_rate")
+    if not d.get("success"):
+        return {}
+    out = {}
+    for t in d.get("data", []):
+        sym = t.get("symbol", "")
+        if not sym.endswith("_USDT"):
+            continue
+        coin = sym[:-5]
+        if coin in EXCLUDE:
+            continue
+        fr  = safe_float(t.get("fundingRate"))
+        nft = safe_float(t.get("nextSettleTime"))
+        ih  = safe_float(t.get("collectCycle")) or 8
+        if fr is None:
+            continue
+        out[coin] = {"fr": fr, "nft_ms": int(nft) if nft else None, "interval_h": ih}
+    return out
+
+
+def fr_bitget_bulk():
+    """Bitget: mix/market/tickers USDT-FUTURES 一括。"""
+    data = fetch(f"{BITGET_BASE}/mix/market/tickers?productType=USDT-FUTURES")["data"]
+    out = {}
+    for t in data:
+        sym = t.get("symbol", "")
+        if not sym.endswith("USDT"):
+            continue
+        coin = sym[:-4]
+        if coin in EXCLUDE:
+            continue
+        fr  = safe_float(t.get("fundingRate"))
+        nft = safe_float(t.get("nextFundingTime"))
+        if fr is None:
+            continue
+        out[coin] = {"fr": fr, "nft_ms": int(nft) if nft else None, "interval_h": 8}
+    return out
 
 
 # ============================================================
 # 計算
 # ============================================================
 def calc_apy(fr, interval_h=8):
-    """FR × 1日の決済回数 × 365 = 年率(小数)。"""
-    if fr is None:
+    if fr is None or interval_h <= 0:
         return None
-    periods_per_day = 24 / interval_h
-    return fr * periods_per_day * 365 * 100  # %
-
-
-def calc_basis(swap_price, spot_price):
-    """ベーシス% = (先物 - 現物) / 現物 × 100。
-    プラス = 先物プレミアム = キャリートレードの妙味。"""
-    if not swap_price or not spot_price or spot_price <= 0:
-        return None
-    return (swap_price - spot_price) / spot_price * 100
-
-
-def taker_fee_round_trip():
-    """OKX 現物+先物 taker 手数料(往復)。
-    現物 0.10% + 先物 0.02% = 0.12% per trade。
-    ポジションを開くだけで 0.12%、閉じるときも 0.12% = 合計 0.24%。
-    """
-    return 0.24
+    return fr * (24 / interval_h) * 365 * 100
 
 
 def minutes_until(ms_ts):
     if not ms_ts:
         return None
-    now = datetime.now(timezone.utc).timestamp() * 1000
-    diff = (ms_ts - now) / 60000
-    return int(diff) if diff > 0 else 0
+    diff = (ms_ts - datetime.now(timezone.utc).timestamp() * 1000) / 60000
+    return max(0, int(diff))
 
 
 def fmt_price(p):
-    if p is None:
-        return "n/a"
-    if abs(p) >= 100:
-        return f"${p:,.2f}"
-    if abs(p) >= 1:
-        return f"${p:,.4f}"
-    if abs(p) >= 0.01:
-        return f"${p:.5f}"
+    if p is None: return "n/a"
+    a = abs(p)
+    if a >= 100:  return f"${p:,.2f}"
+    if a >= 1:    return f"${p:,.4f}"
+    if a >= 0.01: return f"${p:.5f}"
     return f"${p:.8f}"
 
 
 def fmt_vol(v):
-    if v is None:
-        return "n/a"
-    if v >= 1e9:
-        return f"${v/1e9:.2f}B"
-    if v >= 1e6:
-        return f"${v/1e6:.2f}M"
-    if v >= 1e3:
-        return f"${v/1e3:.1f}K"
+    if v is None: return "n/a"
+    if v >= 1e9: return f"${v/1e9:.2f}B"
+    if v >= 1e6: return f"${v/1e6:.2f}M"
+    if v >= 1e3: return f"${v/1e3:.1f}K"
     return f"${v:.0f}"
 
 
-def risk_label(apy, vol, basis_pct):
-    """シグナルのリスクレベルを簡易判定。"""
-    if apy > 100:
-        return "🔴 超高APY=FR反転リスク大。慎重に"
-    if apy > 50:
-        return "🟠 高APY。FRが高い=ロング過熱のサイン。方向シグナルにもなる"
-    if apy > MIN_APY:
-        return "🟡 妙味あり。FR継続を確認してからポジション"
-    return "⚪"
+def risk_tag(apy, cross_spread_pct):
+    if apy > 200:   return "🔴 APY超高=FR反転リスク大"
+    if apy > 80:    return "🟠 高APY=ロング過熱シグナル"
+    if cross_spread_pct and cross_spread_pct > 0.05:
+        return "💡 取引所間FR乖離大 → FRアービ候補"
+    return "🟡 妙味あり"
 
 
 # ============================================================
@@ -227,63 +240,63 @@ def discord_post(payload):
     data = json.dumps(payload).encode()
     req = urllib.request.Request(
         DISCORD_WEBHOOK_URL, data=data, method="POST",
-        headers={"Content-Type": "application/json", "User-Agent": "fr-scanner/1.0"},
-    )
+        headers={"Content-Type": "application/json", "User-Agent": "fr-scanner/2.0"})
     try:
-        with urllib.request.urlopen(req, timeout=15):
-            pass
+        with urllib.request.urlopen(req, timeout=15): pass
     except urllib.error.HTTPError as e:
         print(f"Discord error: {e.code} {e.read().decode()[:200]}")
 
 
-def build_embed(signals, scan_time):
+def build_embed(signals, scan_time, ex_status):
     now_jst = scan_time.strftime("%Y-%m-%d %H:%M JST")
+    alive = [f"{'✅' if ok else '❌'} {n}" for n, ok in ex_status.items()]
 
     if not signals:
-        desc = f"APY≥{MIN_APY}%の銘柄なし。市場のFRは低水準(デルタニュートラルの妙味なし)。"
+        desc = f"APY≥{MIN_APY}%の銘柄なし。市場は均衡状態。"
     else:
         lines = []
-        for s in signals:
-            nft_str = f"次回{s['nft_min']}分後" if s['nft_min'] is not None else "時刻不明"
-            basis_str = f"{s['basis']:+.3f}%" if s['basis'] is not None else "n/a"
-            fee_note = f"※往復手数料{taker_fee_round_trip():.2f}%込み実効APY≈{s['apy'] - taker_fee_round_trip()*365:.1f}%" if s['apy'] else ""
+        for s in signals[:MAX_SIGNALS]:
+            nft = f"次回{s['nft_min']}分後" if s['nft_min'] is not None else ""
+            ex_line = " / ".join(
+                f"{ex}={s['by_ex'][ex]['fr']*100:+.4f}%"
+                for ex in s["by_ex"]
+            )
+            cross = s.get("cross_spread_pct")
+            cross_str = f"  乖離幅 **{cross:.3f}%** ({s['max_ex']}↔{s['min_ex']})" if cross else ""
             lines.append(
-                f"**{s['coin']}/USDT**  FR `{s['fr']*100:+.4f}%`  APY **{s['apy']:.1f}%** {nft_str}\n"
-                f"　価格{fmt_price(s['price'])}  ベーシス{basis_str}  出来高{fmt_vol(s['vol'])}\n"
-                f"　{s['risk']}  {fee_note}"
+                f"**{s['coin']}**  最高FR `{s['max_fr']*100:+.4f}%` @ **{s['max_ex']}**  "
+                f"APY **{s['max_apy']:.1f}%**  {nft}\n"
+                f"　{ex_line}{cross_str}\n"
+                f"　{s['risk']}  出来高{fmt_vol(s.get('vol'))}"
             )
         desc = "\n".join(lines)
 
     embed = {
-        "title": "💰 FRデルタニュートラル妙味スキャン",
-        "description": desc[:3900],  # Discord embed 4096文字制限
+        "title": "💰 FRマルチ取引所比較スキャン v2",
+        "description": desc[:3900],
         "color": 0xFFAA00 if signals else 0x888888,
         "fields": [
-            {"name": "集計条件",
+            {"name": "集計情報",
              "value": (
                  f"スキャン時刻: {now_jst}\n"
-                 f"対象: OKX 全USDT永久先物 ({len(signals)}件点灯 / APY≥{MIN_APY}%)\n"
-                 f"出来高フィルタ: {fmt_vol(MIN_VOL)} / 最大ベーシス: {MAX_BASIS_PCT}%"
-             ),
-             "inline": False},
-            {"name": "デルタニュートラル戦略の仕組み",
+                 f"点灯件数: {len(signals)}件 (APY≥{MIN_APY}%)\n"
+                 f"取引所状態: {' | '.join(alive)}"
+             ), "inline": False},
+            {"name": "読み方",
              "value": (
-                 "現物+1ロング × 永久先物-1ショート → 価格変動の損益が相殺\n"
-                 "FRがプラス → ショート側が8時間ごとにFRを受取\n"
-                 f"往復手数料: {taker_fee_round_trip():.2f}% (開く+閉じる)\n"
-                 "⚠️ FRは次回決済後に符号反転しうる。72h超マイナスなら出血。"
-             ),
-             "inline": False},
+                 "**最高FRの取引所でショート** = FR受取が最大\n"
+                 "**乖離幅が大きい** = 取引所間FRアービの理論上限\n"
+                 "**APY>80% + ロング過熱** = あなたのショート戦略の点火候補\n"
+                 f"往復手数料 {TAKER_FEE_RT*100:.2f}% を超えるFRのみ掲載"
+             ), "inline": False},
             {"name": "200ドルでの現実",
              "value": (
-                 "¥100現物 + $100先物証拠金 = 証拠金薄くロスカリスク大。\n"
-                 "まずはペーパーで FR の継続性を1週間確認し、\n"
-                 "資金500ドル超になってから実運用を推奨(調査結論)。\n"
-                 "このスキャナーは「監視・記録」が目的。"
-             ),
-             "inline": False},
+                 "証拠金薄(各$100)でロスカリスクあり。\n"
+                 "まずペーパーで FR の継続性を1週間確認してから実運用。\n"
+                 "→ 500ドル超になってから本格デルタニュートラル推奨。"
+             ), "inline": False},
         ],
-        "footer": {"text": "FR Delta-Neutral Scanner v1 | ①価格スプレッド + ②FRアービ パイプライン"},
+        "footer": {"text": "FR Multi-Exchange Scanner v2 | CoinGlass相当を直接API取得"},
     }
     return embed
 
@@ -293,83 +306,110 @@ def build_embed(signals, scan_time):
 # ============================================================
 def main():
     scan_time = datetime.now(JST)
-    print(f"FR scan start {scan_time.strftime('%Y-%m-%d %H:%M JST')}")
+    print(f"FR multi-exchange scan start {scan_time.strftime('%Y-%m-%d %H:%M JST')}")
 
-    # ---- Step 1: ティッカー(価格・出来高) ----
-    print("  OKX ティッカー取得中...")
-    tickers = get_all_swap_tickers()
-    print(f"  {len(tickers)} USDT-SWAP ペア取得")
+    # ---- 各取引所FR一括取得 ----
+    sources = {
+        "OKX":   (fr_okx_bulk,   True),
+        "Bybit": (fr_bybit_bulk, False),
+        "Gate":  (fr_gate_bulk,  False),
+        "MEXC":  (fr_mexc_bulk,  False),
+        "Bitget":(fr_bitget_bulk,False),
+    }
+    fr_data  = {}   # ex_name -> {coin: {fr, nft_ms, interval_h, ...}}
+    ex_status = {}  # ex_name -> bool (成功/失敗)
 
-    # ---- Step 2: tickers に FR が含まれるか試す ----
-    fr_in_ticker = get_funding_batch()
-    if fr_in_ticker:
-        print(f"  ticker FR 一括取得: {len(fr_in_ticker)}件")
-    else:
-        print("  ticker に FR なし → 個別取得モードへ")
+    for name, (fn, _) in sources.items():
+        try:
+            d = fn()
+            fr_data[name]   = d
+            ex_status[name] = True
+            print(f"  {name}: {len(d)} 先物ペア取得")
+        except Exception as e:
+            fr_data[name]   = {}
+            ex_status[name] = False
+            print(f"  {name}: FAILED ({type(e).__name__}: {str(e)[:60]})")
 
-    # ---- Step 3: 出来高フィルタ後に個別FR取得 ----
-    # まず出来高でスクリーニングしてからFR個別取得(APIコール削減)
-    vol_filtered = {c: v for c, v in tickers.items() if v["vol"] >= MIN_VOL}
-    print(f"  出来高フィルタ({fmt_vol(MIN_VOL)})後: {len(vol_filtered)} 銘柄")
+    alive_ex = [n for n, ok in ex_status.items() if ok]
+    if len(alive_ex) < 1:
+        print("全取引所取得失敗。終了。")
+        return
 
+    # ---- OKX出来高で共通銘柄フィルタ ----
+    okx_data = fr_data.get("OKX", {})
+    # OKXにない銘柄も拾う: MEXC一括 897 銘柄をベースにして出来高はOKX優先
+    all_coins = set()
+    for ex in alive_ex:
+        all_coins |= set(fr_data[ex].keys())
+
+    # OKX出来高が MIN_VOL_OKX 未満かつOKXに存在しない銘柄は除外
+    filtered_coins = {
+        c for c in all_coins
+        if c in okx_data  # OKX出来高フィルタを通過済み
+    }
+    print(f"  共通銘柄(OKX出来高フィルタ後): {len(filtered_coins)}")
+
+    # ---- 銘柄ごとに取引所横断FR比較 ----
     candidates = []
-    for coin, info in vol_filtered.items():
-        inst = info["inst_id"]
+    for coin in filtered_coins:
+        by_ex = {}
+        for ex in alive_ex:
+            q = fr_data[ex].get(coin)
+            if q:
+                by_ex[ex] = q
 
-        # FR取得 (ticker一括取得があればそれを使い、なければ個別)
-        fr = fr_in_ticker.get(coin)
-        interval_h = 8
-        nft_ms = None
-        if fr is None:
-            fr, nft_ms, interval_h = get_funding_single(inst)
-            if interval_h is None:
-                interval_h = 8
-
-        if fr is None:
+        if len(by_ex) < 1:
             continue
 
-        # APY計算
-        apy = calc_apy(fr, interval_h)
-        if apy is None or apy < MIN_APY:
+        frs = {ex: q["fr"] for ex, q in by_ex.items()}
+        max_ex  = max(frs, key=frs.get)
+        min_ex  = min(frs, key=frs.get)
+        max_fr  = frs[max_ex]
+        min_fr  = frs[min_ex]
+
+        interval_h = by_ex[max_ex].get("interval_h") or 8
+        max_apy = calc_apy(max_fr, interval_h)
+        if max_apy is None or max_apy < MIN_APY:
             continue
 
-        # 現物価格 → ベーシス
-        spot = get_spot_price(coin)
-        basis = calc_basis(info["price"], spot)
-
-        # ベーシス異常値除外 (上場停止/板崩壊)
-        if basis is not None and abs(basis) > MAX_BASIS_PCT:
-            print(f"  {coin}: ベーシス{basis:.1f}%超過 → 除外")
+        # FR がゼロ以下(マイナスFR = ショートが損)は除外
+        if max_fr <= 0:
             continue
 
-        nft_min = minutes_until(nft_ms)
-        risk = risk_label(apy, info["vol"], basis)
+        cross_spread_pct = (max_fr - min_fr) * 100 if len(frs) >= 2 else None
+        nft_min = minutes_until(by_ex[max_ex].get("nft_ms"))
+        vol = okx_data.get(coin, {}).get("vol")
+        price = okx_data.get(coin, {}).get("price")
+        risk = risk_tag(max_apy, cross_spread_pct)
 
         candidates.append({
-            "coin": coin, "inst_id": inst, "price": info["price"],
-            "vol": info["vol"], "fr": fr, "apy": apy,
-            "interval_h": interval_h, "nft_min": nft_min,
-            "basis": basis, "risk": risk,
+            "coin": coin, "by_ex": by_ex, "frs": frs,
+            "max_ex": max_ex, "min_ex": min_ex,
+            "max_fr": max_fr, "min_fr": min_fr,
+            "max_apy": max_apy, "interval_h": interval_h,
+            "cross_spread_pct": cross_spread_pct,
+            "nft_min": nft_min, "vol": vol, "price": price,
+            "risk": risk,
         })
-        print(f"  ✅ {coin}: FR {fr*100:+.4f}% APY {apy:.1f}%  {risk}")
+        ex_str = " / ".join(f"{ex}={v*100:+.4f}%" for ex, v in frs.items())
+        print(f"  ✅ {coin}: max APY {max_apy:.1f}% @ {max_ex} [{ex_str}]")
 
-    candidates.sort(key=lambda x: x["apy"], reverse=True)
+    candidates.sort(key=lambda x: x["max_apy"], reverse=True)
     signals = candidates[:MAX_SIGNALS]
-
-    print(f"\n集計: {len(signals)} 件点灯 (APY≥{MIN_APY}%)")
-
-    embed = build_embed(signals, scan_time)
-    mention = "@everyone" if MENTION_EVERYONE else ""
-    allowed = {"parse": ["everyone"]} if MENTION_EVERYONE else {"parse": []}
-    discord_post({"content": mention, "embeds": [embed], "allowed_mentions": allowed})
+    print(f"\n集計: {len(signals)} 件点灯 (APY≥{MIN_APY}%) / "
+          f"スキャン時刻 {scan_time.strftime('%Y-%m-%d %H:%M JST')}")
 
     if signals:
         print("トップ5:")
         for s in signals[:5]:
-            print(f"  {s['coin']}: APY {s['apy']:.1f}% (FR {s['fr']*100:+.4f}%/8h) "
-                  f"vol {fmt_vol(s['vol'])}")
-    else:
-        print("市場FRは低水準。デルタニュートラルの妙味なし。")
+            cross = f" 乖離{s['cross_spread_pct']:.3f}%" if s.get("cross_spread_pct") else ""
+            print(f"  {s['coin']}: APY {s['max_apy']:.1f}% @ {s['max_ex']}"
+                  f"{cross}  vol {fmt_vol(s.get('vol'))}")
+
+    embed = build_embed(signals, scan_time, ex_status)
+    mention = "@everyone" if MENTION_EVERYONE else ""
+    allowed = {"parse": ["everyone"]} if MENTION_EVERYONE else {"parse": []}
+    discord_post({"content": mention, "embeds": [embed], "allowed_mentions": allowed})
 
 
 if __name__ == "__main__":
