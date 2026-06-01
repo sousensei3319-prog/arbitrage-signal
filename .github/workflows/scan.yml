@@ -2,8 +2,8 @@ name: Cross-Exchange Arb Signal
 
 on:
   schedule:
-    # 5分ごと。スプレッドは秒単位で動くが、シグナル(候補通知)目的なら5分で十分
-    - cron: '*/5 * * * *'
+    # 15分ごと (既存pump-screenerと同じ頻度)
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -17,31 +17,21 @@ jobs:
         with:
           python-version: '3.12'
 
-      # 依存なし(標準ライブラリのみ)。pip install 不要。
+      - name: Install matplotlib + japanize
+        run: pip install matplotlib japanize-matplotlib
 
-      - name: Run price spread scanner (①)
+      # ★ 統合シグナル (全スキャナーを1本に統合)
+      # Layer1: FGI + BTC方向 (マクロ環境)
+      # Layer2: ポンプ検知 + 再現性分析 (旧pump-screener相当)
+      # Layer3: FR5取引所 + ベーシス + OI + L/S (旧①②③相当)
+      - name: Run unified signal scanner
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '0'
-          NET_SPREAD_MIN: '0.5'
-          MAX_SPREAD: '25'
-          TARGET_NOTIONAL: '200'
-          MIN_VOLUME_24H: '1000000'
-        run: python screener.py
-
-      - name: Run FR delta-neutral scanner (②)
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          MENTION_EVERYONE: '0'
-          MIN_APY: '15'
-          MIN_VOL: '2000000'
-          MAX_BASIS_PCT: '5'
-        run: python fr_scanner.py
-
-      - name: Run integrated distortion dashboard (③)
-        env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          MENTION_EVERYONE: '0'
-          MIN_SCORE: '4'
-          MIN_VOL: '3000000'
-        run: python dashboard.py
+          PUMP_1H: '8'
+          PUMP_24H: '15'
+          MIN_VOLUME_24H: '2000000'
+          MIN_DISTORTION: '2'
+          MIN_TOTAL_SCORE: '4'
+          MAX_SIGNALS: '8'
+        run: python unified_signal.py
