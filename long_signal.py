@@ -630,8 +630,16 @@ def main():
           f"スキャン {scan_time.strftime('%Y-%m-%d %H:%M JST')}")
 
     # ── Discord ──
-    mention = "@everyone" if MENTION_EVERYONE else ""
-    allowed = {"parse":["everyone"]} if MENTION_EVERYONE else {"parse":[]}
+    # メンションは「個別銘柄シグナルあり」or「FGIが買い場に新規突入」時のみ。
+    # 地合い(C)が継続中なだけで毎回鳴らさない (通知疲れ防止)。
+    has_coin_signal = bool(signals)
+    c_fresh_cross = (ml["C"] and fgi is not None and fgi_prev is not None
+                     and fgi_prev > FGI_BUY and fgi <= FGI_BUY)
+    should_mention = MENTION_EVERYONE and (has_coin_signal or c_fresh_cross)
+    mention = "@everyone" if should_mention else ""
+    allowed = {"parse":["everyone"]} if should_mention else {"parse":[]}
+    if c_fresh_cross:
+        print("  → FGI買い場に新規突入 → メンション")
 
     macro_embed = build_macro_embed(fgi, fgi_label, fgi_prev, btc_chg, btc_price, ml, scan_time)
     rules_embed = build_rules_embed()
