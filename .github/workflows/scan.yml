@@ -31,9 +31,17 @@ jobs:
 
       - name: Run FR delta-neutral scanner (②)
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_FR }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '0'
           MIN_APY: '15'
           MIN_VOL: '2000000'
           MAX_BASIS_PCT: '5'
         run: python fr_scanner.py
+
+      - name: Run integrated distortion dashboard (③)
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MENTION_EVERYONE: '0'
+          MIN_SCORE: '4'
+          MIN_VOL: '3000000'
+        run: python dashboard.py
