@@ -55,6 +55,21 @@ MIN_VOLUME_24H = float(os.environ.get("MIN_VOLUME_24H", "1000000"))
 MAX_SIGNALS = int(os.environ.get("MAX_SIGNALS", "12"))
 # 安定 / ステーブル系は除外 (鞘がほぼ手数料に消える & 罠が多い)
 EXCLUDE_BASES = {"USDC", "DAI", "TUSD", "FDUSD", "USDD", "EUR", "USDE", "BUSD", "PYUSD"}
+# 株式・ETFトークン除外 (仮想通貨以外)
+STOCK_TOKENS = {
+    "AAPL","MSFT","GOOGL","GOOG","AMZN","META","NVDA","TSLA","AMD","INTC",
+    "IBM","ORCL","DELL","MU","SNDK","ARM","CRM","ADBE","NFLX","QCOM","TXN",
+    "AVGO","AMAT","LRCX","KLAC","MRVL","SMCI","HPE","HPQ","WDC","STX",
+    "COIN","HOOD","MSTR","MARA","RIOT","HUT","CLSK","CIFR","BTBT",
+    "COST","WMT","TGT","HD","LOW","NKE","SBUX","MCD",
+    "JPM","BAC","GS","MS","WFC","C","BLK","V","MA","PYPL",
+    "JNJ","PFE","MRNA","ABBV","LLY","UNH","CVS",
+    "XOM","CVX","COP","SLB","BP","SHEL",
+    "GE","CAT","BA","LMT","RTX","NOC","GD",
+    "QQQ","SPY","IWM","DIA","GLD","SLV","USO","TLT","HYG",
+    "SOXS","SOXX","FNGU","TQQQ","SQQQ",
+    "DRAM","CRCL","H","BIDU","BABA","JD","PDD","NIO","XPEV","LI",
+}
 
 
 # ============================================================
@@ -409,7 +424,7 @@ def main():
 
     prelim = []
     for base in all_bases:
-        if base in EXCLUDE_BASES:
+        if base in EXCLUDE_BASES or base in STOCK_TOKENS:
             continue
         quotes = []  # (name, bid, ask, vol)
         for name in alive:

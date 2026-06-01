@@ -22,6 +22,7 @@ Integrated Distortion Dashboard v1 (③統合ダッシュボード)
 CLAUDE.md ルール: 出力には必ずスキャン時刻(集計期間)を明記する。
 """
 
+import csv
 import json
 import os
 import sys
@@ -46,7 +47,32 @@ MENTION_EVERYONE    = os.environ.get("MENTION_EVERYONE", "0") == "1"
 MIN_SCORE       = int(os.environ.get("MIN_SCORE", "3"))       # 通知スコア下限
 MIN_VOL         = float(os.environ.get("MIN_VOL", "3000000")) # 24h出来高下限($)
 MAX_SIGNALS     = int(os.environ.get("MAX_SIGNALS", "10"))
-EXCLUDE         = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD"}
+CSV_PATH        = os.environ.get("CSV_PATH", "signals_log.csv")
+
+# ステーブルコイン除外
+EXCLUDE = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD"}
+
+# 株式・ETFトークン除外 (取引所が上場している現物株/ETFトークン)
+# これらは FR が異常高騰しやすいが仮想通貨ではない
+STOCK_TOKENS = {
+    # 米国株 テック
+    "AAPL","MSFT","GOOGL","GOOG","AMZN","META","NVDA","TSLA","AMD","INTC",
+    "IBM","ORCL","DELL","MU","SNDK","ARM","CRM","ADBE","NFLX","QCOM","TXN",
+    "AVGO","AMAT","LRCX","KLAC","MRVL","SMCI","HPE","HPQ","WDC","STX",
+    # 米国株 その他
+    "COIN","HOOD","MSTR","MARA","RIOT","HUT","CLSK","CIFR","BTBT",
+    "AAON","COST","WMT","TGT","HD","LOW","NKE","SBUX","MCD",
+    "JPM","BAC","GS","MS","WFC","C","BLK","V","MA","PYPL",
+    "JNJ","PFE","MRNA","ABBV","LLY","UNH","CVS",
+    "XOM","CVX","COP","SLB","BP","SHEL",
+    "GE","CAT","BA","LMT","RTX","NOC","GD",
+    "TSMC","TSM","SAMSUNG","005930",
+    # ETF・指数
+    "QQQ","SPY","IWM","DIA","GLD","SLV","USO","TLT","HYG",
+    "SOXS","SOXX","FNGU","TQQQ","SQQQ",
+    # その他株系トークン (取引所独自)
+    "DRAM","CRCL","H","BIDU","BABA","JD","PDD","NIO","XPEV","LI",
+}
 
 OKX_BASE    = "https://www.okx.com/api/v5"
 BYBIT_BASE  = "https://api.bybit.com/v5"
@@ -88,7 +114,7 @@ def get_okx_swap_tickers():
         if not t["instId"].endswith("-USDT-SWAP"):
             continue
         coin = t["instId"].replace("-USDT-SWAP", "")
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         last = safe_float(t.get("last"))
         vol  = (safe_float(t.get("volCcy24h")) or 0) * (last or 0)
@@ -303,6 +329,43 @@ def score_color(score):
 
 
 # ============================================================
+# CSV 記録
+# ============================================================
+CSV_HEADER = [
+    "timestamp_jst","coin","score","max_fr_pct","max_ex","apy_pct",
+    "basis_pct","oi_chg_pct","ls_ratio","spread_pct","vol_usd","reasons"
+]
+
+def append_csv(signals, scan_time):
+    """シグナルをCSVに追記。ファイルなければヘッダーを先に書く。"""
+    ts = scan_time.strftime("%Y-%m-%d %H:%M JST")
+    write_header = not os.path.exists(CSV_PATH) or os.path.getsize(CSV_PATH) == 0
+    try:
+        with open(CSV_PATH, "a", newline="", encoding="utf-8-sig") as f:
+            w = csv.writer(f)
+            if write_header:
+                w.writerow(CSV_HEADER)
+            for s in signals:
+                w.writerow([
+                    ts,
+                    s["coin"],
+                    s["score"],
+                    round(s["max_fr"] * 100, 4),
+                    s["max_ex"],
+                    round(s["max_apy"], 1),
+                    round(s["basis_pct"], 3) if s["basis_pct"] is not None else "",
+                    round(s["oi_chg"], 1) if s["oi_chg"] is not None else "",
+                    round(s["ls_ratio"], 2) if s["ls_ratio"] is not None else "",
+                    round(s["spread_pct"], 3) if s["spread_pct"] is not None else "",
+                    int(s["vol"]),
+                    " | ".join(s["reasons"]),
+                ])
+        print(f"  CSV追記: {len(signals)}件 → {CSV_PATH}")
+    except Exception as e:
+        print(f"  CSV書き込みエラー: {e}")
+
+
+# ============================================================
 # Discord
 # ============================================================
 def discord_post(payload):
@@ -503,6 +566,10 @@ def main():
                   f"APY{s['max_apy']:.0f}%  "
                   f"OI{s['oi_chg']:+.1f}%  L/S{s['ls_str']}"
                   f"  {', '.join(s['reasons'][:2])}")
+
+    # CSV に記録
+    if signals:
+        append_csv(signals, scan_time)
 
     embeds = build_embed(signals, scan_time)
     if isinstance(embeds, list):

@@ -44,7 +44,21 @@ MIN_APY             = float(os.environ.get("MIN_APY", "15"))       # 点灯APY�
 MIN_VOL_OKX         = float(os.environ.get("MIN_VOL", "2000000"))  # OKX 24h出来高下限($)
 MAX_BASIS_PCT       = float(os.environ.get("MAX_BASIS_PCT", "5"))  # ベーシス上限(%)
 MAX_SIGNALS         = int(os.environ.get("MAX_SIGNALS", "15"))
-EXCLUDE             = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD"}
+EXCLUDE      = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD"}
+STOCK_TOKENS = {
+    "AAPL","MSFT","GOOGL","GOOG","AMZN","META","NVDA","TSLA","AMD","INTC",
+    "IBM","ORCL","DELL","MU","SNDK","ARM","CRM","ADBE","NFLX","QCOM","TXN",
+    "AVGO","AMAT","LRCX","KLAC","MRVL","SMCI","HPE","HPQ","WDC","STX",
+    "COIN","HOOD","MSTR","MARA","RIOT","HUT","CLSK","CIFR","BTBT",
+    "COST","WMT","TGT","HD","LOW","NKE","SBUX","MCD",
+    "JPM","BAC","GS","MS","WFC","C","BLK","V","MA","PYPL",
+    "JNJ","PFE","MRNA","ABBV","LLY","UNH","CVS",
+    "XOM","CVX","COP","SLB","BP","SHEL",
+    "GE","CAT","BA","LMT","RTX","NOC","GD",
+    "QQQ","SPY","IWM","DIA","GLD","SLV","USO","TLT","HYG",
+    "SOXS","SOXX","FNGU","TQQQ","SQQQ",
+    "DRAM","CRCL","H","BIDU","BABA","JD","PDD","NIO","XPEV","LI",
+}
 
 OKX_BASE   = "https://www.okx.com/api/v5"
 BYBIT_BASE = "https://api.bybit.com/v5"
@@ -85,7 +99,7 @@ def fr_okx_bulk(vol_filter=True):
         if not t["instId"].endswith("-USDT-SWAP"):
             continue
         coin = t["instId"].replace("-USDT-SWAP", "")
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         last = safe_float(t.get("last")) or 0
         vol  = (safe_float(t.get("volCcy24h")) or 0) * last
@@ -117,7 +131,7 @@ def fr_bybit_bulk():
         if not sym.endswith("USDT"):
             continue
         coin = sym[:-4]
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         fr  = safe_float(t.get("fundingRate"))
         nft = safe_float(t.get("nextFundingTime"))
@@ -136,7 +150,7 @@ def fr_gate_bulk():
         if not name.endswith("_USDT"):
             continue
         coin = name[:-5]
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         fr  = safe_float(t.get("funding_rate"))
         nft_s = safe_float(t.get("funding_next_apply"))  # unix秒
@@ -159,7 +173,7 @@ def fr_mexc_bulk():
         if not sym.endswith("_USDT"):
             continue
         coin = sym[:-5]
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         fr  = safe_float(t.get("fundingRate"))
         nft = safe_float(t.get("nextSettleTime"))
@@ -179,7 +193,7 @@ def fr_bitget_bulk():
         if not sym.endswith("USDT"):
             continue
         coin = sym[:-4]
-        if coin in EXCLUDE:
+        if coin in EXCLUDE or coin in STOCK_TOKENS:
             continue
         fr  = safe_float(t.get("fundingRate"))
         nft = safe_float(t.get("nextFundingTime"))
