@@ -24,7 +24,7 @@ jobs:
       # Layer1: FGI + BTC方向 (マクロ環境)
       # Layer2: ポンプ検知 + 再現性分析 (旧pump-screener相当)
       # Layer3: FR5取引所 + ベーシス + OI + L/S (旧①②③相当)
-      - name: Run unified signal scanner
+      - name: Run unified signal scanner (ショート)
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '0'
@@ -35,3 +35,17 @@ jobs:
           MIN_TOTAL_SCORE: '4'
           MAX_SIGNALS: '8'
         run: python unified_signal.py
+
+      # ロング3戦略 (A踏み上げ / Bモメンタム / Cマクロ)
+      # FGIで各戦略を自動ON/OFF。ショートと排他的に機能する
+      - name: Run long signal scanner (ロング)
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MENTION_EVERYONE: '0'
+          MIN_VOLUME_24H: '3000000'
+          MIN_SCORE_A: '5'
+          MIN_SCORE_B: '5'
+          FGI_BUY: '30'
+          FGI_STRONG_BUY: '20'
+          MAX_SIGNALS: '6'
+        run: python long_signal.py
