@@ -487,7 +487,7 @@ def build_signal_embed(c, scan_time):
     fields.append({"name":"エントリープラン", "value":"\n".join(plan), "inline":False})
     fields.append({"name":"リンク",
         "value":(f"[CoinGlass](https://www.coinglass.com/ja/currencies/{c['coin']}) ・ "
-                 f"[いなごFlyer](https://inagoflyer.appspot.com/cmac) ・ "
+                 f"[SoSoValue](https://sosovalue.com/ja/coins/{c['coin'].lower()}) ・ "
                  f"[OKX](https://www.okx.com/trade-swap/{c['coin'].lower()}-usdt-swap)"),
         "inline":False})
     return {"title": f"{icon} {c['coin']}/USDT — {sname} スコア{score}/10",
