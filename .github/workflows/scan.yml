@@ -2,8 +2,9 @@ name: Cross-Exchange Arb Signal
 
 on:
   schedule:
-    # 15分ごと (既存pump-screenerと同じ頻度)
-    - cron: '*/15 * * * *'
+    # 15分ごと。:00/:15/:30/:45 はGitHub負荷ピークでドロップされやすいため
+    # 7分オフセット(7,22,37,52)に変更して発火信頼性を上げる
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -28,12 +29,13 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '1'
-          PUMP_1H: '8'
-          PUMP_24H: '15'
+          PUMP_1H: '6'
+          PUMP_24H: '12'
           MIN_VOLUME_24H: '2000000'
-          MIN_DISTORTION: '2'
-          MIN_TOTAL_SCORE: '4'
+          MIN_DISTORTION: '1'
+          MIN_TOTAL_SCORE: '3'
           MAX_SIGNALS: '8'
+          HT_API_TOKEN: ${{ secrets.HT_API_TOKEN }}
         run: python unified_signal.py
 
       # ロング3戦略 (A踏み上げ / Bモメンタム / Cマクロ)
@@ -43,9 +45,10 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '1'
           MIN_VOLUME_24H: '3000000'
-          MIN_SCORE_A: '5'
-          MIN_SCORE_B: '5'
+          MIN_SCORE_A: '4'
+          MIN_SCORE_B: '4'
           FGI_BUY: '30'
           FGI_STRONG_BUY: '20'
           MAX_SIGNALS: '6'
+          HT_API_TOKEN: ${{ secrets.HT_API_TOKEN }}
         run: python long_signal.py

@@ -54,6 +54,11 @@ try:
 except Exception:
     HAS_MPL = False
 
+try:
+    import hypertracker  # HL勝ち組L/S+清算クラスター確認 (任意)
+except Exception:
+    hypertracker = None
+
 JST = timezone(timedelta(hours=9))
 
 # ============================================================
@@ -74,6 +79,10 @@ MIN_SCORE_B = int(os.environ.get("MIN_SCORE_B", "5"))
 # C マクロ: FGI閾値
 FGI_STRONG_BUY = int(os.environ.get("FGI_STRONG_BUY", "20"))  # これ以下=強い買い場
 FGI_BUY        = int(os.environ.get("FGI_BUY", "30"))         # これ以下=買い場
+
+# HyperTracker確認: 高スコア銘柄のみ(予算100回/日を守る)
+HT_MIN_SCORE  = int(os.environ.get("HT_MIN_SCORE", "5"))   # これ以上のスコアだけHL確認
+HT_MAX_LOOKUPS= int(os.environ.get("HT_MAX_LOOKUPS", "2")) # 1実行あたり最大確認数
 
 EXCLUDE = {"USDC","DAI","TUSD","FDUSD","USDD","USDE","BUSD","PYUSD","BTC","ETH"}
 STOCK_TOKENS = {
@@ -683,9 +692,26 @@ def main():
     discord_post({"content":mention, "embeds":embeds_first[:10]+[rules_embed],
                  "allowed_mentions":allowed})
 
-    # 各銘柄 詳細+チャート
+    # HL確認対象を事前選定: 高スコア かつ HL上場銘柄のみ(404無駄打ち防止)
+    ht_targets = set()
+    if hypertracker:
+        hi = [c["coin"] for c in sorted(signals, key=lambda x:-x["score"])
+              if c["score"] >= HT_MIN_SCORE]
+        if hi:
+            ht_targets = set(hypertracker.hl_filter(hi)[:HT_MAX_LOOKUPS])
+            print(f"  HL確認対象: {ht_targets or 'なし'}")
+
+    # 各銘柄 詳細+チャート (+対象はHL確認)
     for c in signals:
         embed = build_signal_embed(c, scan_time)
+        if c["coin"] in ht_targets:
+            a = hypertracker.analyze(c["coin"])
+            if a:
+                txt = hypertracker.summary_text(a, "long")
+                if txt:
+                    embed["fields"].insert(2, {"name":"⚡HL確認(勝ち組L/S+清算)",
+                                               "value": txt, "inline": False})
+                    print(f"  ⚡HL {c['coin']}: {a['bias']}")
         png = render_chart(c["coin"], c["_c1h"], c["levels"])
         if png:
             fn=f"{c['coin']}_long.png"
