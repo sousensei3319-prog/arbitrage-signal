@@ -1,0 +1,48 @@
+name: FR Extreme Monitor
+
+on:
+  schedule:
+    # 30分ごと。:00/:30 はGitHub負荷ピークでドロップされやすいため11分オフセット
+    - cron: '11,41 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # ②FRアービ 点灯型モニター (標準ライブラリのみ・依存なし)
+      # A: 正FR極端 (デルタ中立キャリー) / B: 負FR極端 (FR PANICエッジ照合)
+      # C: 取引所間FR乖離 (perp-perp両建て・価格一致ゲート)
+      - name: Run FR extreme monitor
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MENTION_EVERYONE: '1'
+          MIN_APY_POS: '80'
+          MIN_APY_NEG: '200'
+          MIN_APY_CROSS: '150'
+          MIN_VOL: '2000000'
+          COOLDOWN_H: '8'
+        run: python fr_extreme_monitor.py
+
+      # クールダウン状態 + 発火履歴CSVをリポジトリに永続化
+      # (GH Actionsはステートレスなのでコミットバックが必要)
+      - name: Persist state and signal log
+        run: |
+          git config user.name "fr-monitor-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add fr_monitor_state.json fr_signals_log.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: FR monitor state $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin main || true
+            git push || echo "push failed (concurrent run race) - state persists next run"
+          fi
