@@ -75,10 +75,12 @@ STOCK_TOKENS = {
     "QQQ","SPY","IWM","DIA","GLD","SLV","USO","TLT","HYG",
     "SOXS","SOXX","FNGU","TQQQ","SQQQ",
     "DRAM","CRCL","H","BIDU","BABA","JD","PDD","NIO","XPEV","LI",
+    "SKHYNIX","TSMC","SAMSUNG",   # "STOCK"を含まない株トークン (実弾点灯で発見)
 }
 
 OKX_BASE    = "https://www.okx.com/api/v5"
-BYBIT_BASE  = "https://api.bybit.com/v5"
+# Bybit本体はGH Actions(US IP)から403で拒否されるためミラーへフォールバック
+BYBIT_HOSTS = ["https://api.bybit.com/v5", "https://api.bytick.com/v5"]
 GATE_BASE   = "https://api.gateio.ws/api/v4"
 MEXC_BASE   = "https://contract.mexc.com/api/v1"
 BITGET_BASE = "https://api.bitget.com/api/v2"
@@ -159,12 +161,28 @@ def load_okx():
     return out
 
 
+_bybit_host = [0]   # 直近成功ホストを記憶 (同一実行内の2回目以降の無駄打ち防止)
+
+
+def _bybit_fetch(path):
+    last_err = None
+    for i in range(len(BYBIT_HOSTS)):
+        idx = (_bybit_host[0] + i) % len(BYBIT_HOSTS)
+        try:
+            r = fetch(f"{BYBIT_HOSTS[idx]}{path}")
+            _bybit_host[0] = idx
+            return r
+        except Exception as e:
+            last_err = e
+    raise last_err
+
+
 def load_bybit():
-    data = fetch(f"{BYBIT_BASE}/market/tickers?category=linear")["result"]["list"]
+    data = _bybit_fetch("/market/tickers?category=linear")["result"]["list"]
     # FR間隔はinstruments-infoから (極端時はミーム銘柄が4h/1h間隔になるため必須)
     intervals = {}
     try:
-        info = fetch(f"{BYBIT_BASE}/market/instruments-info?category=linear&limit=1000")
+        info = _bybit_fetch("/market/instruments-info?category=linear&limit=1000")
         for it in info["result"]["list"]:
             m = safe_float(it.get("fundingInterval"))  # 分
             if m:
