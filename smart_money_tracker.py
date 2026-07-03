@@ -303,6 +303,7 @@ def render_chart(chart_specs, out_path="sm_chart.png"):
         ax.set_title(f"{coin} — {title} (7日 1h足, JST)", loc="left", fontsize=10)
         ax.grid(color="#e1e0d9", lw=0.6)
         ax.set_facecolor("#fcfcfb")
+        ax.tick_params(axis="x", labelsize=7, rotation=20)
         for s in ("top", "right"):
             ax.spines[s].set_visible(False)
     fig.tight_layout()

@@ -52,7 +52,7 @@ jobs:
           MIN_WALLETS: '3'
           MIN_POS_USD: '10000'
           COOLDOWN_H: '12'
-          VIP_MIN_POS_USD: '50000'
+          VIP_MIN_POS_USD: '100000'  # 「大きな動きのみ通知」方針 ($100k+)
           VIP_COOLDOWN_H: '6'
         run: python smart_money_tracker.py
 

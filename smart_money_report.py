@@ -171,6 +171,8 @@ def write_csv(res):
 
 
 def render_chart(res, out_path="sm_report.png"):
+    """4枚組: ①急上昇(根拠つき) ②主戦場 ③稼ぎ頭/損失源 ④日別代金。
+    embedの各セクションと1対1対応させ「どこを見て判別したか」を可視化する。"""
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -181,25 +183,68 @@ def render_chart(res, out_path="sm_report.png"):
             pass
     except ImportError:
         return None
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4), facecolor="#fcfcfb")
+    BLUE, RED, GRAY = "#2a78d6", "#e34948", "#898781"
+    fig, axes = plt.subplots(2, 2, figsize=(12, 7.6), facecolor="#fcfcfb")
 
+    # ① 急上昇: 棒の長さ=今週の代金、ラベルに根拠 (新規 or 前週比x・人数)
+    ax = axes[0][0]
     top = res["risers"][:8][::-1]
     if top:
         names = [r[0] for r in top]
-        axes[0].barh(names, [r[3] for r in top], color="#2a78d6")
-        axes[0].set_title("注目急上昇銘柄 (今週/前週の代金比)", loc="left", fontsize=10)
-        axes[0].set_xlabel("伸び率 (x)")
+        vals = [r[1] / 1e6 for r in top]
+        ax.barh(names, vals, color=BLUE)
+        for y, (coin, ntl, prev, ratio, nw) in enumerate(top):
+            tag = "新規" if prev < 10_000 else f"{ratio:.1f}x"
+            ax.text(ntl / 1e6, y, f" {tag}・{nw}人", va="center", fontsize=8,
+                    color="#52514e")
+        ax.set_xlim(0, max(vals) * 1.35)
+    ax.set_title("① 注目急上昇 = 今週$1M+ かつ 前週比で伸びた銘柄", loc="left", fontsize=10)
+    ax.set_xlabel("今週の売買代金 ($M)")
+
+    # ② 主戦場: 今週の代金上位
+    ax = axes[0][1]
+    tn = res["top_ntl"][:10][::-1]
+    if tn:
+        ax.barh([c for c, _ in tn], [v["ntl"] / 1e6 for _, v in tn], color=BLUE)
+        for y, (c, v) in enumerate(tn):
+            ax.text(v["ntl"] / 1e6, y, f" {len(v['w'])}人", va="center",
+                    fontsize=8, color="#52514e")
+    ax.set_title("② 今週の主戦場 = 売買代金の合計上位", loc="left", fontsize=10)
+    ax.set_xlabel("今週の売買代金 ($M)")
+
+    # ③ 稼ぎ頭/損失源: 実現PnL (青=利益 / 赤=損失)
+    ax = axes[1][0]
+    pnl_rows = ([(c, v["pnl"]) for c, v in res["top_pnl"] if v["pnl"] > 0] +
+                [(c, v["pnl"]) for c, v in res["worst_pnl"] if v["pnl"] < 0])
+    pnl_rows.sort(key=lambda r: r[1])
+    if pnl_rows:
+        colors = [BLUE if v > 0 else RED for _, v in pnl_rows]
+        ax.barh([c for c, _ in pnl_rows], [v / 1e6 for _, v in pnl_rows],
+                color=colors)
+        ax.axvline(0, color="#c3c2b7", lw=1)
+    ax.set_title("③ 稼ぎ頭/損失源 = 今週の実現PnL合計 (青=利益/赤=損失)",
+                 loc="left", fontsize=10)
+    ax.set_xlabel("実現PnL ($M)")
+
+    # ④ 日別代金 (活動量の推移。後半7日=今週が判定対象)
+    ax = axes[1][1]
     days = list(res["daily"].keys())
-    axes[1].bar(days, [v / 1e6 for v in res["daily"].values()],
-                color="#2a78d6", width=0.8)
-    axes[1].set_title("人間系スマートマネーの日別売買代金", loc="left", fontsize=10)
-    axes[1].set_ylabel("$M/日")
-    axes[1].tick_params(axis="x", rotation=60, labelsize=7)
-    for ax in axes:
-        ax.set_facecolor("#fcfcfb")
-        ax.grid(color="#e1e0d9", lw=0.6)
-        for s in ("top", "right"):
-            ax.spines[s].set_visible(False)
+    ax.bar(days, [v / 1e6 for v in res["daily"].values()], color=BLUE, width=0.8)
+    if len(days) > 7:
+        ax.axvline(len(days) - 7.5, color=GRAY, lw=1, ls="--")
+        ax.text(len(days) - 7.3, ax.get_ylim()[1] * 0.95, "← ここから今週",
+                fontsize=8, color="#52514e")
+    ax.set_title("④ 日別売買代金 (14日, 破線より右が判定対象の今週)",
+                 loc="left", fontsize=10)
+    ax.set_ylabel("$M/日")
+    ax.tick_params(axis="x", rotation=60, labelsize=7)
+
+    for row in axes:
+        for ax in row:
+            ax.set_facecolor("#fcfcfb")
+            ax.grid(color="#e1e0d9", lw=0.6)
+            for s in ("top", "right"):
+                ax.spines[s].set_visible(False)
     fig.tight_layout()
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
@@ -251,7 +296,8 @@ def main():
     res = analyze(rows)
     write_csv(res)
 
-    rise_lines = [f"**{c}** {r:.1f}x (今週${n/1e6:.1f}M, {w}人)"
+    rise_lines = [(f"**{c}** " + ("🆕新規" if p < 10_000 else f"{r:.1f}x")
+                   + f" (今週${n/1e6:.1f}M, {w}人)")
                   for c, n, p, r, w in res["risers"][:8]]
     ntl_lines = [f"{c}: ${v['ntl']/1e6:.1f}M ({len(v['w'])}人)"
                  for c, v in res["top_ntl"]]
@@ -273,10 +319,16 @@ def main():
              "value": "\n".join(ntl_lines)[:1000] or "-", "inline": True},
             {"name": "💰 今週の稼ぎ頭/損失源 (実現PnL)",
              "value": "\n".join(pnl_lines)[:1000] or "-", "inline": True},
+            {"name": "🔎 どこを見て判別しているか",
+             "value": (f"HL勝ち組の非Botウォレット{len(addrs)}人の直近14日の全約定 "
+                       "(公開API) を毎週取り直し、\n"
+                       "**急上昇** = 今週$1M以上 かつ 前週比で増加 (🆕=前週ゼロから登場)\n"
+                       "**稼ぎ頭** = 今週の実現PnL合計。添付チャート①〜④が各項目に対応"),
+             "inline": False},
             {"name": "使い方",
              "value": ("急上昇銘柄 = ローテーションの初動候補 → 監視リストへ。\n"
                        "稼ぎ頭 = いま効いている銘柄 (代金上位とは別物)。\n"
-                       "詳細は notebooks/smart_money_analysis.ipynb を再実行"),
+                       "生データ: data/smart_money/attention_screen.csv"),
              "inline": False},
         ],
         "footer": {"text": f"Smart Money Weekly | {now.strftime('%Y-%m-%d JST')} | "
