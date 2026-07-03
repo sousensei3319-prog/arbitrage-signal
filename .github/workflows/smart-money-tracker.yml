@@ -1,0 +1,73 @@
+name: Smart Money Tracker
+
+# ④スマートマネー追跡 点灯型シグナルBot
+# 上位ウォレットのポジション差分から「コンセンサス新規参入」を検知しDiscord通知。
+# 注意: schedule はデフォルトブランチ(main)にマージされてから有効になる。
+#       追跡アドレス (data/smart_money/leaderboard_top2000.csv) は
+#       smart-money.yml を月1回程度手動実行して更新すること。
+
+on:
+  schedule:
+    # 1時間ごと。:00 はGitHub負荷ピークでドロップされやすいため17分オフセット
+    # (scheduleはmainマージ後に有効)
+    - cron: '17 * * * *'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る。
+  # 初回実行は基準状態の保存のみでDiscord通知はしない)
+  push:
+    paths:
+      - 'smart_money_tracker.py'
+      - '.github/workflows/smart-money-tracker.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとstateコミットバックが競合するため直列化
+concurrency:
+  group: smart-money-tracker-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  track:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # チャート添付用 (無くてもテキスト通知は動く)
+      - name: Install matplotlib
+        run: pip install --quiet matplotlib matplotlib-fontja
+
+      - name: Run smart money tracker
+        env:
+          # スマートマネー専用Webhook (未設定なら共通DISCORD_WEBHOOK_URLに送る)
+          SMART_MONEY_WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          MENTION_EVERYONE: '1'
+          TRACK_N: '100'
+          MIN_WALLETS: '3'
+          MIN_POS_USD: '10000'
+          COOLDOWN_H: '12'
+          VIP_MIN_POS_USD: '100000'  # 「大きな動きのみ通知」方針 ($100k+)
+          VIP_COOLDOWN_H: '6'
+        run: python smart_money_tracker.py
+
+      # ポジション状態 + 発火履歴をコミットバック (fr-extreme.yml と同方式)
+      - name: Persist state and signal log
+        run: |
+          git config user.name "smart-money-bot"
+          git config user.email "actions@users.noreply.github.com"
+          # 注意: 2ファイルまとめてaddすると片方が未存在の時に全体が失敗する
+          # (pathspec不一致でgit addがabort) ため、必ず個別にaddする
+          git add -- smart_money_state.json 2>/dev/null || true
+          git add -- smart_money_signals_log.csv 2>/dev/null || true
+          git add -- smart_money_vip_log.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: smart money state $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          fi

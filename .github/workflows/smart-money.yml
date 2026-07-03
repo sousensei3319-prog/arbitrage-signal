@@ -1,0 +1,64 @@
+name: Smart Money Collect
+
+# ④スマートマネー追跡のデータ収集 (手動実行のみ)
+# DefiLlama全プロトコル + HLリーダーボード上位2000 + 上位N人のfills/ポジション
+# を取得し、実行したブランチにコミットバックする。
+# 定期実行はしない (データが重いため必要な時だけ回す)。
+# 軽量な定期監視は smart-money-tracker.yml 側で行う。
+
+on:
+  workflow_dispatch:
+    inputs:
+      fills_n:
+        description: 'fills取得アドレス数 (上位N人)'
+        default: '500'
+      fills_days:
+        description: 'fills遡り日数'
+        default: '30'
+      rank_window:
+        description: 'ランキング期間 (day/week/month/allTime)'
+        default: 'month'
+  # フィーチャーブランチのみのworkflowはdispatch登録されないため、
+  # 収集スクリプト自体の変更pushでも起動できるようにする
+  push:
+    paths:
+      - 'smart_money/collect_smart_money.py'
+
+permissions:
+  contents: write
+
+# 同時実行するとコミットバックが競合してデータが落ちるため直列化
+concurrency:
+  group: smart-money-collect-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 標準ライブラリのみ・依存なし
+      - name: Collect smart money data
+        env:
+          TOP_N_ADDRESSES: '2000'
+          FILLS_N: ${{ inputs.fills_n }}
+          FILLS_DAYS: ${{ inputs.fills_days }}
+          RANK_WINDOW: ${{ inputs.rank_window }}
+        run: python smart_money/collect_smart_money.py
+
+      - name: Commit data back
+        run: |
+          git config user.name "smart-money-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/smart_money
+          if ! git diff --cached --quiet; then
+            git commit -m "data: smart money collect $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed"
+          fi

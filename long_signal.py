@@ -633,6 +633,27 @@ def main():
 
     cand_A.sort(key=lambda x:x["score"], reverse=True)
     cand_B.sort(key=lambda x:x["score"], reverse=True)
+
+    # ④スマートマネー拒否権: HL勝ち組が大きくネットショートの銘柄はロングしない
+    # (勝者の総意への逆張りを守りで排除)。state無し/古い時は素通し。
+    try:
+        from smart_money.sm_filter import load_net_exposure, veto
+        sm_exp = load_net_exposure()
+        if sm_exp:
+            def _keep(cands):
+                kept = []
+                for c in cands:
+                    v, why = veto(c["coin"], "LONG", sm_exp)
+                    if v:
+                        print(f"  🛑 {c['coin']}: スマートマネー拒否権 ({why})")
+                    else:
+                        kept.append(c)
+                return kept
+            cand_A = _keep(cand_A)
+            cand_B = _keep(cand_B)
+    except Exception as e:
+        print(f"  SMフィルター無効: {type(e).__name__} {str(e)[:60]}")
+
     signals = (cand_A[:MAX_SIGNALS] + cand_B[:MAX_SIGNALS])
 
     print(f"\n集計: A{len(cand_A)}件 B{len(cand_B)}件  "
