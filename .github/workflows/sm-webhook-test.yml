@@ -1,0 +1,51 @@
+name: SM Webhook Test
+
+# スマートマネー通知先 (SMART_MONEY_WEBHOOK_URL) の疎通テスト。
+# Secrets登録後にこのファイルを更新push (またはmainマージ後はActionsから手動実行)
+# すると、新しい通知先へテストembedを1件送る。
+# SMART_MONEY_WEBHOOK_URL が未登録なら何も送らずその旨を表示するだけ。
+# test-seq: 1
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/sm-webhook-test.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Send test notification
+        env:
+          SMART_MONEY_WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, urllib.request
+          from datetime import datetime, timedelta, timezone
+          url = os.environ.get("SMART_MONEY_WEBHOOK_URL", "")
+          if not url:
+              print("SMART_MONEY_WEBHOOK_URL が未登録です。")
+              print("リポジトリ Settings > Secrets and variables > Actions >")
+              print("New repository secret で登録してください。")
+              raise SystemExit(0)
+          now = datetime.now(timezone(timedelta(hours=9)))
+          embed = {
+              "title": "✅ スマートマネー通知 疎通テスト",
+              "description": ("この通知が見えていれば設定完了です。\n"
+                              "今後このチャンネルに届くもの:\n"
+                              "・🐋 コンセンサス新規参入 (1hごと監視, チャート付き)\n"
+                              "・⭐ VIPウォレット ムーブ (チャート付き)\n"
+                              "・📈 週次レポート (月曜21:23 JST)"),
+              "color": 0x1BAF7A,
+              "footer": {"text": f"SM Webhook Test | {now:%Y-%m-%d %H:%M JST}"},
+          }
+          req = urllib.request.Request(
+              url, data=json.dumps({"embeds": [embed]}).encode(),
+              headers={"Content-Type": "application/json",
+                       "User-Agent": "sm-webhook-test/1.0"})
+          with urllib.request.urlopen(req, timeout=15):
+              pass
+          print("テスト通知を送信しました。")
+          EOF

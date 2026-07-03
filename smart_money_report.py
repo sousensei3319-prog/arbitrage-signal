@@ -22,6 +22,7 @@ Smart Money Weekly Report v1 (④スマートマネー追跡 — 週次ダイジ
 import csv
 import json
 import os
+import socket
 import sys
 import time
 import urllib.error
@@ -33,6 +34,9 @@ try:
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
     pass
+
+# urlopenのtimeout引数が効かない経路 (DNS等) への保険。ジョブハング防止
+socket.setdefaulttimeout(35)
 
 JST = timezone(timedelta(hours=9))
 
@@ -84,12 +88,21 @@ def load_humans():
     return addrs
 
 
+DEADLINE_MIN = float(os.environ.get("REPORT_DEADLINE_MIN") or "12")
+
+
 def fetch_fills_14d(addrs):
-    """直近14日の約定 [(addr, t_ms, coin, side, px, sz, closed_pnl)]"""
+    """直近14日の約定 [(addr, t_ms, coin, side, px, sz, closed_pnl)]。
+    DEADLINE_MIN分を超えたら打ち切り、取れた分で続行 (ジョブハング防止)。"""
     start_ms = int((time.time() - 14 * 86400) * 1000)
     sleep_s = 20.0 / HL_WEIGHT_PER_MIN * 60.0
+    deadline = time.time() + DEADLINE_MIN * 60
     rows, fail = [], 0
     for i, a in enumerate(addrs, 1):
+        if time.time() > deadline:
+            print(f"  ⚠️ デッドライン({DEADLINE_MIN:.0f}分)超過 — "
+                  f"{i-1}/{len(addrs)}人分で打ち切り")
+            break
         try:
             fills = _post_hl({"type": "userFillsByTime", "user": a,
                               "startTime": start_ms, "aggregateByTime": True})
@@ -101,8 +114,9 @@ def fetch_fills_14d(addrs):
         except Exception as e:
             fail += 1
             print(f"  [{i}/{len(addrs)}] {a[:10]}.. fail: {type(e).__name__}")
-        if i % 50 == 0:
-            print(f"  [{i}/{len(addrs)}] fills={len(rows)}")
+        if i % 25 == 0:
+            print(f"  [{i}/{len(addrs)}] fills={len(rows)} "
+                  f"経過{(time.time() - deadline + DEADLINE_MIN*60)/60:.1f}分", flush=True)
         time.sleep(sleep_s)
     print(f"fills: {len(rows)}件 (fail {fail}人)")
     return rows
@@ -268,11 +282,19 @@ def main():
         "footer": {"text": f"Smart Money Weekly | {now.strftime('%Y-%m-%d JST')} | "
                            "月1回 Smart Money Collect でリスト更新を忘れずに"},
     }
-    chart = render_chart(res)
+    # チャート/送信の失敗でもCSVコミットは生かす
+    chart = None
+    try:
+        chart = render_chart(res)
+    except Exception as e:
+        print(f"  チャート描画失敗: {type(e).__name__} {str(e)[:80]}")
     if chart:
         embed["image"] = {"url": f"attachment://{os.path.basename(chart)}"}
-    discord_post({"embeds": [embed], "allowed_mentions": {"parse": []}},
-                 image_path=chart)
+    try:
+        discord_post({"embeds": [embed], "allowed_mentions": {"parse": []}},
+                     image_path=chart)
+    except Exception as e:
+        print(f"  Discord送信失敗: {type(e).__name__} {str(e)[:80]}")
     print(f"送信完了: 急上昇{len(res['risers'])}銘柄"
           f"{' (チャート付き)' if chart else ''}。")
 

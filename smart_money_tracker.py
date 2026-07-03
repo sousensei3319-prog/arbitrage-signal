@@ -38,6 +38,7 @@ data/smart_money/leaderboard_top2000.csv (smart-money.yml が生成) の
 import csv
 import json
 import os
+import socket
 import sys
 import time
 import urllib.error
@@ -49,6 +50,9 @@ try:
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
     pass
+
+# urlopenのtimeout引数が効かない経路 (DNS等) への保険。ジョブハング防止
+socket.setdefaulttimeout(35)
 
 JST = timezone(timedelta(hours=9))
 
