@@ -302,8 +302,31 @@ def collect_fills_and_positions(top):
                ["address", "coin", "szi", "entry_px", "position_value",
                 "unrealized_pnl", "leverage", "leverage_type", "liq_px"],
                pos_rows)
+    write_tracked(targets, fill_rows)
     return {"fills_addresses_ok": ok, "fills_addresses_fail": fail,
             "fills": len(fill_rows), "positions": len(pos_rows)}
+
+
+def write_tracked(targets, fill_rows):
+    """tracker用の追跡リストを出力。約定間隔の中央値でBot(MM/HFT)を判定する。
+    Botの執行はパクれない(レイテンシ負け)ため、trackerは人間系を優先追跡する。"""
+    times = {}
+    for r in fill_rows:
+        times.setdefault(r[0], []).append(r[1])
+    rows = []
+    for t in targets:
+        a = t["address"]
+        ts = sorted(times.get(a, []))
+        gaps = [(b - c) / 1000 for b, c in zip(ts[1:], ts[:-1])]
+        med = sorted(gaps)[len(gaps) // 2] if gaps else ""
+        # 中央値60秒未満はBot/MM濃厚。約定10件未満は判定不能→人間扱い
+        is_bot = 1 if (gaps and len(ts) >= 10 and med < 60) else 0
+        rows.append([a, round(t[f"pnl_{RANK_WINDOW}"], 2),
+                     round(t["account_value"], 2), len(ts),
+                     round(med, 1) if med != "" else "", is_bot])
+    _write_csv(f"{OUT_DIR}/tracked_addresses.csv",
+               ["address", "pnl_rank_window", "account_value", "n_fills",
+                "median_gap_s", "is_bot"], rows)
 
 
 def collect_hl_meta():
