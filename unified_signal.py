@@ -727,6 +727,24 @@ def main():
         return
 
     candidates.sort(key=lambda x: x["score_total"], reverse=True)
+
+    # ④スマートマネー拒否権: HL勝ち組(追跡100人)が大きくネットロングの銘柄は
+    # ショートしない (勝者の総意への逆張りを守りで排除)。state無し/古い時は素通し。
+    try:
+        from smart_money.sm_filter import load_net_exposure, veto
+        sm_exp = load_net_exposure()
+        if sm_exp:
+            kept = []
+            for c in candidates:
+                v, why = veto(c["coin"], "SHORT", sm_exp)
+                if v:
+                    print(f"  🛑 {c['coin']}: スマートマネー拒否権 ({why})")
+                else:
+                    kept.append(c)
+            candidates = kept
+    except Exception as e:
+        print(f"  SMフィルター無効: {type(e).__name__} {str(e)[:60]}")
+
     signals = candidates[:MAX_SIGNALS]
 
     # Discord: マクロembedを1件目に、以降各銘柄embed+チャート

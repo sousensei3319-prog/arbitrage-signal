@@ -77,9 +77,17 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
   `docs/DEFILLAMA_GUIDE.md`。主な発見: 月間PnL上位の9割超はMM/HFT Bot（執行はパクれない）、
   PnLは上位100人に6割集中、代金上位と稼ぎ頭の銘柄は別物
 - **通知Bot**: `smart_money_tracker.py`（`smart-money-tracker.yml`, 1hごと）が
-  非Bot上位100人のポジション差分から「コンセンサス新規参入（3人以上・同一銘柄・同方向）」を
-  Discord通知。クールダウン12h、履歴は `smart_money_signals_log.csv`
-- ⚠️ シグナルは監視リスト入り候補。追随は常に彼らより悪い価格（RULES.md の合流原則で使う）
+  非Bot上位100人のポジション差分から「コンセンサス新規参入（3人以上・同一銘柄・同方向）」と
+  「⭐VIP（実現PnL上位8人, `vip_addresses.csv`）の単独大口ムーブ($50k+)」を
+  **7日足チャート付き**でDiscord通知。30日検証: +24h平均+1.4%・勝率60%。
+  履歴は `smart_money_signals_log.csv` / `smart_money_vip_log.csv`
+- **週次レポート**: `smart_money_report.py`（`smart-money-report.yml`, 月曜21:23 JST）が
+  人間系の直近14日から「注目急上昇銘柄」「主戦場（株式perp xyz:シェア含む）」「稼ぎ頭」を
+  チャート付き配信。ローテーション初動の定点観測
+- **拒否権フィルター**: `smart_money/sm_filter.py` — unified_signal/long_signal が
+  スマートマネーの合算ネットポジション($2M+)に逆らう候補を自動除外
+- Webhook: Secrets の `SMART_MONEY_WEBHOOK_URL`（未設定なら `DISCORD_WEBHOOK_URL`）
+- ⚠️ シグナルは監視リスト入り候補。追随は常に彼らより悪い価格（RULES.md ④の運用ルール参照）
 
 ## 次の段階（ロードマップ）
 

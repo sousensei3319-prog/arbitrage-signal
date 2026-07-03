@@ -38,15 +38,22 @@ jobs:
         with:
           python-version: '3.12'
 
-      # 標準ライブラリのみ・依存なし
+      # チャート添付用 (無くてもテキスト通知は動く)
+      - name: Install matplotlib
+        run: pip install --quiet matplotlib matplotlib-fontja
+
       - name: Run smart money tracker
         env:
+          # スマートマネー専用Webhook (未設定なら共通DISCORD_WEBHOOK_URLに送る)
+          SMART_MONEY_WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '1'
           TRACK_N: '100'
           MIN_WALLETS: '3'
           MIN_POS_USD: '10000'
           COOLDOWN_H: '12'
+          VIP_MIN_POS_USD: '50000'
+          VIP_COOLDOWN_H: '6'
         run: python smart_money_tracker.py
 
       # ポジション状態 + 発火履歴をコミットバック (fr-extreme.yml と同方式)
@@ -58,6 +65,7 @@ jobs:
           # (pathspec不一致でgit addがabort) ため、必ず個別にaddする
           git add -- smart_money_state.json 2>/dev/null || true
           git add -- smart_money_signals_log.csv 2>/dev/null || true
+          git add -- smart_money_vip_log.csv 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "chore: smart money state $(date -u +'%Y-%m-%d %H:%M')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
