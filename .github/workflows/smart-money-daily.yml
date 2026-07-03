@@ -1,29 +1,23 @@
-name: Smart Money Weekly Report
+name: Smart Money Daily Report
 
-# ④スマートマネー追跡 週次ダイジェスト
-# 人間系ウォレットの直近14日の約定から「注目急上昇銘柄」「主戦場」「稼ぎ頭」を
-# チャート付きでDiscord配信。attention_screen.csv をコミットバック。
+# ④スマートマネー追跡 デイリーダイジェスト (直近24h vs 前日24hの比較)
 # scheduleはmainマージ後に有効。
 
 on:
   schedule:
-    # 毎週月曜 21:23 JST (12:23 UTC)。週明けにローテーションを確認する想定
-    - cron: '23 12 * * 1'
+    # 毎日 21:07 JST (12:07 UTC)
+    - cron: '7 12 * * *'
   workflow_dispatch:
-  # フィーチャーブランチ上での動作検証用 (本体変更時に1回走る)
-  push:
-    paths:
-      - 'smart_money_report.py'
 
 permissions:
   contents: write
 
 concurrency:
-  group: smart-money-report-${{ github.ref }}
+  group: smart-money-daily-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  report:
+  daily:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -33,26 +27,26 @@ jobs:
         with:
           python-version: '3.12'
 
-      # チャート添付用 (無くてもテキスト通知は動く)
       - name: Install matplotlib
         run: pip install --quiet matplotlib matplotlib-fontja
 
-      - name: Run weekly report
+      - name: Run daily report
         env:
           SMART_MONEY_WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          REPORT_WINDOW_DAYS: '7'
+          REPORT_WINDOW_DAYS: '1'
+          MIN_RISE_USD: '250000'
           REPORT_N: '200'
-          MIN_RISE_USD: '1000000'
+          OUT_CSV: 'data/smart_money/attention_daily.csv'
         run: python smart_money_report.py
 
-      - name: Persist attention screen
+      - name: Persist daily screen
         run: |
           git config user.name "smart-money-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -- data/smart_money/attention_screen.csv 2>/dev/null || true
+          git add -- data/smart_money/attention_daily.csv 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "data: attention screen $(date -u +'%Y-%m-%d')"
+            git commit -m "data: attention daily $(date -u +'%Y-%m-%d')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed"
           fi

@@ -256,7 +256,8 @@ def log_vip(now, moves):
 def render_chart(chart_specs, out_path="sm_chart.png"):
     """シグナル銘柄の7日1h足チャートを1枚に描く (最大4銘柄)。
     matplotlib未導入なら None (通知はテキストのみで成立する設計)。
-    chart_specs: [(coin, タイトル文字列, entry_px or None)]"""
+    chart_specs: [(coin, タイトル文字列, entry_px or None, side "L"/"S"/None)]
+    エントリー描写: ロング=緑の上向き矢印(下から上)、ショート=赤の下向き矢印(上から下)"""
     try:
         import matplotlib
         matplotlib.use("Agg")
@@ -272,7 +273,8 @@ def render_chart(chart_specs, out_path="sm_chart.png"):
     specs = chart_specs[:4]
     candles = {}
     start = int((time.time() - 7 * 86400) * 1000)
-    for coin, _, _ in specs:
+    for spec in specs:
+        coin = spec[0]
         if coin in candles:
             continue
         try:
@@ -287,19 +289,32 @@ def render_chart(chart_specs, out_path="sm_chart.png"):
     if not specs:
         return None
 
+    GREEN, RED = "#0ca30c", "#e34948"
     fig, axes = plt.subplots(len(specs), 1, figsize=(8, 2.6 * len(specs)),
                              squeeze=False, facecolor="#fcfcfb")
     from datetime import datetime as _dt
-    for ax_row, (coin, title, entry) in zip(axes, specs):
+    for ax_row, (coin, title, entry, side) in zip(axes, specs):
         ax = ax_row[0]
         cs = candles[coin]
         ts = [_dt.fromtimestamp(c["t"] / 1000, tz=JST) for c in cs]
         close = [float(c["c"]) for c in cs]
         ax.plot(ts, close, color="#2a78d6", lw=1.6)
         if entry:
-            ax.axhline(entry, color="#e34948", lw=1, ls="--")
-            ax.text(ts[0], entry, f" entry {entry:g}", fontsize=8,
-                    color="#e34948", va="bottom")
+            col = GREEN if side == "L" else RED
+            ax.axhline(entry, color=col, lw=1, ls="--")
+            # エントリー矢印: ロング=下から上(緑) / ショート=上から下(赤)
+            lo, hi = min(close + [entry]), max(close + [entry])
+            span = (hi - lo) or entry * 0.01
+            x_arrow = ts[int(len(ts) * 0.9)]
+            d = span * 0.18
+            tail = entry - d if side == "L" else entry + d
+            ax.annotate("", xy=(x_arrow, entry), xytext=(x_arrow, tail),
+                        arrowprops=dict(color=col, width=2.2, headwidth=9,
+                                        headlength=7))
+            label = "LONG entry" if side == "L" else "SHORT entry"
+            ax.text(ts[0], entry, f" {label} {entry:g}", fontsize=8,
+                    color=col, va="bottom" if side == "L" else "top")
+            ax.set_ylim(lo - span * 0.25, hi + span * 0.25)
         ax.set_title(f"{coin} — {title} (7日 1h足, JST)", loc="left", fontsize=10)
         ax.grid(color="#e1e0d9", lw=0.6)
         ax.set_facecolor("#fcfcfb")
@@ -419,7 +434,7 @@ def main():
                      f"　└ {wallets}{more}")
         # チャートタイトルは絵文字なし (matplotlibのフォントに無いため)
         chart_specs.append((coin, f"{len(rows)}人 {'LONG' if side == 'L' else 'SHORT'}",
-                            avg_e))
+                            avg_e, side))
 
     vip_lines = []
     for a, kind, coin, side, usd, entry in sorted(vip_fire, key=lambda m: -m[4]):
@@ -429,7 +444,8 @@ def main():
                          + (f" @ {entry:g}" if entry else ""))
         if kind == "OPEN":
             chart_specs.append((coin, f"VIP {a[:8]} "
-                                f"{'LONG' if side == 'L' else 'SHORT'}", entry))
+                                f"{'LONG' if side == 'L' else 'SHORT'}",
+                                entry, side))
 
     exp_lines = []
     for coin, usd in net_exposure(cur_pos):

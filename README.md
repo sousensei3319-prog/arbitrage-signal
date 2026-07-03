@@ -81,9 +81,10 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
   「⭐VIP（実現PnL上位8人, `vip_addresses.csv`）の単独大口ムーブ($50k+)」を
   **7日足チャート付き**でDiscord通知。30日検証: +24h平均+1.4%・勝率60%。
   履歴は `smart_money_signals_log.csv` / `smart_money_vip_log.csv`
-- **週次レポート**: `smart_money_report.py`（`smart-money-report.yml`, 月曜21:23 JST）が
-  人間系の直近14日から「注目急上昇銘柄」「主戦場（株式perp xyz:シェア含む）」「稼ぎ頭」を
-  チャート付き配信。ローテーション初動の定点観測
+- **週次/デイリーレポート**: `smart_money_report.py`（週次=月曜21:23 JST /
+  デイリー=毎日21:07 JST）が今回窓vs前回窓の**比較**で「急上昇▲/手仕舞い▼」「主戦場」
+  「実現PnL」をチャート3枚（比較4枚組・時間帯ヒートマップ・現在ポジション）付き配信。
+  全体増減と増減銘柄数から資金集中（ファンダ発生の兆候）を自動判定
 - **拒否権フィルター**: `smart_money/sm_filter.py` — unified_signal/long_signal が
   スマートマネーの合算ネットポジション($2M+)に逆らう候補を自動除外
 - Webhook: Secrets の `SMART_MONEY_WEBHOOK_URL`（未設定なら `DISCORD_WEBHOOK_URL`）
