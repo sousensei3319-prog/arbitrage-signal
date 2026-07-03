@@ -1,9 +1,9 @@
 {
- "collected_at_utc": "2026-07-03T06:18:02.230628+00:00",
- "collected_at_jst": "2026-07-03T15:18:02.230645+09:00",
+ "collected_at_utc": "2026-07-03T11:30:55.419935+00:00",
+ "collected_at_jst": "2026-07-03T20:30:55.419945+09:00",
  "params": {
   "TOP_N_ADDRESSES": 2000,
-  "FILLS_N": 200,
+  "FILLS_N": 500,
   "FILLS_DAYS": 30,
   "RANK_WINDOW": "month",
   "MIN_ACCT_VALUE": 10000.0
@@ -11,16 +11,16 @@
  "counts": {
   "protocols": 7775,
   "chains": 455,
-  "dexs": 1191,
+  "dexs": 1193,
   "fees": 2363,
   "perp_coins": 231,
   "spot_pairs": 308,
-  "leaderboard_total": 40015,
+  "leaderboard_total": 40074,
   "leaderboard_saved": 2000,
-  "fills_addresses_ok": 200,
+  "fills_addresses_ok": 500,
   "fills_addresses_fail": 0,
-  "fills": 223889,
-  "positions": 1022
+  "fills": 427990,
+  "positions": 1989
  },
- "elapsed_sec": 454.8
+ "elapsed_sec": 968.2
 }
