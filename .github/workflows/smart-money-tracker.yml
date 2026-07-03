@@ -54,7 +54,10 @@ jobs:
         run: |
           git config user.name "smart-money-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add smart_money_state.json smart_money_signals_log.csv 2>/dev/null || true
+          # 注意: 2ファイルまとめてaddすると片方が未存在の時に全体が失敗する
+          # (pathspec不一致でgit addがabort) ため、必ず個別にaddする
+          git add -- smart_money_state.json 2>/dev/null || true
+          git add -- smart_money_signals_log.csv 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "chore: smart money state $(date -u +'%Y-%m-%d %H:%M')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
