@@ -44,7 +44,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '1'
           TRACK_N: '100'
-          MIN_WALLETS: '2'
+          MIN_WALLETS: '3'
           MIN_POS_USD: '10000'
           COOLDOWN_H: '12'
         run: python smart_money_tracker.py
