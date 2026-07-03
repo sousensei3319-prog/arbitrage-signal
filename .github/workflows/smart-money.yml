@@ -18,6 +18,11 @@ on:
       rank_window:
         description: 'ランキング期間 (day/week/month/allTime)'
         default: 'month'
+  # フィーチャーブランチのみのworkflowはdispatch登録されないため、
+  # 収集スクリプト自体の変更pushでも起動できるようにする
+  push:
+    paths:
+      - 'smart_money/collect_smart_money.py'
 
 permissions:
   contents: write
