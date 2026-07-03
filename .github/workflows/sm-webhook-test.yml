@@ -4,7 +4,7 @@ name: SM Webhook Test
 # Secrets登録後にこのファイルを更新push (またはmainマージ後はActionsから手動実行)
 # すると、新しい通知先へテストembedを1件送る。
 # SMART_MONEY_WEBHOOK_URL が未登録なら何も送らずその旨を表示するだけ。
-# test-seq: 1
+# test-seq: 2
 
 on:
   workflow_dispatch:
