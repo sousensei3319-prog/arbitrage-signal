@@ -27,6 +27,11 @@ on:
 permissions:
   contents: write
 
+# 同時実行するとコミットバックが競合してデータが落ちるため直列化
+concurrency:
+  group: smart-money-collect-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   collect:
     runs-on: ubuntu-latest

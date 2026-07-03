@@ -15,6 +15,11 @@ on:
 permissions:
   contents: write
 
+# 同時実行するとstateコミットバックが競合するため直列化
+concurrency:
+  group: smart-money-tracker-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   track:
     runs-on: ubuntu-latest
@@ -32,7 +37,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           MENTION_EVERYONE: '1'
           TRACK_N: '100'
-          MIN_WALLETS: '3'
+          MIN_WALLETS: '2'
           MIN_POS_USD: '10000'
           COOLDOWN_H: '12'
         run: python smart_money_tracker.py

@@ -54,7 +54,7 @@ DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL", "")
 MENTION_EVERYONE    = os.environ.get("MENTION_EVERYONE", "0") == "1"
 
 TRACK_N      = int(os.environ.get("TRACK_N") or "100")       # 追跡アドレス数
-MIN_WALLETS  = int(os.environ.get("MIN_WALLETS") or "3")     # コンセンサス閾値(人)
+MIN_WALLETS  = int(os.environ.get("MIN_WALLETS") or "2")     # コンセンサス閾値(人)。人間系は少数精鋭のため2 (検証: 3だと30日で0回)
 MIN_POS_USD  = float(os.environ.get("MIN_POS_USD") or "10000")  # ノイズ除外: この額未満の新規ポジは無視($)
 COOLDOWN_H   = float(os.environ.get("COOLDOWN_H") or "12")   # 同一銘柄・同方向の再通知間隔(h)
 ADDR_FILE    = os.environ.get("ADDR_FILE") or "data/smart_money/leaderboard_top2000.csv"
