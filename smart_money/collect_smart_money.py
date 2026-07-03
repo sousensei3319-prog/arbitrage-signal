@@ -57,12 +57,13 @@ JST = timezone(timedelta(hours=9))
 # ============================================================
 # Config (環境変数で調整可)
 # ============================================================
-TOP_N_ADDRESSES = int(os.environ.get("TOP_N_ADDRESSES", "2000"))  # リーダーボード保存数
-FILLS_N         = int(os.environ.get("FILLS_N", "200"))           # fills取得アドレス数
-FILLS_DAYS      = int(os.environ.get("FILLS_DAYS", "30"))         # fills遡り日数
-RANK_WINDOW     = os.environ.get("RANK_WINDOW", "month")          # day/week/month/allTime
-MIN_ACCT_VALUE  = float(os.environ.get("MIN_ACCT_VALUE", "10000"))# fills対象の最低口座残高($)
-OUT_DIR         = os.environ.get("OUT_DIR", "data/smart_money")
+# 環境変数は空文字で渡ってくることがある(pushイベント時のinputs等)ため `or` で防御
+TOP_N_ADDRESSES = int(os.environ.get("TOP_N_ADDRESSES") or "2000")   # リーダーボード保存数
+FILLS_N         = int(os.environ.get("FILLS_N") or "200")            # fills取得アドレス数
+FILLS_DAYS      = int(os.environ.get("FILLS_DAYS") or "30")          # fills遡り日数
+RANK_WINDOW     = os.environ.get("RANK_WINDOW") or "month"           # day/week/month/allTime
+MIN_ACCT_VALUE  = float(os.environ.get("MIN_ACCT_VALUE") or "10000") # fills対象の最低口座残高($)
+OUT_DIR         = os.environ.get("OUT_DIR") or "data/smart_money"
 
 LLAMA_BASE = "https://api.llama.fi"
 HL_INFO    = "https://api.hyperliquid.xyz/info"
