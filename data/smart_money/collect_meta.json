@@ -1,0 +1,26 @@
+{
+ "collected_at_utc": "2026-07-03T06:08:20.353412+00:00",
+ "collected_at_jst": "2026-07-03T15:08:20.353424+09:00",
+ "params": {
+  "TOP_N_ADDRESSES": 2000,
+  "FILLS_N": 200,
+  "FILLS_DAYS": 30,
+  "RANK_WINDOW": "month",
+  "MIN_ACCT_VALUE": 10000.0
+ },
+ "counts": {
+  "protocols": 7775,
+  "chains": 455,
+  "dexs": 1191,
+  "fees": 2363,
+  "perp_coins": 231,
+  "spot_pairs": 308,
+  "leaderboard_total": 40015,
+  "leaderboard_saved": 2000,
+  "fills_addresses_ok": 200,
+  "fills_addresses_fail": 0,
+  "fills": 223851,
+  "positions": 1021
+ },
+ "elapsed_sec": 397.6
+}
