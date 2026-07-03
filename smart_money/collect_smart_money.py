@@ -166,16 +166,21 @@ def collect_defillama():
     counts["chains"] = len(rows)
 
     # --- DEX / perp / 手数料 (dimensions API) ---
-    for kind, fname in [("dexs", "defillama_dexs.csv"),
-                        ("derivatives", "defillama_perps.csv"),
-                        ("fees", "defillama_fees.csv")]:
-        print(f"[llama] /overview/{kind} ...")
-        url = (f"{LLAMA_BASE}/overview/{kind}"
-               "?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true")
-        try:
-            ov = json.loads(_get(url))
-        except Exception as e:
-            print(f"  skip {kind}: {type(e).__name__} {str(e)[:80]}")
+    # perpは /overview/perps (新) → /overview/derivatives (旧) の順で試す
+    for kinds, fname in [(["dexs"], "defillama_dexs.csv"),
+                         (["perps", "derivatives"], "defillama_perps.csv"),
+                         (["fees"], "defillama_fees.csv")]:
+        ov, kind = None, kinds[0]
+        for k in kinds:
+            print(f"[llama] /overview/{k} ...")
+            url = (f"{LLAMA_BASE}/overview/{k}"
+                   "?excludeTotalDataChart=true&excludeTotalDataChartBreakdown=true")
+            try:
+                ov, kind = json.loads(_get(url)), k
+                break
+            except Exception as e:
+                print(f"  skip {k}: {type(e).__name__} {str(e)[:80]}")
+        if ov is None:
             continue
         rows = []
         for p in ov.get("protocols", []):
