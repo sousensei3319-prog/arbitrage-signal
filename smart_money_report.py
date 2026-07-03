@@ -48,6 +48,7 @@ JST = timezone(timedelta(hours=9))
 # ============================================================
 DISCORD_WEBHOOK_URL = (os.environ.get("SMART_MONEY_WEBHOOK_URL")
                        or os.environ.get("DISCORD_WEBHOOK_URL", ""))
+MENTION_EVERYONE = os.environ.get("MENTION_EVERYONE", "0") == "1"
 WINDOW_DAYS  = float(os.environ.get("REPORT_WINDOW_DAYS") or "7")  # 比較窓(日)
 REPORT_N     = int(os.environ.get("REPORT_N") or "200")            # 対象人数上限
 MIN_RISE_USD = float(os.environ.get("MIN_RISE_USD")
@@ -498,9 +499,11 @@ def main():
         for c in charts[1:]:
             embeds.append({"image": {"url": f"attachment://{os.path.basename(c)}"},
                            "color": 0x1BAF7A})
+    mention = "@everyone" if MENTION_EVERYONE else ""
+    allowed = {"parse": ["everyone"]} if MENTION_EVERYONE else {"parse": []}
     try:
-        discord_post({"embeds": embeds, "allowed_mentions": {"parse": []}},
-                     image_paths=charts)
+        discord_post({"content": mention, "embeds": embeds,
+                      "allowed_mentions": allowed}, image_paths=charts)
     except Exception as e:
         print(f"  Discord送信失敗: {type(e).__name__} {str(e)[:80]}")
     print(f"送信完了: 急上昇{len(res['risers'])}/減少{len(res['fallers'])}銘柄, "

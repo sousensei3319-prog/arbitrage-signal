@@ -40,6 +40,7 @@ jobs:
       - name: Run weekly report
         env:
           SMART_MONEY_WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL }}
+          MENTION_EVERYONE: '1'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPORT_WINDOW_DAYS: '7'
           REPORT_N: '200'
