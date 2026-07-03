@@ -9,8 +9,15 @@ name: Smart Money Tracker
 on:
   schedule:
     # 1時間ごと。:00 はGitHub負荷ピークでドロップされやすいため17分オフセット
+    # (scheduleはmainマージ後に有効)
     - cron: '17 * * * *'
   workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る。
+  # 初回実行は基準状態の保存のみでDiscord通知はしない)
+  push:
+    paths:
+      - 'smart_money_tracker.py'
+      - '.github/workflows/smart-money-tracker.yml'
 
 permissions:
   contents: write

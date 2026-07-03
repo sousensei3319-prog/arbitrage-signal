@@ -11,7 +11,7 @@ on:
     inputs:
       fills_n:
         description: 'fills取得アドレス数 (上位N人)'
-        default: '200'
+        default: '500'
       fills_days:
         description: 'fills遡り日数'
         default: '30'

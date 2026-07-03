@@ -59,7 +59,7 @@ JST = timezone(timedelta(hours=9))
 # ============================================================
 # 環境変数は空文字で渡ってくることがある(pushイベント時のinputs等)ため `or` で防御
 TOP_N_ADDRESSES = int(os.environ.get("TOP_N_ADDRESSES") or "2000")   # リーダーボード保存数
-FILLS_N         = int(os.environ.get("FILLS_N") or "200")            # fills取得アドレス数
+FILLS_N         = int(os.environ.get("FILLS_N") or "500")            # fills取得アドレス数 (500で人間系の母数を確保)
 FILLS_DAYS      = int(os.environ.get("FILLS_DAYS") or "30")          # fills遡り日数
 RANK_WINDOW     = os.environ.get("RANK_WINDOW") or "month"           # day/week/month/allTime
 MIN_ACCT_VALUE  = float(os.environ.get("MIN_ACCT_VALUE") or "10000") # fills対象の最低口座残高($)
