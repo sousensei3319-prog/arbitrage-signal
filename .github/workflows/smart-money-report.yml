@@ -43,7 +43,7 @@ jobs:
           MENTION_EVERYONE: '1'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPORT_WINDOW_DAYS: '7'
-          REPORT_N: '200'
+          REPORT_N: '400'  # 収集をFILLS_N=1000に拡大したのに合わせて母数を広げる
           MIN_RISE_USD: '1000000'
         run: python smart_money_report.py
 

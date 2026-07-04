@@ -72,7 +72,7 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 **戦場選び (DefiLlama) → 選球眼 (HLリーダーボード上位2000) → 手法解剖 → シグナル化** の4段。
 
 - **収集**: `smart-money.yml` を手動実行（月1目安）→ DefiLlama全プロトコル +
-  リーダーボード上位2000 + 上位200人の30日約定/現在ポジションを `data/smart_money/` にコミット
+  リーダーボード上位2000 + 上位1000人の30日約定/現在ポジションを `data/smart_money/` にコミット
 - **教材/分析**: `notebooks/smart_money_analysis.ipynb`（実行済みグラフ付き）と
   `docs/DEFILLAMA_GUIDE.md`。主な発見: 月間PnL上位の9割超はMM/HFT Bot（執行はパクれない）、
   PnLは上位100人に6割集中、代金上位と稼ぎ頭の銘柄は別物

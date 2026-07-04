@@ -11,7 +11,7 @@ on:
     inputs:
       fills_n:
         description: 'fills取得アドレス数 (上位N人)'
-        default: '500'
+        default: '1000'
       fills_days:
         description: 'fills遡り日数'
         default: '30'
@@ -35,7 +35,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v5
 
@@ -44,6 +44,8 @@ jobs:
           python-version: '3.12'
 
       # 標準ライブラリのみ・依存なし
+      # fills_n=1000で約22分(userFillsByTime weight20 x 1000 / 1000weight/min) +
+      # leaderboard/defillama取得で数分。45分タイムアウトに余裕を持たせる
       - name: Collect smart money data
         env:
           TOP_N_ADDRESSES: '2000'

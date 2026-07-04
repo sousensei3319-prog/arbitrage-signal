@@ -37,7 +37,7 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPORT_WINDOW_DAYS: '1'
           MIN_RISE_USD: '250000'
-          REPORT_N: '200'
+          REPORT_N: '400'  # 収集をFILLS_N=1000に拡大したのに合わせて母数を広げる
           OUT_CSV: 'data/smart_money/attention_daily.csv'
         run: python smart_money_report.py
 
