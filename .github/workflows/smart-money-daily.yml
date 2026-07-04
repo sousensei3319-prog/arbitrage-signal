@@ -37,8 +37,9 @@ jobs:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPORT_WINDOW_DAYS: '1'
           MIN_RISE_USD: '250000'
-          REPORT_N: '200'
+          REPORT_N: '400'  # 収集をFILLS_N=1000に拡大したのに合わせて母数を広げる
           OUT_CSV: 'data/smart_money/attention_daily.csv'
+          NEW_PROTOCOLS_CSV: 'data/smart_money/new_protocols_daily.csv'
         run: python smart_money_report.py
 
       - name: Persist daily screen
@@ -46,6 +47,7 @@ jobs:
           git config user.name "smart-money-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- data/smart_money/attention_daily.csv 2>/dev/null || true
+          git add -- data/smart_money/new_protocols_daily.csv 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "data: attention daily $(date -u +'%Y-%m-%d')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true

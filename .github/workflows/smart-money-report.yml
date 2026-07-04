@@ -43,8 +43,9 @@ jobs:
           MENTION_EVERYONE: '1'
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           REPORT_WINDOW_DAYS: '7'
-          REPORT_N: '200'
+          REPORT_N: '400'  # 収集をFILLS_N=1000に拡大したのに合わせて母数を広げる
           MIN_RISE_USD: '1000000'
+          NEW_PROTOCOLS_CSV: 'data/smart_money/new_protocols_weekly.csv'
         run: python smart_money_report.py
 
       - name: Persist attention screen
@@ -52,6 +53,7 @@ jobs:
           git config user.name "smart-money-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- data/smart_money/attention_screen.csv 2>/dev/null || true
+          git add -- data/smart_money/new_protocols_weekly.csv 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "data: attention screen $(date -u +'%Y-%m-%d')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true

@@ -39,9 +39,9 @@
 
 | ファイル | 役割 | 実行 |
 |---|---|---|
-| `smart_money/collect_smart_money.py` | 収集器: DefiLlama全プロトコル + HLリーダーボード上位2000 + 上位500人の30日約定/現在ポジション。約定間隔中央値<60秒でBot判定し `tracked_addresses.csv` 出力 | `smart-money.yml` **月1回手動** (Actionsから) |
+| `smart_money/collect_smart_money.py` | 収集器: DefiLlama全プロトコル + HLリーダーボード上位2000 + 上位1000人の30日約定/現在ポジション。約定間隔中央値<60秒でBot判定し `tracked_addresses.csv` 出力 | `smart-money.yml` **月1回手動** (Actionsから) |
 | `smart_money_tracker.py` | シグナルBot: 🐋コンセンサス新規参入 (非Bot 3人以上・同一銘柄・同方向・$10k+, CD12h) + ⭐VIP単独ムーブ (PnL上位8人・$100k+・新規/転換/クローズ, CD6h)。7日1h足チャート添付 (ロング=緑↑矢印/ショート=赤↓矢印でentry描写) | `smart-money-tracker.yml` 毎時:17 |
-| `smart_money_report.py` | 週次/デイリーレポート: 今回窓vs前回窓比較で急上昇▲/手仕舞い▼/主戦場/実現PnL。チャート3枚添付 (比較4枚組・時間帯ヒートマップ・現在ポジション)。全体増減%×増減銘柄数で「資金集中=ファンダ発生の可能性」を自動判定 | 週次=`smart-money-report.yml` 月曜21:23 JST / 日次=`smart-money-daily.yml` 毎日21:07 JST |
+| `smart_money_report.py` | 週次/デイリーレポート: 今回窓vs前回窓比較で急上昇▲/手仕舞い▼/主戦場/実現PnL。チャート3枚添付 (比較4枚組・時間帯ヒートマップ・現在ポジション)。全体増減%×増減銘柄数で「資金集中=ファンダ発生の可能性」を自動判定。DefiLlama新規上場 (直近14日・TVL$500k+) を検知する新戦場アラートも同梱 | 週次=`smart-money-report.yml` 月曜21:23 JST / 日次=`smart-money-daily.yml` 毎日21:07 JST |
 | `smart_money/sm_filter.py` | 拒否権フィルター: SM合算ネットポジション$2M+に逆らう候補を unified_signal(ショート)/long_signal(ロング) から自動除外。state無し/6h超は素通し | 両シグナルに統合済み |
 | `notebooks/smart_money_analysis.ipynb` | 教材ノート (24セル・グラフ13枚, 実行済み) | 手動 |
 | `docs/DEFILLAMA_GUIDE.md` | DefiLlama全機能マップ + 方法論 + 罠 | - |
@@ -59,7 +59,8 @@
 ### 実データで検証済みの知見 (2026-07-03, 30日窓)
 
 - HL=perp戦場の6割超。PnLは上位100人に6割集中
-- **月間PnL上位500人中337人はMM/HFT Bot** → 追跡は人間系のみ (Botの執行はパクれない)
+- **月間PnL上位500人中337人はMM/HFT Bot** (2026-07-03収集時点) → 追跡は人間系のみ
+  (Botの執行はパクれない)。2026-07-04にFILLS_N=1000へ拡大したので次回収集後に再確認
 - コンセンサスのイベントスタディ: **+24hで平均+1.4%・勝率60%** (n=51, ベースライン±0.2%)
 - 閾値は追跡母数に比例して変わる: 人間163人ではBot除外×3人=1.5回/日が実用域
   (×2人=5.5回/日で過多)。**収集のたびにノート§5のスイープで再確認**
