@@ -85,6 +85,8 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
   デイリー=毎日21:07 JST）が今回窓vs前回窓の**比較**で「急上昇▲/手仕舞い▼」「主戦場」
   「実現PnL」をチャート3枚（比較4枚組・時間帯ヒートマップ・現在ポジション）付き配信。
   全体増減と増減銘柄数から資金集中（ファンダ発生の兆候）を自動判定
+- **新戦場アラート**: 同レポート内でDefiLlama新規上場（直近14日・TVL$500k+）も検知し
+  「🆕新戦場アラート」欄に表示。`data/smart_money/new_protocols_{weekly,daily}.csv` に記録
 - **拒否権フィルター**: `smart_money/sm_filter.py` — unified_signal/long_signal が
   スマートマネーの合算ネットポジション($2M+)に逆らう候補を自動除外
 - Webhook: Secrets の `SMART_MONEY_WEBHOOK_URL`（未設定なら `DISCORD_WEBHOOK_URL`）
