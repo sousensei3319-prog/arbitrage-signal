@@ -63,6 +63,7 @@ LABEL = "週次" if WINDOW_DAYS >= 7 else "デイリー"
 CUR_L, PREV_L = ("今週", "前週") if WINDOW_DAYS >= 7 else ("今日", "前日")
 
 HL_INFO = "https://api.hyperliquid.xyz/info"
+HL_LEADERBOARD_URL = "https://app.hyperliquid.xyz/leaderboard"
 HL_WEIGHT_PER_MIN = 1000.0
 BLUE, RED, GRAY, GREEN = "#2a78d6", "#e34948", "#c3c2b7", "#0ca30c"
 
@@ -480,6 +481,13 @@ def main():
                        f"急上昇={CUR_L}${MIN_RISE_USD/1e6:g}M+かつ前回比1.3x+ / "
                        f"減少=前回${MIN_RISE_USD/1e6:g}M+が2/3未満に。\n"
                        "添付: [1]比較4枚組 [2]時間帯ヒートマップ [3]現在ポジション"),
+             "inline": False},
+            {"name": "🔎 ソース元",
+             "value": (f"データ: [Hyperliquid 公式リーダーボード]({HL_LEADERBOARD_URL}) の"
+                       "公開API (認証不要)\n"
+                       "対象ウォレット: `data/smart_money/tracked_addresses.csv` "
+                       "(月間PnL上位, 約定間隔からBot自動除外済み)\n"
+                       "集計ロジック: `smart_money_report.py` (GitHub Actions)"),
              "inline": False},
         ],
         "footer": {"text": f"Smart Money {LABEL} | {now.strftime('%Y-%m-%d %H:%M JST')}"
