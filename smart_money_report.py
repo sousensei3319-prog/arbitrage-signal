@@ -67,6 +67,12 @@ HL_LEADERBOARD_URL = "https://app.hyperliquid.xyz/leaderboard"
 HL_WEIGHT_PER_MIN = 1000.0
 BLUE, RED, GRAY, GREEN = "#2a78d6", "#e34948", "#c3c2b7", "#0ca30c"
 
+LLAMA_BASE = "https://api.llama.fi"
+LLAMA_PROTOCOLS_URL = "https://defillama.com/recent"  # 通知に載せる閲覧用URL
+NEW_LISTING_DAYS = float(os.environ.get("NEW_LISTING_DAYS") or "14")  # 新戦場の判定窓(日)
+MIN_NEW_TVL = float(os.environ.get("MIN_NEW_TVL") or "500000")  # ノイズ除外の下限TVL($)
+NEW_PROTOCOLS_CSV = os.environ.get("NEW_PROTOCOLS_CSV") or "data/smart_money/new_protocols.csv"
+
 
 def _post_hl(body, timeout=30, retries=3):
     data = json.dumps(body).encode()
@@ -82,6 +88,50 @@ def _post_hl(body, timeout=30, retries=3):
             if i == retries - 1:
                 raise
             time.sleep(2 ** (i + 1))
+
+
+def fetch_new_protocols():
+    """新戦場アラート: DefiLlama /protocols から直近NEW_LISTING_DAYS日以内に
+    新規上場 (listedAt) かつ MIN_NEW_TVL 以上のプロトコルを検知する。
+    DefiLlama Guide §1「Recent = 早期に触ると報われやすい戦場候補」に対応。
+    失敗しても他の集計は止めない (レポート全体を落とさない)。"""
+    try:
+        req = urllib.request.Request(
+            f"{LLAMA_BASE}/protocols",
+            headers={"User-Agent": "arb-signal/1.0"})
+        with urllib.request.urlopen(req, timeout=30) as r:
+            protos = json.loads(r.read())
+    except Exception as e:
+        print(f"  新戦場アラート取得失敗: {type(e).__name__} {str(e)[:80]}")
+        return []
+    cutoff = time.time() - NEW_LISTING_DAYS * 86400
+    rows = []
+    for p in protos:
+        listed = p.get("listedAt")
+        tvl = p.get("tvl") or 0
+        if not listed or listed < cutoff or tvl < MIN_NEW_TVL:
+            continue
+        rows.append({
+            "name": p.get("name", ""), "category": p.get("category", ""),
+            "chains": ";".join(p.get("chains", []) or [])[:40],
+            "tvl": tvl, "change_7d": p.get("change_7d"),
+            "listed_at": listed,
+        })
+    rows.sort(key=lambda r: -r["tvl"])
+    return rows
+
+
+def write_new_protocols_csv(rows):
+    if not rows:
+        return
+    with open(NEW_PROTOCOLS_CSV, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["name", "category", "chains", "tvl_usd", "change_7d_pct",
+                    "listed_at_unix"])
+        for r in rows:
+            w.writerow([r["name"], r["category"], r["chains"],
+                       round(r["tvl"]), r["change_7d"], int(r["listed_at"])])
+    print(f"wrote {NEW_PROTOCOLS_CSV} ({len(rows)} rows)")
 
 
 def load_humans():
@@ -449,6 +499,11 @@ def main():
     res = analyze(rows)
     write_csv(res)
 
+    new_protos = fetch_new_protocols()
+    write_new_protocols_csv(new_protos)
+    print(f"新戦場アラート: 直近{NEW_LISTING_DAYS:g}日以内の新規上場 "
+          f"{len(new_protos)}件 (TVL${MIN_NEW_TVL/1e6:g}M+)")
+
     rise_lines = [(f"**{c}** " + ("🆕新規" if p < 1e4 else f"▲{r:.1f}x")
                    + f" ({CUR_L}${n/1e6:.1f}M, {w}人)")
                   for c, n, p, r, w in res["risers"][:8]]
@@ -475,11 +530,20 @@ def main():
              "value": "\n".join(ntl_lines)[:1000] or "-", "inline": True},
             {"name": f"💰 実現PnL ({CUR_L})",
              "value": "\n".join(pnl_lines)[:1000] or "-", "inline": True},
+            {"name": f"🆕 新戦場アラート (直近{NEW_LISTING_DAYS:g}日以内の新規上場)",
+             "value": ("\n".join(
+                 f"[{r['name']}]({LLAMA_PROTOCOLS_URL}) ({r['category']}) "
+                 f"TVL${r['tvl']/1e6:.1f}M"
+                 + (f" 7日{r['change_7d']:+.0f}%" if r['change_7d'] is not None else "")
+                 for r in new_protos[:6])[:1000] or "該当なし"),
+             "inline": False},
             {"name": "🔎 どこを見て判別しているか",
              "value": (f"人間系{len(addrs)}人の直近{2*WINDOW_DAYS:g}日の全約定を取得し、"
                        f"{CUR_L}窓と{PREV_L}窓で比較。\n"
                        f"急上昇={CUR_L}${MIN_RISE_USD/1e6:g}M+かつ前回比1.3x+ / "
                        f"減少=前回${MIN_RISE_USD/1e6:g}M+が2/3未満に。\n"
+                       f"新戦場=DefiLlama上場{NEW_LISTING_DAYS:g}日以内・"
+                       f"TVL${MIN_NEW_TVL/1e6:g}M+ ([Recent一覧]({LLAMA_PROTOCOLS_URL}))。\n"
                        "添付: [1]比較4枚組 [2]時間帯ヒートマップ [3]現在ポジション"),
              "inline": False},
             {"name": "🔎 ソース元",
