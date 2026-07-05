@@ -1,0 +1,68 @@
+name: JP Stock 1m Collector
+
+# 日本株1分足コレクター (jp_stock_fetch.py)
+# Yahoo Financeの非公式チャートAPIから東証銘柄の1分足を取得し data/jp_stocks/ に差分蓄積。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチでの検証は push トリガーで代用 (本体/workflow変更時に1回走る)
+#   - このサンドボックス(Claude Code)からはYahooがproxyブロックで到達不可のため、
+#     実データ疎通の検証はこのランナー上の実行が初となる
+
+on:
+  schedule:
+    # 東証の立会時間 9:00-15:00 JST = 00:00-06:00 UTC の平日のみ。
+    # :00/:30 はGitHub負荷ピークでドロップされやすいため :23/:53 にオフセット。
+    # 各実行で直近5日分の1分足を取り直し重複排除するので、多少ドロップしても欠損しない。
+    - cron: '23,53 0-6 * * 1-5'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'jp_stock_fetch.py'
+      - '.github/workflows/jp-stock.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとCSVコミットバックが競合するため直列化
+concurrency:
+  group: jp-stock-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ) — pip installは不要
+      - name: Fetch JP stock 1m bars
+        env:
+          # 取得銘柄 (Yahoo Finance形式・カンマ区切り)。閾値/対象の調整はここのenvのみで行う
+          #   7203=トヨタ 6758=ソニーG 9984=SBG 6861=キーエンス 8035=東エレク
+          #   9983=ファストリ 8306=三菱UFJ 7974=任天堂
+          JP_TICKERS: '7203.T,6758.T,9984.T,6861.T,8035.T,9983.T,8306.T,7974.T'
+          RANGE: '5d'
+          INTERVAL: '1m'
+          FETCH_DEADLINE_MIN: '8'
+        run: python jp_stock_fetch.py
+
+      # 蓄積したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
+      # data/jp_stocks/ 配下をまとめてadd (ディレクトリ指定は未存在でもabortしない・念のため保護)
+      - name: Persist collected data
+        run: |
+          git config user.name "jp-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/jp_stocks 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: JP stock 1m data $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "新規バーなし (立会時間外/休場日/既に取得済み)"
+          fi
