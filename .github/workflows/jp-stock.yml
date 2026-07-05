@@ -50,6 +50,13 @@ jobs:
           FETCH_DEADLINE_MIN: '14'
         run: python jp_stock_fetch.py
 
+      # 収集した1分足から売買代金の異常集中をスクリーニング
+      # (data/jp_stocks/money_flow.{csv,json} を出力 → 資金の向き先を近似)
+      - name: Screen money flow
+        env:
+          WINDOW_MIN: '30'
+        run: python jp_money_flow.py
+
       # 蓄積したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
       # data/jp_stocks/ 配下をまとめてadd (ディレクトリ指定は未存在でもabortしない・念のため保護)
       - name: Persist collected data
