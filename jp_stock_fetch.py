@@ -51,8 +51,8 @@ JST = timezone(timedelta(hours=9))
 # Config (環境変数で調整可)
 # ============================================================
 DEFAULT_TICKERS = "7203.T,6758.T,9984.T"  # トヨタ/ソニーG/ソフトバンクG (サンプル)
-TICKERS = [t.strip() for t in
-           (os.environ.get("JP_TICKERS") or DEFAULT_TICKERS).split(",") if t.strip()]
+# 監視ユニバース: code列を持つCSV (name/bucket列は任意)。多数銘柄を扱う本命の入口。
+UNIVERSE_FILE = os.environ.get("UNIVERSE_FILE") or "data/jp_stocks/universe.csv"
 RANGE        = os.environ.get("RANGE") or "5d"
 INTERVAL     = os.environ.get("INTERVAL") or "1m"
 DATA_DIR     = os.environ.get("DATA_DIR") or "data/jp_stocks"
@@ -131,15 +131,36 @@ def append_bars(path, ticker, timestamps, quote, known):
     return len(new_rows)
 
 
+def load_tickers():
+    """取得対象を解決: JP_TICKERS(env) > UNIVERSE_FILE(code列) > DEFAULT_TICKERS。
+    universeのcodeは '7203' でも '7203.T' でも可 (.Tを自動補完)。"""
+    env = os.environ.get("JP_TICKERS")
+    if env:
+        return [t.strip() for t in env.split(",") if t.strip()]
+    if os.path.exists(UNIVERSE_FILE):
+        out = []
+        with open(UNIVERSE_FILE, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                code = (r.get("code") or "").strip()
+                if not code:
+                    continue
+                out.append(code if "." in code else code + ".T")
+        if out:
+            print(f"ユニバース {UNIVERSE_FILE} から {len(out)}銘柄")
+            return out
+    return [t.strip() for t in DEFAULT_TICKERS.split(",") if t.strip()]
+
+
 def main():
     os.makedirs(DATA_DIR, exist_ok=True)
+    tickers = load_tickers()
     deadline = time.time() + DEADLINE_MIN * 60
     total_new, fail = 0, 0
 
-    for i, ticker in enumerate(TICKERS, 1):
+    for i, ticker in enumerate(tickers, 1):
         if time.time() > deadline:
             print(f"⚠️ デッドライン({DEADLINE_MIN:.0f}分)超過 — "
-                  f"{i - 1}/{len(TICKERS)}銘柄で打ち切り")
+                  f"{i - 1}/{len(tickers)}銘柄で打ち切り")
             break
         safe_name = ticker.replace(".", "_")
         path = os.path.join(DATA_DIR, f"{safe_name}_{INTERVAL}.csv")
@@ -148,11 +169,11 @@ def main():
             known = existing_epochs(path)
             n = append_bars(path, ticker, timestamps, quote, known)
             total_new += n
-            print(f"[{i}/{len(TICKERS)}] {ticker}: 取得{len(timestamps)}本 / 新規{n}本追記")
+            print(f"[{i}/{len(tickers)}] {ticker}: 取得{len(timestamps)}本 / 新規{n}本追記")
         except (urllib.error.URLError, urllib.error.HTTPError,
                 ValueError, KeyError, TimeoutError) as e:
             fail += 1
-            print(f"[{i}/{len(TICKERS)}] {ticker}: 取得失敗 ({type(e).__name__}: {e})")
+            print(f"[{i}/{len(tickers)}] {ticker}: 取得失敗 ({type(e).__name__}: {e})")
         time.sleep(1)  # 連続リクエストでのブロック回避
 
     print(f"完了: 新規{total_new}本を{DATA_DIR}に保存 (失敗{fail}銘柄)")

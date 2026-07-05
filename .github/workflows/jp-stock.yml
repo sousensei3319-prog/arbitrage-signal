@@ -32,7 +32,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v5
 
@@ -43,13 +43,11 @@ jobs:
       # 依存なし (標準ライブラリのみ) — pip installは不要
       - name: Fetch JP stock 1m bars
         env:
-          # 取得銘柄 (Yahoo Finance形式・カンマ区切り)。閾値/対象の調整はここのenvのみで行う
-          #   7203=トヨタ 6758=ソニーG 9984=SBG 6861=キーエンス 8035=東エレク
-          #   9983=ファストリ 8306=三菱UFJ 7974=任天堂
-          JP_TICKERS: '7203.T,6758.T,9984.T,6861.T,8035.T,9983.T,8306.T,7974.T'
+          # 取得対象は data/jp_stocks/universe.csv (code列) で管理。
+          # 単発で上書きしたい時だけ JP_TICKERS='7203.T,...' を渡す。
           RANGE: '5d'
           INTERVAL: '1m'
-          FETCH_DEADLINE_MIN: '8'
+          FETCH_DEADLINE_MIN: '14'
         run: python jp_stock_fetch.py
 
       # 蓄積したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
