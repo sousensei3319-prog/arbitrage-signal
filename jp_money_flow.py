@@ -62,7 +62,8 @@ def load_universe():
                 if not code:
                     continue
                 sym = code if "." in code else code + ".T"
-                meta[sym] = (r.get("name") or sym, r.get("bucket") or "core")
+                meta[sym] = (r.get("name") or sym, r.get("bucket") or "core",
+                             (r.get("sector") or "").strip())
     return meta
 
 
@@ -113,7 +114,7 @@ def analyze():
     win_sec = WINDOW_MIN * 60
     recs = []
     latest_ts = 0
-    for sym, (name, bucket) in meta.items():
+    for sym, (name, bucket, sector) in meta.items():
         rows = load_bars(sym)
         if len(rows) < 5:
             continue
@@ -134,7 +135,7 @@ def analyze():
         last_c = rows[-1][1]
         pct = (last_c / first_c - 1) * 100 if first_c else 0.0
         recs.append({
-            "sym": sym, "name": name, "bucket": bucket,
+            "sym": sym, "name": name, "bucket": bucket, "sector": sector,
             "recent": recent, "baseline_med": med, "surge": surge, "z": z,
             "total_to": total_to, "last": last_c, "pct": pct,
         })
@@ -161,12 +162,12 @@ def analyze():
     recs_by_surge = sorted(recs, key=lambda r: -r["surge"])
     with open(OUT_CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["code", "name", "bucket", "surge_ratio", "zscore",
+        w.writerow(["code", "name", "bucket", "sector", "surge_ratio", "zscore",
                     "recent_turnover_yen", "baseline_median_yen",
                     "share_recent_pct", "share_base_pct", "share_delta_pp",
                     "last_close", "pct_window"])
         for r in recs_by_surge:
-            w.writerow([r["sym"], r["name"], r["bucket"],
+            w.writerow([r["sym"], r["name"], r["bucket"], r["sector"],
                         f'{r["surge"]:.3f}', f'{r["z"]:.2f}',
                         f'{r["recent"]:.0f}', f'{r["baseline_med"]:.0f}',
                         f'{r["share_recent"]:.3f}', f'{r["share_base"]:.3f}',
@@ -190,6 +191,7 @@ def _dump_json(recs, buckets, latest_ts):
         },
         "rows": [{
             "code": r["sym"], "name": r["name"], "bucket": r["bucket"],
+            "sector": r["sector"],
             "surge": round(r["surge"], 3), "z": round(r["z"], 2),
             "recent": round(r["recent"]), "share_recent": round(r["share_recent"], 3),
             "share_base": round(r["share_base"], 3), "share_delta": round(r["share_delta"], 3),
