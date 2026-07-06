@@ -174,13 +174,83 @@ def analyze():
                         f'{r["share_delta"]:+.3f}',
                         f'{r["last"]:.1f}', f'{r["pct"]:+.2f}'])
 
-    # ダッシュボード用JSON
-    _dump_json(recs_by_surge, buckets, latest_ts)
+    # 自動分析コメント (事実ベース) + ダッシュボード用JSON
+    commentary = _commentary(recs_by_surge, buckets, latest_ts)
+    _dump_json(recs_by_surge, buckets, latest_ts, commentary)
     _print_report(recs_by_surge, buckets, latest_ts)
+    print("\n--- 自動分析コメント ---")
+    for line in commentary:
+        print("  " + line)
     return recs_by_surge, buckets
 
 
-def _dump_json(recs, buckets, latest_ts):
+def _session_bars(sym, latest_ts):
+    """最新セッション(最新バーと同一JST日付)の (epoch,close,vol,turnover)。"""
+    day = datetime.fromtimestamp(latest_ts, JST).strftime("%Y-%m-%d")
+    return [row for row in load_bars(sym)
+            if datetime.fromtimestamp(row[0], JST).strftime("%Y-%m-%d") == day]
+
+
+def _peak_window(bars, win_sec=1800):
+    """売買代金が最も集中した win_sec 窓を返す: (開始epoch, 窓内代金, 株価変化%)。"""
+    if len(bars) < 2:
+        return None
+    best = None
+    for i, (e0, c0, _v, _to) in enumerate(bars):
+        s = 0.0; c_end = c0
+        for e, c, _v2, to in bars[i:]:
+            if e - e0 > win_sec:
+                break
+            s += to; c_end = c
+        chg = (c_end / c0 - 1) * 100 if c0 else 0.0
+        if best is None or s > best[1]:
+            best = (e0, s, chg)
+    return best
+
+
+def _commentary(recs, buckets, latest_ts):
+    """算出可能な事実のみで日本語コメントを組み立てる (捏造しない)。"""
+    lines = []
+    if not recs or not latest_ts:
+        return ["データ不足のため分析なし。"]
+    hhmm = lambda e: datetime.fromtimestamp(e, JST).strftime("%H:%M")
+    tot_recent = sum(b["recent"] for b in buckets.values()) or 1.0
+    top_bucket = max(buckets.items(), key=lambda kv: kv[1]["recent"])
+    bshare = top_bucket[1]["recent"] / tot_recent * 100
+    total_recent = sum(r["recent"] for r in recs)
+    lines.append(f"直近{WINDOW_MIN}分の売買代金は全体で {_yen(total_recent)}。"
+                 f"最も資金が寄っているのは「{BUCKET_LABEL.get(top_bucket[0],top_bucket[0])}」層で全体の {bshare:.0f}%。")
+
+    # 上位集中銘柄の時間帯と値動き
+    strong = [r for r in recs if r["surge"] >= 1.5][:3]
+    for r in strong:
+        pk = _peak_window(_session_bars(r["sym"], latest_ts))
+        when = f"{hhmm(pk[0])}頃から" if pk else "本セッションで"
+        move = f"（同時間帯で株価 {pk[2]:+.1f}%）" if pk else ""
+        lines.append(f"{r['name']}（{r['sector']}）: 集中度 {r['surge']:.1f}x。{when}売買代金が集中{move}。")
+
+    # 業種クラスタ (同一業種で複数が平常比プラス)
+    sect = {}
+    for r in recs:
+        if r["surge"] >= 1.3 and r["share_delta"] > 0:
+            sect.setdefault(r["sector"], []).append(r["name"])
+    clusters = sorted([(s, v) for s, v in sect.items() if len(v) >= 2], key=lambda x: -len(x[1]))
+    if clusters:
+        s, names = clusters[0]
+        lines.append(f"業種では「{s}」に資金が広がっている（{len(names)}銘柄が平常比プラス: {'・'.join(names[:4])}）。")
+
+    # 急伸 (勢い) — momentum は share_delta を代理指標として上位を提示
+    movers = sorted([r for r in recs if r["share_delta"] >= 0.3], key=lambda r: -r["share_delta"])[:3]
+    if movers:
+        lines.append("シェア急伸: " + " / ".join(f"{r['name']} +{r['share_delta']:.2f}pp" for r in movers) + "。")
+
+    # 正直な限界 (捏造回避)
+    lines.append("※きっかけ（ニュース等）・信用残・空売り需給は本データに含まれず未検証。"
+                 "反転/ショートスクイーズ等の判断は材料未装備のため本コメントでは断定しない。投資助言ではない。")
+    return lines
+
+
+def _dump_json(recs, buckets, latest_ts, commentary=None):
     import json
     tot_recent = sum(b["recent"] for b in buckets.values()) or 1.0
     payload = {
@@ -189,6 +259,7 @@ def _dump_json(recs, buckets, latest_ts):
             "latest": datetime.fromtimestamp(latest_ts, JST).strftime("%Y-%m-%d %H:%M") if latest_ts else "-",
             "n": len(recs),
         },
+        "commentary": commentary or [],
         "rows": [{
             "code": r["sym"], "name": r["name"], "bucket": r["bucket"],
             "sector": r["sector"],
