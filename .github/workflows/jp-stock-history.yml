@@ -1,0 +1,59 @@
+name: JP Stock History (daily/weekly/monthly)
+
+# 週足・月足および長期日足チャート/集計窓のためのデータ収集。
+# jp_stock_fetch.py を INTERVAL/RANGE を変えて3回呼び、
+#   {code}_1d.csv (日足2年) / {code}_1wk.csv (週足5年) / {code}_1mo.csv (月足max)
+# を data/jp_stocks/ に差分蓄積する (1分足コレクターとは別サイクル)。
+# 日/週/月足は場中に動かないので1日1回 (引け後) で十分。
+
+on:
+  schedule:
+    # 東証引け(15:30 JST=06:30 UTC)の後。:00/:30 を避け 07:33 UTC (16:33 JST)。平日。
+    - cron: '33 7 * * 1-5'
+  workflow_dispatch:
+  # フィーチャーブランチ検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'jp_stock_fetch.py'
+      - '.github/workflows/jp-stock-history.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jp-stock-history-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ)。取得対象は data/jp_stocks/universe.csv
+      - name: Fetch daily bars (2y)
+        env: { INTERVAL: '1d',  RANGE: '2y',  FETCH_DEADLINE_MIN: '6' }
+        run: python jp_stock_fetch.py
+      - name: Fetch weekly bars (5y)
+        env: { INTERVAL: '1wk', RANGE: '5y',  FETCH_DEADLINE_MIN: '6' }
+        run: python jp_stock_fetch.py
+      - name: Fetch monthly bars (max)
+        env: { INTERVAL: '1mo', RANGE: 'max', FETCH_DEADLINE_MIN: '6' }
+        run: python jp_stock_fetch.py
+
+      - name: Persist collected data
+        run: |
+          git config user.name "jp-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/jp_stocks 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: JP stock history (d/w/m) $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "新規バーなし"
+          fi

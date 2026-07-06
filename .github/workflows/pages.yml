@@ -1,0 +1,60 @@
+name: Deploy Dashboard (GitHub Pages)
+
+# 資金集中ダッシュボードを自動生成して GitHub Pages に配信する。
+# 収集(JP Stock 1m Collector)が完了するたびに再ビルド → 「開けば最新」になる。
+# schedule はバックアップ (引け後1回)。dispatch で手動再デプロイも可。
+
+on:
+  workflow_run:
+    workflows: ["JP Stock 1m Collector"]
+    types: [completed]
+  workflow_dispatch:
+  schedule:
+    - cron: '37 6 * * 1-5'   # 引け(06:30 UTC)後のバックアップ
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# デプロイは直列化 (同時実行不可)
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 最新の売買代金スクリーナー + 自動分析コメントを再計算 (money_flow.json)
+      - name: Run money-flow screener
+        env:
+          WINDOW_MIN: '30'
+        run: python jp_money_flow.py || echo "screener skipped (no data yet)"
+
+      # 収集済みCSV + コメントから site/index.html を生成
+      - name: Build dashboard HTML
+        run: python dashboard/build_dashboard.py
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
