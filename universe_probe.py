@@ -122,32 +122,39 @@ def probe_jpx_listed_all():
             f.write(body2)
         ok = try_open_excel("/tmp/data_j_probe.bin")
         if ok:
-            # 規模区分列・33業種区分列の値の分布を見る (列位置は不明なので全列を軽くダンプして人力確認)
-            print("\n  --- 規模区分/業種区分の値サンプル (列名探索) ---")
+            # 規模区分列・33業種区分列の値の分布を見る (xlrd経路。openpyxlはこの形式を開けないため)
+            print("\n  --- 規模区分/33業種区分の値サンプル (xlrd経路) ---")
             try:
-                import openpyxl
-                wb = openpyxl.load_workbook("/tmp/data_j_probe.bin", read_only=True)
-                ws = wb[wb.sheetnames[0]]
-                rows_iter = ws.iter_rows(values_only=True)
-                header = next(rows_iter)
+                import xlrd
+                from collections import Counter
+                wb = xlrd.open_workbook("/tmp/data_j_probe.bin")
+                ws = wb.sheet_by_index(0)
+                header = ws.row_values(0)
                 print("   header:", header)
-                size_col = None
-                for ci, h in enumerate(header):
-                    if h and "規模" in str(h):
-                        size_col = ci
+                size_col = next((i for i, h in enumerate(header) if "規模" in str(h) and "コード" not in str(h)), None)
+                sector_col = next((i for i, h in enumerate(header) if h == "33業種区分"), None)
+                market_col = next((i for i, h in enumerate(header) if "市場" in str(h)), None)
+                print(f"   規模区分列={size_col}, 33業種区分列={sector_col}, 市場区分列={market_col}")
+                size_cnt, market_cnt = Counter(), Counter()
+                for i in range(1, ws.nrows):
+                    row = ws.row_values(i)
+                    if size_col is not None and len(row) > size_col:
+                        size_cnt[row[size_col]] += 1
+                    if market_col is not None and len(row) > market_col:
+                        market_cnt[row[market_col]] += 1
+                print(f"   規模区分 値分布(全{ws.nrows - 1}行):", dict(size_cnt))
+                print(f"   市場・商品区分 値分布:", dict(market_cnt))
                 if size_col is not None:
-                    from collections import Counter
-                    cnt = Counter()
-                    n = 0
-                    for row in rows_iter:
-                        if len(row) > size_col:
-                            cnt[row[size_col]] += 1
-                        n += 1
-                        if n > 5000:
-                            break
-                    print(f"   規模区分(列{size_col})の値分布(先頭5000行):", dict(cnt))
+                    topix500_n = sum(v for k, v in size_cnt.items()
+                                      if str(k) in ("TOPIX Core30", "TOPIX Large70", "TOPIX Mid400"))
+                    print(f"   仮説検証: Core30+Large70+Mid400 の合計行数 = {topix500_n} (500に近いか？)")
+                # 33業種区分のサンプル(ユニーク値)
+                if sector_col is not None:
+                    sectors = sorted({ws.row_values(i)[sector_col] for i in range(1, ws.nrows)
+                                       if len(ws.row_values(i)) > sector_col})
+                    print(f"   33業種区分ユニーク値数={len(sectors)}: {sectors}")
             except Exception as e:
-                print(f"   列探索失敗(openpyxl経路): {type(e).__name__}: {e}")
+                print(f"   列探索失敗(xlrd経路): {type(e).__name__}: {e}")
     except Exception as e:
         print(f"ダウンロード失敗: {type(e).__name__}: {e}")
 
@@ -168,9 +175,12 @@ def probe_nikkei225():
                 for enc in ("cp932", "utf-8", "shift_jis"):
                     try:
                         text = body.decode(enc)
-                        lines = text.splitlines()
-                        print(f"  デコード成功 enc={enc}, 行数={len(lines)}")
-                        for l in lines[:8]:
+                        lines = [l for l in text.splitlines() if l.strip()]
+                        print(f"  デコード成功 enc={enc}, 行数(空行除く)={len(lines)}, データ行数={len(lines)-1}")
+                        for l in lines[:5]:
+                            print("   ", l)
+                        print("   ...")
+                        for l in lines[-3:]:
                             print("   ", l)
                         break
                     except UnicodeDecodeError:
