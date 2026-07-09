@@ -95,22 +95,32 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 ## ⑤ 日本株 資金集中スクリーナー（`jp_stock_fetch.py` 他） — 全自動稼働中
 
 暗号資産とは別軸。Yahoo Finance の非公式チャートAPIを標準ライブラリのみで叩き、
-日本株46銘柄（leader/core/hot の3バケット）の1分足〜月足を `data/jp_stocks/` にCSV蓄積し、
-売買代金の異常集中をスクリーニングして GitHub Pages のダッシュボードとして常時公開する
-（yfinance等の外部ライブラリ不使用）。
+日本株 **約500銘柄（TOPIX500＋日経225＋話題枠、leader/core/hot の3バケット）** の
+1分足〜月足を `data/jp_stocks/` にCSV蓄積し、売買代金の異常集中をスクリーニングして
+GitHub Pages のダッシュボードとして常時公開する（yfinance等の外部ライブラリ不使用）。
 
-- **収集**: `jp_stock_fetch.py` が `data/jp_stocks/universe.csv`（code,name,bucket,sector）
-  駆動で全銘柄の1分足を取得。1分足はAPI側の制限で直近5〜7日分しか返らないため、
-  定期実行して重複タイムスタンプを除いた差分だけ追記することで、実行間隔を超えた
-  連続履歴を自前で積み上げる設計。`INTERVAL`/`RANGE` を変えて日足(2年)/週足(5年)/
-  月足(max)も別workflowで収集
+- **ユニバース**: `universe_refresh.py` が JPX「東証上場銘柄一覧」（規模区分
+  Core30/Large70/Mid400 → TOPIX500）と日経公式の構成銘柄ウエイトCSV（→日経225）から
+  `data/jp_stocks/universe.csv` を機械的に再構築（月1回 `universe-refresh.yml`）。
+  話題枠(hot)は手動シードを温存。手打ちでの銘柄追加は不要
+- **収集**: `jp_stock_fetch.py` が universe.csv（code,name,bucket,sector）駆動で
+  全銘柄の1分足を取得。通常巡回は `RANGE=1d`（当日分のみ・約4分/497銘柄実測）で
+  30分間隔に収め、日をまたぐ欠損は引け後の `RANGE=5d` 追取りで回収。
+  429検知時は自動でスリープを延長（適応的バックオフ）。`INTERVAL`/`RANGE` を変えて
+  日足(2年)/週足(5年)/月足(max)も同じ引け後workflowで収集
+- **ストレージ**: `jp_stock_rotate.py` が1分足ライブファイルを直近7営業日に切り詰め、
+  溢れた分を月次gzipアーカイブ（`{code}_T_1m_YYYYMM.csv.gz`）へ退避（引け後に自動実行）。
+  スクリーナー/ダッシュボードはライブ窓だけで動き、アーカイブは後検証用
 - **スクリーナー**: `jp_money_flow.py` が直近窓 vs 履歴中央値で売買代金の集中度を算出し、
   事実ベースの自動分析コメント付きで `data/jp_stocks/money_flow.{csv,json}` を出力
+  （497銘柄で1秒未満）
 - **ダッシュボード**: `dashboard/build_dashboard.py` + `dashboard/template.html` が
-  収集済みCSV+分析コメントから `site/index.html`（銘柄セレクタ・チャート足切替・
-  急騰アラート付きの単一HTML）を生成し、GitHub Pages に自動デプロイ
+  `site/index.html`（ランキング・ヒート・急騰アラート・検索可能な銘柄セレクタ）と
+  銘柄別チャートJSON `site/data/{code}.json` を生成し、GitHub Pages に自動デプロイ。
+  約500銘柄の生データはHTMLに埋め込まず、**銘柄選択時にfetchで遅延読み込み**する設計
+  （集計窓1分〜月足のランキング統計はビルド時にPython側で事前計算）
 - **需給レイヤー**: `jp_supply_demand.py` がJPX公式「空売りの残高に関する情報」
-  （発行済株式数0.5%以上を報告した大口投資家のみ・日次公表）から監視46銘柄該当分を
+  （発行済株式数0.5%以上を報告した大口投資家のみ・日次公表）から監視銘柄該当分を
   抽出して `data/jp_stocks/supply_demand/short_positions.csv` に蓄積。
   `jp_money_flow.py` の自動分析コメントに「大口ショートN件・合計M%」を追記し、
   ダッシュボードにも銘柄別の空売り残バッジを表示する。信用取引残高・空売り比率
@@ -120,18 +130,21 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 - 非公式・無認証エンドポイントのため仕様変更/一時ブロックのリスクは残る
 
 ```bash
-python jp_stock_fetch.py                          # universe.csv 駆動 (既定46銘柄)
+python jp_stock_fetch.py                          # universe.csv 駆動 (約500銘柄)
 JP_TICKERS="7203.T,6758.T" python jp_stock_fetch.py  # 単発上書き
+python universe_refresh.py                          # ユニバース再構築 (xlrd要)
 python jp_supply_demand.py                          # JPX空売り残高報告の収集 (xlrd要)
 python jp_money_flow.py                            # 資金集中スクリーニング
-python dashboard/build_dashboard.py                 # site/index.html 生成
+python jp_stock_rotate.py                           # 1分足ローテーション (7営業日窓)
+python dashboard/build_dashboard.py                 # site/index.html + site/data/*.json 生成
 ```
 
 **公開URL: https://sousensei3319-prog.github.io/arbitrage-signal/**
 
 全自動で稼働（`jp-stock.yml` 東証立会時間の平日30分間隔（毎時23分・53分） → `jp_money_flow.py` →
-`jp-stock-history.yml` 引け後1回の日足/週足/月足 → `jp-supply-demand.yml` 平日18:07 JSTの
-空売り残高報告収集 → `pages.yml` が収集完了ごとに再デプロイ）。運用ランブック
+`jp-stock-history.yml` 引け後1回の日足/週足/月足＋1分足追取り＋ローテーション →
+`jp-supply-demand.yml` 平日18:07 JSTの空売り残高報告収集 → `universe-refresh.yml` 月1回の
+構成銘柄入替 → `pages.yml` が収集完了ごとに再デプロイ）。運用ランブック
 （点検・障害対応・銘柄追加・閾値調整）は `.claude/skills/jp-stock-ops/SKILL.md` を参照。
 
 ## 次の段階（ロードマップ）
