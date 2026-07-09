@@ -52,6 +52,46 @@ JSON_OUT      = os.environ.get("MONEY_FLOW_JSON") or os.path.join(DATA_DIR, "mon
 
 BUCKET_LABEL = {"leader": "けん引大型", "core": "主力", "hot": "話題・噂"}
 
+SUPPLY_CSV = os.environ.get("SUPPLY_DEMAND_CSV") or os.path.join(DATA_DIR, "supply_demand", "short_positions.csv")
+
+
+def load_short_positions():
+    """JPX空売り残高報告(大口0.5%以上・日次)を銘柄別に集計する。
+
+    jp_supply_demand.py が投資家(報告者)単位で蓄積したCSVから、銘柄ごとに
+    「最新の公表日」時点の行だけを合算する(同一銘柄に複数投資家が報告している
+    ケースがあるため件数・合計比率になる)。ファイルが無い/空なら空dictを返し、
+    呼び出し側は「データ無し」として扱う(捏造しない)。
+    戻り値: {code: {"date": "YYYY-MM-DD", "n_holders": int, "total_ratio_pct": float}}
+    """
+    if not os.path.exists(SUPPLY_CSV):
+        return {}
+    latest_date = {}
+    try:
+        with open(SUPPLY_CSV, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                code, date = r.get("code"), r.get("disclosure_date")
+                if not code or not date:
+                    continue
+                if date > latest_date.get(code, ""):
+                    latest_date[code] = date
+        agg = {}
+        with open(SUPPLY_CSV, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                code = r.get("code")
+                if not code or r.get("disclosure_date") != latest_date.get(code):
+                    continue
+                try:
+                    ratio = float(r.get("ratio_pct") or 0)
+                except (TypeError, ValueError):
+                    ratio = 0.0
+                a = agg.setdefault(code, {"date": latest_date[code], "n_holders": 0, "total_ratio_pct": 0.0})
+                a["n_holders"] += 1
+                a["total_ratio_pct"] += ratio
+        return agg
+    except (OSError, csv.Error):
+        return {}
+
 
 def load_universe():
     meta = {}
@@ -244,9 +284,32 @@ def _commentary(recs, buckets, latest_ts):
     if movers:
         lines.append("シェア急伸: " + " / ".join(f"{r['name']} +{r['share_delta']:.2f}pp" for r in movers) + "。")
 
+    # JPX空売り残高報告 (大口0.5%以上・日次) — データがある銘柄のみ事実を記載
+    short_pos = load_short_positions()
+    risky_names = []
+    if short_pos:
+        hits = [(r, short_pos[r["sym"].split(".")[0]]) for r in recs
+                if r["sym"].split(".")[0] in short_pos]
+        hits.sort(key=lambda x: -x[1]["total_ratio_pct"])
+        for r, sp in hits[:3]:
+            lines.append(f"空売り残高報告: {r['name']}に大口ショート {sp['n_holders']}件・"
+                         f"合計 {sp['total_ratio_pct']:.2f}%（{sp['date']}公表・"
+                         f"発行済株式数0.5%以上の報告のみ）。")
+        # 集中度上位 かつ 空売りデータありの銘柄は一般論としての注意喚起のみ(予測断定はしない)
+        risky = [r for r, sp in hits if r["surge"] >= 1.5]
+        risky_names = [r["name"] for r in risky[:3]]
+        if risky_names:
+            lines.append(f"{'・'.join(risky_names)}は資金集中と大口空売り報告が重なっている。"
+                         f"一般に、逆行した場合はショートカバー（買い戻し）が値動きを増幅する"
+                         f"可能性があるが、実際に反転するかどうかは本データからは判断できない。")
+
     # 正直な限界 (捏造回避)
-    lines.append("※きっかけ（ニュース等）・信用残・空売り需給は本データに含まれず未検証。"
-                 "反転/ショートスクイーズ等の判断は材料未装備のため本コメントでは断定しない。投資助言ではない。")
+    lines.append("※空売り残高報告は発行済株式数0.5%以上を報告した大口投資家のみが対象"
+                 "(JPX公式・日次)。掲載が無い銘柄は「空売りが無い」のではなく"
+                 "「大口報告が無い(基準未満または未報告)」ことを意味する。信用取引残高・"
+                 "空売り比率(市場全体集計)はJPX公式配信がPDFのみで自動取得できないため未収録。"
+                 "きっかけ（ニュース等）も本データには含まれず未検証。"
+                 "反転/ショートスクイーズ発生の断定は行わない。投資助言ではない。")
     return lines
 
 

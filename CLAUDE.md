@@ -85,10 +85,11 @@
    info APIはweight 1200/min (userFillsByTime=20, clearinghouseState=2)
 5. matplotlibのフォントに絵文字なし → チャートタイトルはテキストのみ
 
-## ⑤ 日本株資金集中スクリーナー (2026-07-05〜 実装, PR #6)
+## ⑤ 日本株資金集中スクリーナー (2026-07-05〜 実装, PR #6 / 需給レイヤーPR #8)
 
 暗号資産とは別軸。日本株46銘柄 (leader/core/hot) の1分足〜月足をYahoo Finance非公式APIから
 収集し、売買代金の異常集中を検知してダッシュボードとしてGitHub Pagesに常時公開する。
+JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付けとして追加済み (下記コンポーネント表)。
 
 ### コンポーネント
 
@@ -96,8 +97,9 @@
 |---|---|---|
 | `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector の46銘柄)。INTERVAL/RANGEで日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回 |
 | `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文 | `jp-stock.yml`/`pages.yml` に統合済み |
-| `dashboard/template.html` + `dashboard/build_dashboard.py` | 収集済みCSV+money_flow.jsonから `site/index.html`(自動分析コメント・急騰アラート・集計窓1分〜月足・全46銘柄セレクタ・チャート足切替を持つ単一HTML)を生成 | `pages.yml` の1ステップ |
+| `dashboard/template.html` + `dashboard/build_dashboard.py` | 収集済みCSV+money_flow.json+空売り残高報告から `site/index.html`(自動分析コメント・急騰アラート・集計窓1分〜月足・全46銘柄セレクタ・チャート足切替・空売り残バッジを持つ単一HTML)を生成 | `pages.yml` の1ステップ |
 | — | `site/index.html` をGitHub Pagesにデプロイ | `pages.yml`(`jp-stock.yml`完了ごとにworkflow_run発火、schedule 06:37 UTCバックアップ、workflow_dispatch可) |
+| `jp_supply_demand.py` | JPX需給レイヤー: 「空売りの残高に関する情報」(発行済株式数0.5%以上の大口報告、日次、旧xls形式)から一覧ページを都度スクレイピングしてuniverse該当分だけ抽出し `data/jp_stocks/supply_demand/short_positions.csv` に投資家単位で差分蓄積。`jp_money_flow.py`のcommentaryと`dashboard`のバッジに供給。xlrd未導入時は自動スキップ(コア機能は継続) | `jp-supply-demand.yml` 平日18:07 JST(空売り残高公表17:00の後) |
 
 公開URL: **https://sousensei3319-prog.github.io/arbitrage-signal/**
 
@@ -118,3 +120,8 @@
 4. 日足ファイルの当日バーは寄り直後取得で未確定値になる → 当日分は1分足から再構成
 5. 1分足はYahoo側の直近5〜7日制限があるため、定期実行+重複排除で実行間隔を超える
    連続履歴を自前で積み上げる設計。数日止まると欠損は埋め戻せない
+6. JPX空売り残高報告のExcelは旧OLE2/BIFF形式(.xls)で配信され、openpyxlでは開けない
+   (xlrdが必要、2026-07-09にActionsランナー上の実データで確認)。一覧ページのDLリンクは
+   日付ごとにハッシュ化されたディレクトリ名を含み予測できないため、毎回一覧HTMLをスクレイピング
+   してリンクを解決する設計。信用取引週末残高・空売り比率(市場全体)はJPX公式配信がPDFのみと
+   判明したため不採用(実装しない判断が正しい判断のケース)

@@ -101,6 +101,8 @@
   thead th{color:var(--muted);font-weight:600;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;}
   tbody td{font-family:var(--num);font-variant-numeric:tabular-nums;}tbody td.nm{font-family:var(--ui);font-weight:560;}
   .bdot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
+  td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
   footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
@@ -166,7 +168,7 @@
   <section>
     <details class="tbl"><summary>全銘柄を表で見る（現在の窓）</summary>
       <div class="tbl-scroll"><table id="tbl">
-        <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th></tr></thead>
+        <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
         <tbody></tbody></table></div>
     </details>
   </section>
@@ -174,7 +176,8 @@
 </div>
 
 <script>const D = __MFR__;
-const D_COMMENT = __COMMENTARY__;</script>
+const D_COMMENT = __COMMENTARY__;
+const D_SUPPLY = __SUPPLY__;</script>
 <script>
 (function(){
   const $=s=>document.querySelector(s);
@@ -257,7 +260,9 @@ const D_COMMENT = __COMMENTARY__;</script>
 
     $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pc=tk.close.filter(x=>x!=null),first=pc[0],lastc=pc[pc.length-1],pct=(lastc/first-1)*100;
       const mc=tk._momentum>=THR?"flag":(tk._momentum>0?"up":"down");
-      return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk._surge.toFixed(2)}x</td><td>${yen(tk._recent)}円</td><td class="${mc}">${tk._momentum>0?"+":""}${tk._momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
+      const sd=D_SUPPLY[tk.code];
+      const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
+      return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk._surge.toFixed(2)}x</td><td>${yen(tk._recent)}円</td><td class="${mc}">${tk._momentum>0?"+":""}${tk._momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
     if(!SEL)SEL=rk[0].code;drawDetail(SEL);
   }
@@ -298,9 +303,11 @@ const D_COMMENT = __COMMENTARY__;</script>
 
   function drawDetail(code){
     const tk=T.find(x=>x.code===code);if(!tk)return;
+    const sd=D_SUPPLY[tk.code];
+    const sdBadge=sd?`<span class="supplybadge" title="JPX空売り残高報告(大口0.5%以上・日次) ${sd.n}件">空売り残 ${sd.pct.toFixed(2)}%（${sd.date}）</span>`:"";
     const {bars,seps,intraday}=aggregate(tk,TF);const n=bars.length;
     if(!n){svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--muted)" font-size="13">この足のデータがありません</text>`;svgV.innerHTML="";geom=null;
-      $("#chartttl").textContent=`${tk.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector}</span>`;return;}
+      $("#chartttl").textContent=`${tk.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector}</span>${sdBadge}`;return;}
     let ymin=Infinity,ymax=-Infinity,vmax=0;bars.forEach(b=>{if(b.l<ymin)ymin=b.l;if(b.h>ymax)ymax=b.h;if(b.v>vmax)vmax=b.v;});
     const yp=(ymax-ymin)*0.08||1;ymin-=yp;ymax+=yp;
     const Y=x=>pt+(1-(x-ymin)/(ymax-ymin))*(PH-pt-pb);const VY=x=>vpt+(1-x/(vmax||1))*(VH-vpt-vpb);
@@ -324,7 +331,7 @@ const D_COMMENT = __COMMENTARY__;</script>
     svgV.innerHTML=`<path d="${vd}" stroke="var(--axis)" stroke-width="${Math.max(1,bw*0.5).toFixed(1)}" fill="none" opacity="0.7"/><line id="cxV2" x1="0" y1="${vpt}" x2="0" y2="${VH-vpb}" stroke="var(--accent-2)" stroke-width="1" opacity="0"/><text x="${pl-8}" y="${vpt+6}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="var(--num)">出来高</text>`;
     const first=bars[0].o,lastc=bars[n-1].c,pct=(lastc/first-1)*100;
     $("#chartttl").textContent=`${tk.name} のチャート`;
-    $("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector} · ${BL[tk.bucket]}</span>`+
+    $("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector} · ${BL[tk.bucket]}</span>${sdBadge}`+
       `<span class="dpx tnum">¥${fmtPx(lastc)}</span><span class="dpx tnum ${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%（表示範囲）</span>`+
       `<span class="drange tnum">${TFLB[TF]}・${n}本</span>`;
     const sel=$("#stocksel");if(sel.value!==code)sel.value=code;
@@ -366,7 +373,7 @@ const D_COMMENT = __COMMENTARY__;</script>
 
   $("#footer").innerHTML=
     `<div><b>読み方</b>　「集中度」＝各銘柄の直近窓の売買代金が平常時（履歴の同幅中央値）の何倍か。「勢いΔpp」＝直前の同じ窓と比べたユニバース内シェアの増減（pp）で、急騰しきい値超で🚨アラート。チャートはローソク足（1分のみ終値ライン）。板情報は使わず売買代金の集中で近似（真の板/歩み値リアルタイムは無料枠外）。`+
-    `<div class="warn"><b>データ範囲</b>：分足系（1分〜4時間・集計窓と分足チャート）は直近5営業日の1分足から。<b>日/週/月（集計窓・日足〜月足チャート）は日足2年から集約</b>（週足・月足はYahooの月足APIが新規上場銘柄で不安定なため、信頼できる日足を自前で集約）。対象は本番850銘柄の種となる46銘柄の検証セット。データ: Yahoo Finance / 最新 ${D.meta.end} JST。<b>投資助言ではありません。</b></div>`;
+    `<div class="warn"><b>データ範囲</b>：分足系（1分〜4時間・集計窓と分足チャート）は直近5営業日の1分足から。<b>日/週/月（集計窓・日足〜月足チャート）は日足2年から集約</b>（週足・月足はYahooの月足APIが新規上場銘柄で不安定なため、信頼できる日足を自前で集約）。<b>空売り残</b>バッジはJPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口投資家のみ・日次）を集計したもので、表示が無い銘柄は空売りが無いのではなく大口報告が無いことを意味する。対象は本番850銘柄の種となる46銘柄の検証セット。データ: Yahoo Finance・JPX / 最新 ${D.meta.end} JST。<b>投資助言ではありません。</b></div>`;
 
   render();
 })();

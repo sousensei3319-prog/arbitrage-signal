@@ -109,12 +109,20 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 - **ダッシュボード**: `dashboard/build_dashboard.py` + `dashboard/template.html` が
   収集済みCSV+分析コメントから `site/index.html`（銘柄セレクタ・チャート足切替・
   急騰アラート付きの単一HTML）を生成し、GitHub Pages に自動デプロイ
+- **需給レイヤー**: `jp_supply_demand.py` がJPX公式「空売りの残高に関する情報」
+  （発行済株式数0.5%以上を報告した大口投資家のみ・日次公表）から監視46銘柄該当分を
+  抽出して `data/jp_stocks/supply_demand/short_positions.csv` に蓄積。
+  `jp_money_flow.py` の自動分析コメントに「大口ショートN件・合計M%」を追記し、
+  ダッシュボードにも銘柄別の空売り残バッジを表示する。信用取引残高・空売り比率
+  （市場全体集計）はJPX公式配信がPDFのみで自動取得できないため対象外（詳細は
+  `.claude/skills/jp-stock-ops/SKILL.md`）
 - 休場日・昼休みに実行しても新規バーが無いだけ（重複排除が休場日カレンダー代わり）
 - 非公式・無認証エンドポイントのため仕様変更/一時ブロックのリスクは残る
 
 ```bash
 python jp_stock_fetch.py                          # universe.csv 駆動 (既定46銘柄)
 JP_TICKERS="7203.T,6758.T" python jp_stock_fetch.py  # 単発上書き
+python jp_supply_demand.py                          # JPX空売り残高報告の収集 (xlrd要)
 python jp_money_flow.py                            # 資金集中スクリーニング
 python dashboard/build_dashboard.py                 # site/index.html 生成
 ```
@@ -122,9 +130,9 @@ python dashboard/build_dashboard.py                 # site/index.html 生成
 **公開URL: https://sousensei3319-prog.github.io/arbitrage-signal/**
 
 全自動で稼働（`jp-stock.yml` 東証立会時間の平日30分間隔（毎時23分・53分） → `jp_money_flow.py` →
-`jp-stock-history.yml` 引け後1回の日足/週足/月足 → `pages.yml` が収集完了ごとに
-再デプロイ）。運用ランブック（点検・障害対応・銘柄追加・閾値調整）は
-`.claude/skills/jp-stock-ops/SKILL.md` を参照。
+`jp-stock-history.yml` 引け後1回の日足/週足/月足 → `jp-supply-demand.yml` 平日18:07 JSTの
+空売り残高報告収集 → `pages.yml` が収集完了ごとに再デプロイ）。運用ランブック
+（点検・障害対応・銘柄追加・閾値調整）は `.claude/skills/jp-stock-ops/SKILL.md` を参照。
 
 ## 次の段階（ロードマップ）
 
