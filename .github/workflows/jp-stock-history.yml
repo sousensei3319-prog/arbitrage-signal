@@ -1,10 +1,14 @@
-name: JP Stock History (daily/weekly/monthly)
+name: JP Stock History (daily/weekly/monthly/1m backfill/rotate)
 
 # 週足・月足および長期日足チャート/集計窓のためのデータ収集。
-# jp_stock_fetch.py を INTERVAL/RANGE を変えて3回呼び、
+# jp_stock_fetch.py を INTERVAL/RANGE を変えて4回呼び、
 #   {code}_1d.csv (日足2年) / {code}_1wk.csv (週足5年) / {code}_1mo.csv (月足max)
-# を data/jp_stocks/ に差分蓄積する (1分足コレクターとは別サイクル)。
-# 日/週/月足は場中に動かないので1日1回 (引け後) で十分。
+#   / {code}_1m.csv (1分足RANGE=5dで追取り — 30分cadence(jp-stock.yml)がRANGE=1dに
+#     軽量化された分、日をまたいだ欠損をここで回収する)
+# を data/jp_stocks/ に差分蓄積したあと、jp_stock_rotate.py で1分足ライブファイルを
+# 直近ROLLING_DAYS営業日に切り詰め、溢れた分を月次gzipアーカイブへ退避する
+# (850銘柄化のリポジトリ肥大化対策)。日/週/月足・1分足backfillは場中に動かないため
+# 1日1回(引け後)で十分。
 
 on:
   schedule:
@@ -15,6 +19,7 @@ on:
   push:
     paths:
       - 'jp_stock_fetch.py'
+      - 'jp_stock_rotate.py'
       - '.github/workflows/jp-stock-history.yml'
 
 permissions:
@@ -27,7 +32,7 @@ concurrency:
 jobs:
   history:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -36,14 +41,25 @@ jobs:
 
       # 依存なし (標準ライブラリのみ)。取得対象は data/jp_stocks/universe.csv
       - name: Fetch daily bars (2y)
-        env: { INTERVAL: '1d',  RANGE: '2y',  FETCH_DEADLINE_MIN: '6' }
+        env: { INTERVAL: '1d',  RANGE: '2y',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
         run: python jp_stock_fetch.py
       - name: Fetch weekly bars (5y)
-        env: { INTERVAL: '1wk', RANGE: '5y',  FETCH_DEADLINE_MIN: '6' }
+        env: { INTERVAL: '1wk', RANGE: '5y',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
         run: python jp_stock_fetch.py
       - name: Fetch monthly bars (max)
-        env: { INTERVAL: '1mo', RANGE: 'max', FETCH_DEADLINE_MIN: '6' }
+        env: { INTERVAL: '1mo', RANGE: 'max', SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
         run: python jp_stock_fetch.py
+      # 30分cadence(jp-stock.yml)はRANGE=1dに軽量化したため、日をまたいだ欠損
+      # (実行ドロップ・ジョブ失敗等)をここでRANGE=5dの取り直しにより回収する。
+      - name: Fetch 1m bars (5d backfill)
+        env: { INTERVAL: '1m',  RANGE: '5d',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '16' }
+        run: python jp_stock_fetch.py
+
+      # 1分足ライブファイルを直近ROLLING_DAYS営業日に切り詰め、溢れた分を
+      # 月次gzipアーカイブ({code}_T_1m_YYYYMM.csv.gz)へ退避 (リポジトリ肥大化対策)
+      - name: Rotate 1m live files to monthly archive
+        env: { ROLLING_DAYS: '7' }
+        run: python jp_stock_rotate.py
 
       - name: Persist collected data
         run: |
@@ -51,7 +67,7 @@ jobs:
           git config user.email "actions@users.noreply.github.com"
           git add -- data/jp_stocks 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "chore: JP stock history (d/w/m) $(date -u +'%Y-%m-%d %H:%M')"
+            git commit -m "chore: JP stock history (d/w/m/1m backfill/rotate) $(date -u +'%Y-%m-%d %H:%M')"
             git pull --rebase origin "${GITHUB_REF_NAME}" || true
             git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
           else
