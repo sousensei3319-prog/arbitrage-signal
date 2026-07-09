@@ -1,0 +1,33 @@
+name: JPX Supply-Demand Probe (Phase1 temp)
+
+# jp_supply_demand_probe.py の実データ疎通確認専用・一時workflow。
+# サンドボックス(Claude Code)からはJPXにproxy403で到達不可なため、
+# 実URL形式・ファイル形式(xls/xlsx/pdf)の確認はこのランナー上でのみ可能。
+# 検証が終わり次第、本体スクリプトと共にこのworkflowも削除する。
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'jp_supply_demand_probe.py'
+      - '.github/workflows/jp-supply-demand-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install optional excel readers (probe用のみ)
+        run: pip install openpyxl xlrd
+
+      - name: Run probe
+        run: python jp_supply_demand_probe.py
