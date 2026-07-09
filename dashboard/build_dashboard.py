@@ -21,6 +21,7 @@ DATA = os.path.join(ROOT, "data", "jp_stocks")
 TEMPLATE = os.path.join(ROOT, "dashboard", "template.html")
 OUT_DIR = os.environ.get("SITE_DIR") or os.path.join(ROOT, "site")
 MF_JSON = os.path.join(DATA, "money_flow.json")
+SD_CSV = os.path.join(DATA, "supply_demand", "short_positions.csv")
 
 
 def load_universe():
@@ -70,6 +71,41 @@ def load_1d(sym, cutoff_date, m1):
     return {"t": T, "o": O, "h": H, "l": L, "c": C, "v": V} if T else None
 
 
+def load_supply_demand():
+    """JPX空売り残高報告(大口0.5%以上・日次、jp_supply_demand.py が蓄積)を
+    銘柄(sym形式、例 "7203.T")別に集計する。データが無い/該当銘柄が無ければ
+    空dict(=ダッシュボード側は該当銘柄を「データ無し」として素通し表示)。
+    戻り値: {sym: {"date": "YYYY-MM-DD", "n": 報告者数, "pct": 合計比率%}}
+    """
+    if not os.path.exists(SD_CSV):
+        return {}
+    latest_date = {}
+    with open(SD_CSV, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            code, date = r.get("code"), r.get("disclosure_date")
+            if not code or not date:
+                continue
+            if date > latest_date.get(code, ""):
+                latest_date[code] = date
+    agg = {}
+    with open(SD_CSV, newline="", encoding="utf-8") as f:
+        for r in csv.DictReader(f):
+            code = r.get("code")
+            if not code or r.get("disclosure_date") != latest_date.get(code):
+                continue
+            try:
+                ratio = float(r.get("ratio_pct") or 0)
+            except (ValueError, TypeError):
+                ratio = 0.0
+            sym = code if "." in code else code + ".T"
+            a = agg.setdefault(sym, {"date": latest_date[code], "n": 0, "pct": 0.0})
+            a["n"] += 1
+            a["pct"] += ratio
+    for v in agg.values():
+        v["pct"] = round(v["pct"], 2)
+    return agg
+
+
 def build_rich(uni):
     allt = set()
     m1all = {}
@@ -117,15 +153,17 @@ def main():
             commentary = json.load(open(MF_JSON, encoding="utf-8")).get("commentary", [])
         except (ValueError, OSError):
             commentary = []
+    supply = load_supply_demand()
     tpl = open(TEMPLATE, encoding="utf-8").read()
     html = (tpl.replace("__MFR__", json.dumps(rich, ensure_ascii=False, separators=(",", ":")))
-               .replace("__COMMENTARY__", json.dumps(commentary, ensure_ascii=False)))
+               .replace("__COMMENTARY__", json.dumps(commentary, ensure_ascii=False))
+               .replace("__SUPPLY__", json.dumps(supply, ensure_ascii=False, separators=(",", ":"))))
     os.makedirs(OUT_DIR, exist_ok=True)
     outp = os.path.join(OUT_DIR, "index.html")
     with open(outp, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"built {outp} ({round(os.path.getsize(outp)/1024, 1)} KB, "
-          f"{len(rich['tickers'])}銘柄, コメント{len(commentary)}行)")
+          f"{len(rich['tickers'])}銘柄, コメント{len(commentary)}行, 空売り残高データ{len(supply)}銘柄)")
 
 
 if __name__ == "__main__":
