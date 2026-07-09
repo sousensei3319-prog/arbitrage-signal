@@ -45,7 +45,7 @@ https://sousensei3319-prog.github.io/arbitrage-signal/  ◄──────┘
 
 | ファイル | 役割 | workflow | 頻度 |
 |---|---|---|---|
-| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足(既定)を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。`INTERVAL`/`RANGE` で日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` | 東証立会時間の平日 `23,53 0-6 * * 1-5` (JST 9:00-15:00相当、15分ごと目安) |
+| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足(既定)を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。`INTERVAL`/`RANGE` で日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` | 東証立会時間の平日 `23,53 0-6 * * 1-5` (JST 9:00-15:00相当、毎時23分・53分の30分間隔) |
 | `jp_stock_fetch.py` (履歴用) | 同スクリプトをINTERVAL/RANGE違いで3回呼び日足2年/週足5年/月足maxを蓄積 | `jp-stock-history.yml` | 引け後の平日 `33 7 * * 1-5` (07:33 UTC=16:33 JST) |
 | `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓(既定30分)vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文 | `jp-stock.yml` 内の1ステップ、および `pages.yml` の再計算ステップ | jp-stock.ymlに同期 / pages.yml実行毎 |
 | `dashboard/build_dashboard.py` + `dashboard/template.html` | 収集済みCSV(1m/1d/1wk/1mo) + universe.csv + money_flow.json を読み、テンプレートの `__MFR__`/`__COMMENTARY__` プレースホルダを埋めて `site/index.html`(単一HTML、外部依存なし)を生成 | `pages.yml` の1ステップ | 同上 |
@@ -62,7 +62,7 @@ git pull origin main
 tail -3 data/jp_stocks/7203_T_1m.csv   # 最終バーの timestamp_jst 列を見る
 ```
 
-- 平日 9:00-15:30 JST の間は数分〜15分遅れで最新バーが伸びているはず。
+- 平日 9:00-15:30 JST の間は数分〜30分程度の遅れで最新バーが伸びているはず(収集は毎時23分・53分の30分間隔)。
 - 15:30 JST 前後のバー(出来高0の板寄せ相当)まで来ていれば当日の1分足収集は完了。
 - 日足/週足/月足は `{code}_T_1d.csv` 等の末尾を同様に確認。引け後(16:33 JST以降)に前日分まで
   伸びていれば正常。当日分は日足ファイルには**まだ**入らない設計(§4-3参照、1分足から再構成される)。
@@ -176,7 +176,7 @@ workflowのenvのみで調整する(コード変更不要)。
    その日のOHLVを再構成**している(`dashboard/build_dashboard.py` の `load_1d()` 内
    `cutoff_date` 以降を1分足から組み立てる処理を参照)
 5. **1分足はYahoo側の直近5〜7日制限**があり、それより古いデータは取得できない。
-   定期実行(15分間隔)+重複排除(epoch集合との差分のみ追記)で、実行間隔を超えた
+   定期実行(30分間隔)+重複排除(epoch集合との差分のみ追記)で、実行間隔を超えた
    連続履歴を自前で積み上げている。ジョブが数日止まると欠損が生まれ、埋め戻せない
 6. **`schedule` トリガーはデフォルトブランチ(main)にマージ後のみ有効**(GitHub仕様)。
    フィーチャーブランチでの動作検証は `push`(該当ファイル変更時)や `workflow_dispatch` で代用する

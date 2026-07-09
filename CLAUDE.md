@@ -94,7 +94,7 @@
 
 | ファイル | 役割 | workflow / 頻度 |
 |---|---|---|
-| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector の46銘柄)。INTERVAL/RANGEで日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` 東証立会時間の平日15分間隔 / `jp-stock-history.yml` 平日引け後1回 |
+| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector の46銘柄)。INTERVAL/RANGEで日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回 |
 | `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文 | `jp-stock.yml`/`pages.yml` に統合済み |
 | `dashboard/template.html` + `dashboard/build_dashboard.py` | 収集済みCSV+money_flow.jsonから `site/index.html`(自動分析コメント・急騰アラート・集計窓1分〜月足・全46銘柄セレクタ・チャート足切替を持つ単一HTML)を生成 | `pages.yml` の1ステップ |
 | — | `site/index.html` をGitHub Pagesにデプロイ | `pages.yml`(`jp-stock.yml`完了ごとにworkflow_run発火、schedule 06:37 UTCバックアップ、workflow_dispatch可) |
