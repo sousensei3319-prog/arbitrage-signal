@@ -33,9 +33,6 @@ jobs:
       - name: Run probe
         run: python universe_probe.py
 
-      - name: Check 6594 (デバッグ用一時ステップ)
-        run: python check_6594.py
-
       # universe_refresh.py の本番実装をdry-run検証 (実universe.csvは書き換えず一時ファイルへ)
       - name: Dry-run universe_refresh.py
         env:
