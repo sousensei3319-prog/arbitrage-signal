@@ -10,6 +10,7 @@ on:
   push:
     paths:
       - 'universe_probe.py'
+      - 'universe_refresh.py'
       - '.github/workflows/universe-probe.yml'
 
 permissions:
@@ -31,3 +32,18 @@ jobs:
 
       - name: Run probe
         run: python universe_probe.py
+
+      # universe_refresh.py の本番実装をdry-run検証 (実universe.csvは書き換えず一時ファイルへ)
+      - name: Dry-run universe_refresh.py
+        env:
+          UNIVERSE_FILE: /tmp/universe_dryrun.csv
+        run: |
+          cp data/jp_stocks/universe.csv /tmp/universe_dryrun.csv
+          python universe_refresh.py
+          echo "--- 行数/バケット内訳 ---"
+          wc -l /tmp/universe_dryrun.csv
+          cut -d, -f3 /tmp/universe_dryrun.csv | sort | uniq -c
+          echo "--- 先頭20行 ---"
+          head -20 /tmp/universe_dryrun.csv
+          echo "--- hotブロック(温存確認) ---"
+          grep ',hot,' /tmp/universe_dryrun.csv
