@@ -29,6 +29,7 @@
 | ① | 取引所間価格スプレッド検知 | `screener.py` → 現在は `unified_signal.py`+`long_signal.py` | `scan.yml` 15分ごと |
 | ② | FR極端モニター (キャリー/パニック/取引所間乖離) | `fr_extreme_monitor.py` | `fr-extreme.yml` 30分ごと |
 | ④ | スマートマネー追跡 (下記詳細) | `smart_money/` ほか | 複数 |
+| ⑤ | 日本株資金集中スクリーナー (下記詳細) | `jp_stock_fetch.py`+`jp_money_flow.py`+`dashboard/` | 複数 |
 
 ## ④ スマートマネー追跡 (2026-07-03 実装, PR #3)
 
@@ -83,3 +84,37 @@
 4. HLリーダーボードは `stats-data.hyperliquid.xyz/Mainnet/leaderboard` (数十MB)。
    info APIはweight 1200/min (userFillsByTime=20, clearinghouseState=2)
 5. matplotlibのフォントに絵文字なし → チャートタイトルはテキストのみ
+
+## ⑤ 日本株資金集中スクリーナー (2026-07-05〜 実装, PR #6)
+
+暗号資産とは別軸。日本株46銘柄 (leader/core/hot) の1分足〜月足をYahoo Finance非公式APIから
+収集し、売買代金の異常集中を検知してダッシュボードとしてGitHub Pagesに常時公開する。
+
+### コンポーネント
+
+| ファイル | 役割 | workflow / 頻度 |
+|---|---|---|
+| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector の46銘柄)。INTERVAL/RANGEで日足(1d/2y)・週足(1wk/5y)・月足(1mo/max)も取得可 | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回 |
+| `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文 | `jp-stock.yml`/`pages.yml` に統合済み |
+| `dashboard/template.html` + `dashboard/build_dashboard.py` | 収集済みCSV+money_flow.jsonから `site/index.html`(自動分析コメント・急騰アラート・集計窓1分〜月足・全46銘柄セレクタ・チャート足切替を持つ単一HTML)を生成 | `pages.yml` の1ステップ |
+| — | `site/index.html` をGitHub Pagesにデプロイ | `pages.yml`(`jp-stock.yml`完了ごとにworkflow_run発火、schedule 06:37 UTCバックアップ、workflow_dispatch可) |
+
+公開URL: **https://sousensei3319-prog.github.io/arbitrage-signal/**
+
+### 運用
+
+- 全自動 (収集→スクリーナー→ダッシュボード→Pagesデプロイの一気通貫)。手動操作は基本不要
+- 詳細な運用手順(データ鮮度確認・手動収集・Pages再デプロイと障害切り分け・銘柄追加/削除・
+  閾値調整・ダッシュボード改修時の検証)は **`.claude/skills/jp-stock-ops/SKILL.md`** 参照
+
+### ハマりどころ (再発防止・詳細はSKILL.md)
+
+1. サンドボックス(Claude Code)からはYahoo/github.ioがproxy403で到達不可。実データ検証は
+   GitHub Actionsランナー上の実行結果(run conclusion・ログ)でのみ判断可能
+2. Yahoo月足APIは新規上場銘柄(285A等)に日足相当のデータを返すバグがある → 週足/月足は
+   Yahooの1wk/1moを直接信用せず、自前で日足から集約する設計
+3. エポック時刻基準で複数銘柄の窓を揃えると銘柄間の最終バーずれで偽の急騰(集中度)が
+   生まれる → 日付・インデックス基準で揃える
+4. 日足ファイルの当日バーは寄り直後取得で未確定値になる → 当日分は1分足から再構成
+5. 1分足はYahoo側の直近5〜7日制限があるため、定期実行+重複排除で実行間隔を超える
+   連続履歴を自前で積み上げる設計。数日止まると欠損は埋め戻せない

@@ -92,23 +92,39 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 - Webhook: Secrets の `SMART_MONEY_WEBHOOK_URL`（未設定なら `DISCORD_WEBHOOK_URL`）
 - ⚠️ シグナルは監視リスト入り候補。追随は常に彼らより悪い価格（RULES.md ④の運用ルール参照）
 
-## 日本株 1分足コレクター（`jp_stock_fetch.py`） — 実験プロトタイプ
+## ⑤ 日本株 資金集中スクリーナー（`jp_stock_fetch.py` 他） — 全自動稼働中
 
-暗号資産とは別軸の実験。Yahoo Finance の非公式チャートAPIを標準ライブラリのみで叩き、
-指定銘柄の1分足を `data/jp_stocks/` にCSV蓄積する（yfinance等の外部ライブラリ不使用）。
+暗号資産とは別軸。Yahoo Finance の非公式チャートAPIを標準ライブラリのみで叩き、
+日本株46銘柄（leader/core/hot の3バケット）の1分足〜月足を `data/jp_stocks/` にCSV蓄積し、
+売買代金の異常集中をスクリーニングして GitHub Pages のダッシュボードとして常時公開する
+（yfinance等の外部ライブラリ不使用）。
 
-- 1分足はAPI側の制限で直近5〜7日分しか返らないため、定期実行して重複タイムスタンプを
-  除いた差分だけ追記することで、実行間隔を超えた連続履歴を自前で積み上げる設計
+- **収集**: `jp_stock_fetch.py` が `data/jp_stocks/universe.csv`（code,name,bucket,sector）
+  駆動で全銘柄の1分足を取得。1分足はAPI側の制限で直近5〜7日分しか返らないため、
+  定期実行して重複タイムスタンプを除いた差分だけ追記することで、実行間隔を超えた
+  連続履歴を自前で積み上げる設計。`INTERVAL`/`RANGE` を変えて日足(2年)/週足(5年)/
+  月足(max)も別workflowで収集
+- **スクリーナー**: `jp_money_flow.py` が直近窓 vs 履歴中央値で売買代金の集中度を算出し、
+  事実ベースの自動分析コメント付きで `data/jp_stocks/money_flow.{csv,json}` を出力
+- **ダッシュボード**: `dashboard/build_dashboard.py` + `dashboard/template.html` が
+  収集済みCSV+分析コメントから `site/index.html`（銘柄セレクタ・チャート足切替・
+  急騰アラート付きの単一HTML）を生成し、GitHub Pages に自動デプロイ
 - 休場日・昼休みに実行しても新規バーが無いだけ（重複排除が休場日カレンダー代わり）
-- 非公式・無認証エンドポイントのため仕様変更/一時ブロックのリスクあり。安定性を見てから
-  シグナル化を検討する
+- 非公式・無認証エンドポイントのため仕様変更/一時ブロックのリスクは残る
 
 ```bash
-python jp_stock_fetch.py                          # 既定銘柄 (7203.T,6758.T,9984.T)
-JP_TICKERS="7203.T,6758.T" python jp_stock_fetch.py
+python jp_stock_fetch.py                          # universe.csv 駆動 (既定46銘柄)
+JP_TICKERS="7203.T,6758.T" python jp_stock_fetch.py  # 単発上書き
+python jp_money_flow.py                            # 資金集中スクリーニング
+python dashboard/build_dashboard.py                 # site/index.html 生成
 ```
 
-まだ定期実行workflowは無し（手元/手動実行のプロトタイプ段階）。
+**公開URL: https://sousensei3319-prog.github.io/arbitrage-signal/**
+
+全自動で稼働（`jp-stock.yml` 東証立会時間の平日30分間隔（毎時23分・53分） → `jp_money_flow.py` →
+`jp-stock-history.yml` 引け後1回の日足/週足/月足 → `pages.yml` が収集完了ごとに
+再デプロイ）。運用ランブック（点検・障害対応・銘柄追加・閾値調整）は
+`.claude/skills/jp-stock-ops/SKILL.md` を参照。
 
 ## 次の段階（ロードマップ）
 
