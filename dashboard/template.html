@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>日本株 資金集中スクリーナー</title>
 <style>
   :root{
@@ -257,7 +259,7 @@ const D_INITIAL = __INITIAL__;</script>
 
   async function loadTickerChart(code){
     if(chartCache[code]) return chartCache[code];
-    const res=await fetch("data/"+code+".json");
+    const res=await fetch("data/"+code.replace(/\./g,"_")+".json");  // build側は 7203.T → 7203_T.json で出力
     if(!res.ok) throw new Error("HTTP "+res.status);
     const j=await res.json();
     chartCache[code]=j;
