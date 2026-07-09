@@ -87,8 +87,28 @@ def probe_short_positions():
                 wb = xlrd.open_workbook("/tmp/short_positions_probe.bin")
                 ws = wb.sheet_by_index(0)
                 print(f"xlrdで読込成功: sheet0 rows={ws.nrows} cols={ws.ncols}")
-                for i in range(min(6, ws.nrows)):
-                    print("   ", ws.row_values(i))
+                for i in range(min(12, ws.nrows)):
+                    print("   row", i, ws.row_values(i))
+                # ヘッダー行を探す(「銘柄コード」「Code」等を含む行)
+                header_i = None
+                for i in range(min(20, ws.nrows)):
+                    rv = [str(x) for x in ws.row_values(i)]
+                    if any("コード" in x or "Code" in x for x in rv):
+                        header_i = i
+                        print(f"ヘッダー候補行 {i}: {rv}")
+                        break
+                # universe銘柄コード(7203トヨタ等)を含む行を探して実データ例を出す
+                target_codes = {"7203", "6758", "9984", "8306"}
+                found = 0
+                for i in range(ws.nrows):
+                    rv = ws.row_values(i)
+                    rvs = {str(int(x)) if isinstance(x, float) and x == int(x) else str(x) for x in rv}
+                    if rvs & target_codes:
+                        print(f"データ例 row {i}: {rv}")
+                        found += 1
+                        if found >= 6:
+                            break
+                print(f"universe銘柄がヒットした行数(先頭一致のみ確認): {found}")
             except Exception as e2:
                 print(f"xlrdでの読込も失敗: {type(e2).__name__}: {e2}")
     except Exception as e:
