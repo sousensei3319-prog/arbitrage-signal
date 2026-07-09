@@ -1,0 +1,67 @@
+name: JPX Supply-Demand Collector
+
+# JPX需給レイヤー: 空売り残高報告コレクター (jp_supply_demand.py)
+# JPXが日次公表する「空売りの残高に関する情報」(発行済株式数0.5%以上の大口報告)から
+# universe.csv 該当銘柄だけを抽出し data/jp_stocks/supply_demand/ にCSV差分蓄積する。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチでの検証は push トリガーで代用 (本体/workflow変更時に1回走る)
+#   - このサンドボックス(Claude Code)からはJPXがproxyブロックで到達不可のため、
+#     実データ疎通の検証はこのランナー上の実行が初 (jp-stock.ymlと同じ制約)
+#   - 空売り残高報告はOLE2/BIFF形式の旧xlsで配信されるため openpyxl ではなく xlrd が必要
+#     (matplotlibと同様、workflow内でのみ pip install。未導入でもコア機能=収集全体は継続する設計)
+
+on:
+  schedule:
+    # JPXの公表目処は毎営業日17:00 JST=08:00 UTC。処理バッファを見て18:07 JST=09:07 UTCに実行。
+    # :00/:15/:30 はGitHub負荷ピークでドロップされやすいため :07 にオフセット。
+    - cron: '7 9 * * 1-5'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'jp_supply_demand.py'
+      - '.github/workflows/jp-supply-demand.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとCSVコミットバックが競合するため直列化
+concurrency:
+  group: jp-supply-demand-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 空売り残高報告が旧BIFF形式(.xls)で配信されるためxlrdのみ導入
+      # (未導入でもjp_supply_demand.py側でImportErrorを捕捉しスキップする設計)
+      - name: Install xlrd (旧xls形式の解析用)
+        run: pip install xlrd
+
+      - name: Collect JPX short-selling positions (0.5%+)
+        env:
+          FETCH_DEADLINE_MIN: '8'
+        run: python jp_supply_demand.py
+
+      # 蓄積したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
+      - name: Persist collected data
+        run: |
+          git config user.name "jp-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/jp_stocks/supply_demand/short_positions.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: JPX空売り残高報告 $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "新規データなし (休場日/既に取得済み/universe該当なし)"
+          fi
