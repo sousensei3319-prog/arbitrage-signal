@@ -76,7 +76,10 @@ JPX_BASE = "https://www.jpx.co.jp"
 NIKKEI225_CSV_URL = "https://indexes.nikkei.co.jp/nkave/archives/file/nikkei_stock_average_weight_jp.csv"
 
 TOPIX500_SIZES = {"TOPIX Core30", "TOPIX Large70", "TOPIX Mid400"}
-CODE_RE = re.compile(r"^[0-9]{4}[0-9A-Za-z]?$")  # 4桁数字 or 英数混在(例 285A)
+# 東証の証券コードは常に4文字: 先頭1桁は数字、残り3文字は数字または英字
+# (2024年の新コード体系で末尾が英字になる銘柄が増えている。例 285A・130A等)。
+# 旧仮定「4桁数字+任意の英数字1文字」だと新コードを1文字取りこぼしていたため修正。
+CODE_RE = re.compile(r"^[0-9][0-9A-Za-z]{3}$")
 FIELDNAMES = ["code", "name", "bucket", "sector"]
 
 
