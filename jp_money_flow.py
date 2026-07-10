@@ -19,8 +19,10 @@ JP Money Flow Screener (日本株 資金集中スクリーナー)
   share_base   = 履歴全体での売買代金シェア(%)
   share_delta  = share_recent - share_base  (資金が"向かってきた"量, ppt)
 バケット別 (leader/core/hot) の recent/baseline で「どの層が熱いか」も集計。
-業種グループ別 (universe.csvのgroup列=JPX正式33業種区分) の share_recent/share_base
+業種グループ別 (group=JPX正式33業種区分+独自区分) の share_recent/share_base
 合算で「どの業種に資金が向いているか」も集計 (money_flow.jsonの"groups"に出力)。
+独自区分は data/jp_stocks/custom_groups.csv (code,custom_group,basis) による上書きで、
+JPX公式に無い切り口(例:「半導体」)を切り出す (ファイル無しなら従来どおり)。
 group列が無い旧universe.csvでもsector列にフォールバックして後方互換で動く。
 
 設計:
@@ -96,17 +98,48 @@ def load_short_positions():
         return {}
 
 
-def _group_of(r):
-    """業種グループ(JPX正式33業種)を取り出す共通ヘルパー。
+CUSTOM_GROUPS_CSV = os.environ.get("CUSTOM_GROUPS_CSV") or os.path.join(DATA_DIR, "custom_groups.csv")
 
-    universe.csvにまだgroup列が無い旧ファイルでも動く後方互換フォールバック:
-    group列 → (無ければ)sector列 → (それも無ければ)"不明"。
+
+def load_custom_groups():
+    """独自区分の上書きマップ {code: custom_group} を返す。
+
+    JPX公式33業種に存在しない切り口(例:「半導体」— 公式では電気機器/機械/金属製品
+    等に分散)を、data/jp_stocks/custom_groups.csv (code,custom_group,basis) で
+    グループ集計に反映するための仕組み。universe.csv は universe_refresh.py が
+    月次で機械再構築するため、独自区分は別ファイルに持たせて再構築に耐える設計。
+    ファイルが無い/読めない場合は空dict(=従来どおりJPX33業種のみ、後方互換)。
     """
+    if not os.path.exists(CUSTOM_GROUPS_CSV):
+        return {}
+    try:
+        overrides = {}
+        with open(CUSTOM_GROUPS_CSV, newline="", encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                code = (r.get("code") or "").strip()
+                grp = (r.get("custom_group") or "").strip()
+                if code and grp:
+                    overrides[code] = grp
+        return overrides
+    except (OSError, csv.Error):
+        return {}
+
+
+def _group_of(r, custom=None):
+    """業種グループを取り出す共通ヘルパー。
+
+    優先順位: 独自区分(custom_groups.csv、codeで引く) → group列(JPX正式33業種) →
+    sector列(group列が無い旧universe.csvの後方互換) → "不明"。
+    """
+    code = (r.get("code") or "").strip()
+    if custom and code in custom:
+        return custom[code]
     return (r.get("group") or "").strip() or (r.get("sector") or "").strip() or "不明"
 
 
 def load_universe():
     meta = {}
+    custom = load_custom_groups()
     if os.path.exists(UNIVERSE_FILE):
         with open(UNIVERSE_FILE, newline="", encoding="utf-8") as f:
             for r in csv.DictReader(f):
@@ -115,7 +148,7 @@ def load_universe():
                     continue
                 sym = code if "." in code else code + ".T"
                 meta[sym] = (r.get("name") or sym, r.get("bucket") or "core",
-                             (r.get("sector") or "").strip(), _group_of(r))
+                             (r.get("sector") or "").strip(), _group_of(r, custom))
     return meta
 
 

@@ -18,9 +18,10 @@ dashboard/template.html の __MFR__/__COMMENTARY__/__SUPPLY__/__INITIAL__/__GROU
 これを実行してデプロイする。
 
 __GROUPS__ (compute_group_windows()) は universe.csv の group 列(JPX正式33業種区分。
-旧ファイルはsectorへフォールバック)で銘柄単位のshareR/dBaseをグループ合算した
+旧ファイルはsectorへフォールバック)に custom_groups.csv の独自区分(例:「半導体」、
+jmf.load_custom_groups()で上書き)を適用したグループで銘柄単位のshareR/dBaseを合算した
 {wkey: [{group, share_pct, delta_pp, n}, ...]} で、ダッシュボードの「業種別シェア」
-パネルが既存の集計窓セレクタと連動して参照する。33業種×窓数程度でサイズは極小。
+パネルが既存の集計窓セレクタと連動して参照する。34業種×窓数程度でサイズは極小。
 
 依存なし (標準ライブラリのみ)。実行: python dashboard/build_dashboard.py
 """
@@ -61,14 +62,17 @@ DEFAULT_WKEY = "5m"
 
 def load_universe():
     uni = []
+    # 独自区分(custom_groups.csv、例:「半導体」)の上書きマップ。jp_money_flow.py の
+    # ロジックを再利用してスクリーナーとダッシュボードのグループ判定を単一化する。
+    custom = jmf.load_custom_groups()
     with open(os.path.join(DATA, "universe.csv"), encoding="utf-8") as f:
         for r in csv.DictReader(f):
             code = r["code"].strip()
             sym = code if "." in code else code + ".T"
             sector = r.get("sector", "")
-            # group = JPX正式33業種区分。旧universe.csv(group列なし)ではsectorに
-            # フォールバックする(jp_money_flow.pyの_group_of()と同じ後方互換規則)。
-            group = (r.get("group") or "").strip() or sector or "不明"
+            # group = 独自区分 → JPX正式33業種区分 → sector(旧universe.csvの後方互換)
+            # → 不明 (jp_money_flow.pyの_group_of()と同じ優先順位)。
+            group = jmf._group_of(r, custom)
             uni.append((sym, r["name"], r.get("bucket", "core"), sector, group))
     return uni
 
@@ -289,6 +293,9 @@ def build(uni):
         "n": len(summary_tickers),
         "source": "Yahoo Finance",
         "default_win": DEFAULT_WKEY,
+        # 独自区分の名前一覧 (テンプレート側がツールチップに「独自区分」注記を
+        # 付けるために使う。custom_groups.csvに区分を足してもテンプレ変更不要)
+        "custom_groups": sorted(set(jmf.load_custom_groups().values())),
     }
     return meta, summary_tickers, ticker_meta, initial_sym, supply, group_windows
 
