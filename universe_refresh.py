@@ -1,7 +1,7 @@
 """
 日本株 監視ユニバース自動更新 (universe_refresh.py) — 850銘柄化
 
-data/jp_stocks/universe.csv (code,name,bucket,sector) を、TOPIX500 + 日経225 + 話題枠
+data/jp_stocks/universe.csv (code,name,bucket,sector,group) を、TOPIX500 + 日経225 + 話題枠
 (既存hot手動シード) から機械的に再構築する。手打ちでの銘柄追加は行わない設計。
 
 データソース (2026-07-09 Phase1調査でActionsランナー上の実データにより確認済み。
@@ -36,6 +36,12 @@ data/jp_stocks/universe.csv (code,name,bucket,sector) を、TOPIX500 + 日経225
 bucket割当の優先順位 (PM決定): hot(既存手動シード) > leader(日経225) > core(TOPIX500の残り)。
 既存46銘柄の手書きsector(詳細な業種タグ)は上書きせず温存。新規銘柄のsectorは
 JPX 33業種区分から機械的に埋め、JPXデータに無い場合のみ日経の「業種」列で補完する。
+
+group列 (JPX正式33業種区分、業種グループ集計用): sectorとは別に、全銘柄へ
+JPX「東証上場銘柄一覧」の33業種区分(jpx_sector)をそのまま機械付与する。
+sectorは初期46銘柄が手書きの詳細タグ(「総合商社」「電線・光ファイバ」等、全68種類)
+でグループ集計に使えないため、正規の33業種で揃えたgroup列を別途持たせる。
+フォールバック順: jpx_sector → 既存universe.csvのgroup(温存) → ""(空、取得失敗時)。
 
 全候補ソースが機械取得不可な場合は、取得できた範囲で構築し不足分をログに正直に出す
 (例: TOPIX500取得失敗→leader+hotのみで構築を続行し、その旨を明示)。
@@ -80,7 +86,7 @@ TOPIX500_SIZES = {"TOPIX Core30", "TOPIX Large70", "TOPIX Mid400"}
 # (2024年の新コード体系で末尾が英字になる銘柄が増えている。例 285A・130A等)。
 # 旧仮定「4桁数字+任意の英数字1文字」だと新コードを1文字取りこぼしていたため修正。
 CODE_RE = re.compile(r"^[0-9][0-9A-Za-z]{3}$")
-FIELDNAMES = ["code", "name", "bucket", "sector"]
+FIELDNAMES = ["code", "name", "bucket", "sector", "group"]
 
 
 def _fetch(url, timeout=25):
@@ -176,7 +182,8 @@ def fetch_nikkei225():
 
 def load_existing():
     """既存universe.csvを読み、(hot_codes, existing_row) を返す。
-    existing_rowは全既存銘柄のname/sectorを保持する辞書 (温存用)。"""
+    existing_rowは全既存銘柄のname/sector/group(旧ファイルにgroup列が無ければ空文字)
+    を保持する辞書 (温存用)。"""
     hot_codes, existing = set(), {}
     if not os.path.exists(UNIVERSE_FILE):
         return hot_codes, existing
@@ -185,7 +192,8 @@ def load_existing():
             code = (r.get("code") or "").strip()
             if not code:
                 continue
-            existing[code] = {"name": r.get("name") or code, "sector": r.get("sector") or ""}
+            existing[code] = {"name": r.get("name") or code, "sector": r.get("sector") or "",
+                               "group": r.get("group") or ""}
             if (r.get("bucket") or "").strip() == "hot":
                 hot_codes.add(code)
     return hot_codes, existing
@@ -230,7 +238,11 @@ def build_universe(deadline):
             name = nikkei_name.get(code) or jpx_name.get(code) or code
             sector = jpx_sector.get(code) or nikkei_sector.get(code) or ""
 
-        rows.append({"code": code, "name": name, "bucket": bucket, "sector": sector})
+        # group = 正規JPX33業種区分。全銘柄に対しjpx_sectorを最優先で機械付与し、
+        # 取得失敗時のみ既存group(温存)、それも無ければ空文字にフォールバックする。
+        group = jpx_sector.get(code) or existing.get(code, {}).get("group") or ""
+
+        rows.append({"code": code, "name": name, "bucket": bucket, "sector": sector, "group": group})
 
     order = {"leader": 0, "core": 1, "hot": 2}
     rows.sort(key=lambda r: (order.get(r["bucket"], 9), r["code"]))
