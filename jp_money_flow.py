@@ -5,7 +5,7 @@ JP Money Flow Screener (日本株 資金集中スクリーナー)
 の異常集中** で捉える。本リポジトリの smart_money_report が暗号資産でやっている
 「今窓 vs 前窓」比較の株式版。
 
-入力: data/jp_stocks/universe.csv (code,name,bucket) + data/jp_stocks/{code}_1m.csv
+入力: data/jp_stocks/universe.csv (code,name,bucket,sector,group) + data/jp_stocks/{code}_1m.csv
 出力: data/jp_stocks/money_flow.csv (銘柄別スコア) と Discord/標準出力サマリー
 
 各銘柄について:
@@ -19,6 +19,9 @@ JP Money Flow Screener (日本株 資金集中スクリーナー)
   share_base   = 履歴全体での売買代金シェア(%)
   share_delta  = share_recent - share_base  (資金が"向かってきた"量, ppt)
 バケット別 (leader/core/hot) の recent/baseline で「どの層が熱いか」も集計。
+業種グループ別 (universe.csvのgroup列=JPX正式33業種区分) の share_recent/share_base
+合算で「どの業種に資金が向いているか」も集計 (money_flow.jsonの"groups"に出力)。
+group列が無い旧universe.csvでもsector列にフォールバックして後方互換で動く。
 
 設計:
   - 標準ライブラリのみ (matplotlibがあればチャートも出せるが本体はテキストで動く)
@@ -93,6 +96,15 @@ def load_short_positions():
         return {}
 
 
+def _group_of(r):
+    """業種グループ(JPX正式33業種)を取り出す共通ヘルパー。
+
+    universe.csvにまだgroup列が無い旧ファイルでも動く後方互換フォールバック:
+    group列 → (無ければ)sector列 → (それも無ければ)"不明"。
+    """
+    return (r.get("group") or "").strip() or (r.get("sector") or "").strip() or "不明"
+
+
 def load_universe():
     meta = {}
     if os.path.exists(UNIVERSE_FILE):
@@ -103,7 +115,7 @@ def load_universe():
                     continue
                 sym = code if "." in code else code + ".T"
                 meta[sym] = (r.get("name") or sym, r.get("bucket") or "core",
-                             (r.get("sector") or "").strip())
+                             (r.get("sector") or "").strip(), _group_of(r))
     return meta
 
 
@@ -180,7 +192,7 @@ def analyze():
     win_sec = WINDOW_MIN * 60
     recs = []
     latest_ts = 0
-    for sym, (name, bucket, sector) in meta.items():
+    for sym, (name, bucket, sector, group) in meta.items():
         rows = load_bars(sym)
         if len(rows) < 5:
             continue
@@ -201,7 +213,7 @@ def analyze():
         last_c = rows[-1][1]
         pct = (last_c / first_c - 1) * 100 if first_c else 0.0
         recs.append({
-            "sym": sym, "name": name, "bucket": bucket, "sector": sector,
+            "sym": sym, "name": name, "bucket": bucket, "sector": sector, "group": group,
             "recent": recent, "baseline_med": med, "surge": surge, "z": z,
             "total_to": total_to, "last": last_c, "pct": pct,
         })
@@ -224,16 +236,28 @@ def analyze():
         b = buckets.setdefault(r["bucket"], {"recent": 0.0, "total": 0.0, "n": 0})
         b["recent"] += r["recent"]; b["total"] += r["total_to"]; b["n"] += 1
 
+    # 業種グループ別集計 (JPX33業種、group列。無ければsectorにフォールバック)
+    # 既に銘柄単位で計算済みのshare_recent/share_baseを合算するだけ (二重計算しない)。
+    group_agg = {}
+    for r in recs:
+        g = group_agg.setdefault(r["group"], {"share_recent": 0.0, "share_base": 0.0, "n": 0})
+        g["share_recent"] += r["share_recent"]; g["share_base"] += r["share_base"]; g["n"] += 1
+    groups = sorted(
+        [{"group": g, "share_pct": v["share_recent"], "base_share_pct": v["share_base"],
+          "delta_pp": v["share_recent"] - v["share_base"], "n": v["n"]}
+         for g, v in group_agg.items()],
+        key=lambda x: -x["share_pct"])
+
     # 出力CSV
     recs_by_surge = sorted(recs, key=lambda r: -r["surge"])
     with open(OUT_CSV, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["code", "name", "bucket", "sector", "surge_ratio", "zscore",
+        w.writerow(["code", "name", "bucket", "sector", "group", "surge_ratio", "zscore",
                     "recent_turnover_yen", "baseline_median_yen",
                     "share_recent_pct", "share_base_pct", "share_delta_pp",
                     "last_close", "pct_window"])
         for r in recs_by_surge:
-            w.writerow([r["sym"], r["name"], r["bucket"], r["sector"],
+            w.writerow([r["sym"], r["name"], r["bucket"], r["sector"], r["group"],
                         f'{r["surge"]:.3f}', f'{r["z"]:.2f}',
                         f'{r["recent"]:.0f}', f'{r["baseline_med"]:.0f}',
                         f'{r["share_recent"]:.3f}', f'{r["share_base"]:.3f}',
@@ -241,8 +265,8 @@ def analyze():
                         f'{r["last"]:.1f}', f'{r["pct"]:+.2f}'])
 
     # 自動分析コメント (事実ベース) + ダッシュボード用JSON
-    commentary = _commentary(recs_by_surge, buckets, latest_ts)
-    _dump_json(recs_by_surge, buckets, latest_ts, commentary)
+    commentary = _commentary(recs_by_surge, buckets, latest_ts, groups)
+    _dump_json(recs_by_surge, buckets, latest_ts, commentary, groups)
     _print_report(recs_by_surge, buckets, latest_ts)
     print("\n--- 自動分析コメント ---")
     for line in commentary:
@@ -274,7 +298,7 @@ def _peak_window(bars, win_sec=1800):
     return best
 
 
-def _commentary(recs, buckets, latest_ts):
+def _commentary(recs, buckets, latest_ts, groups=None):
     """算出可能な事実のみで日本語コメントを組み立てる (捏造しない)。"""
     lines = []
     if not recs or not latest_ts:
@@ -286,6 +310,18 @@ def _commentary(recs, buckets, latest_ts):
     total_recent = sum(r["recent"] for r in recs)
     lines.append(f"直近{WINDOW_MIN}分の売買代金は全体で {_yen(total_recent)}。"
                  f"最も資金が寄っているのは「{BUCKET_LABEL.get(top_bucket[0],top_bucket[0])}」層で全体の {bshare:.0f}%。")
+
+    # 業種別シェア (JPX33業種区分、group列) — 上位3業種 + 変化幅(Δpp)が突出した業種
+    if groups:
+        top3 = groups[:3]
+        rest = groups[3:]
+        big_delta = max(rest, key=lambda g: abs(g["delta_pp"])) if rest else None
+        parts = [f"{g['group']} {g['share_pct']:.1f}%（通常{g['base_share_pct']:.1f}%・{g['delta_pp']:+.1f}pp）"
+                 for g in top3]
+        if big_delta and abs(big_delta["delta_pp"]) >= 0.5:
+            parts.append(f"{big_delta['group']} {big_delta['share_pct']:.1f}%"
+                         f"（通常{big_delta['base_share_pct']:.1f}%・{big_delta['delta_pp']:+.1f}pp、変化幅で突出）")
+        lines.append("業種別シェア: " + "、".join(parts) + "。")
 
     # 上位集中銘柄の時間帯と値動き
     strong = [r for r in recs if r["surge"] >= 1.5][:3]
@@ -339,7 +375,7 @@ def _commentary(recs, buckets, latest_ts):
     return lines
 
 
-def _dump_json(recs, buckets, latest_ts, commentary=None):
+def _dump_json(recs, buckets, latest_ts, commentary=None, groups=None):
     import json
     tot_recent = sum(b["recent"] for b in buckets.values()) or 1.0
     payload = {
@@ -351,7 +387,7 @@ def _dump_json(recs, buckets, latest_ts, commentary=None):
         "commentary": commentary or [],
         "rows": [{
             "code": r["sym"], "name": r["name"], "bucket": r["bucket"],
-            "sector": r["sector"],
+            "sector": r["sector"], "group": r["group"],
             "surge": round(r["surge"], 3), "z": round(r["z"], 2),
             "recent": round(r["recent"]), "share_recent": round(r["share_recent"], 3),
             "share_base": round(r["share_base"], 3), "share_delta": round(r["share_delta"], 3),
@@ -362,6 +398,11 @@ def _dump_json(recs, buckets, latest_ts, commentary=None):
             "recent": round(b["recent"]), "n": b["n"],
             "share": round(b["recent"] / tot_recent * 100, 2),
         } for name, b in sorted(buckets.items(), key=lambda kv: -kv[1]["recent"])],
+        "groups": [{
+            "group": g["group"], "share_pct": round(g["share_pct"], 3),
+            "base_share_pct": round(g["base_share_pct"], 3),
+            "delta_pp": round(g["delta_pp"], 3), "n": g["n"],
+        } for g in (groups or [])],
     }
     with open(JSON_OUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, separators=(",", ":"))
