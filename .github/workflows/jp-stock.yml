@@ -2,17 +2,21 @@ name: JP Stock 1m Collector
 
 # 日本株1分足コレクター (jp_stock_fetch.py)
 # Yahoo Financeの非公式チャートAPIから東証銘柄の1分足を取得し data/jp_stocks/ に差分蓄積。
+# 850銘柄化(2026-07)により、通常巡回はRANGE=1d(当日分のみ)に軽量化して30分cadenceに
+# 収める設計に変更。取りこぼした欠損は jp-stock-history.yml の RANGE=5d 追取りで埋める。
 # 注意:
 #   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
 #   - フィーチャーブランチでの検証は push トリガーで代用 (本体/workflow変更時に1回走る)
 #   - このサンドボックス(Claude Code)からはYahooがproxyブロックで到達不可のため、
 #     実データ疎通の検証はこのランナー上の実行が初となる
+#   - 850銘柄規模での実測時間・429有無はPR本文に記録 (ランナー上でベンチマーク実施)
 
 on:
   schedule:
     # 東証の立会時間 9:00-15:00 JST = 00:00-06:00 UTC の平日のみ。
     # :00/:30 はGitHub負荷ピークでドロップされやすいため :23/:53 にオフセット。
-    # 各実行で直近5日分の1分足を取り直し重複排除するので、多少ドロップしても欠損しない。
+    # RANGE=1d(当日分のみ)を毎回取り直し重複排除するので、多少ドロップしても
+    # 同日内なら欠損しない(日をまたぐ欠損はjp-stock-history.ymlのRANGE=5dで回収)。
     - cron: '23,53 0-6 * * 1-5'
   workflow_dispatch:
   # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
@@ -32,7 +36,7 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v5
 
@@ -45,9 +49,12 @@ jobs:
         env:
           # 取得対象は data/jp_stocks/universe.csv (code列) で管理。
           # 単発で上書きしたい時だけ JP_TICKERS='7203.T,...' を渡す。
-          RANGE: '5d'
+          # RANGE=1d: 850銘柄規模で30分cadenceに収めるための軽量化 (当日分のみ取得)。
+          # 日をまたぐ欠損はjp-stock-history.ymlのRANGE=5d追取りステップで埋める。
+          RANGE: '1d'
           INTERVAL: '1m'
-          FETCH_DEADLINE_MIN: '14'
+          SLEEP_SEC: '0.4'
+          FETCH_DEADLINE_MIN: '16'
         run: python jp_stock_fetch.py
 
       # 収集した1分足から売買代金の異常集中をスクリーニング
@@ -66,7 +73,10 @@ jobs:
           git add -- data/jp_stocks 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "chore: JP stock 1m data $(date -u +'%Y-%m-%d %H:%M')"
-            git pull --rebase origin "${GITHUB_REF_NAME}" || true
+          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
+          # (競合したまま放置するとpushが「Everything up-to-date」となり
+          #  データ喪失がsuccessに見える。2026-07-09に並走runで実際に発生)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
             git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
           else
             echo "新規バーなし (立会時間外/休場日/既に取得済み)"

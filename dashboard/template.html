@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>日本株 資金集中スクリーナー</title>
 <style>
   :root{
@@ -82,13 +84,16 @@
   .rval .s{font-family:var(--num);font-size:13.5px;font-weight:680;}.rval .t{font-family:var(--num);font-size:10px;color:var(--muted);}
   .up{color:var(--up-text);}.down{color:var(--down-text);}.flag{color:var(--alert-ink);font-weight:680;}
   .chartctl{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;margin-bottom:12px;}
-  select.stocksel{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 12px;cursor:pointer;max-width:100%;}
-  select.stocksel:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  input.stocksel,select.stocksel{font:inherit;font-size:13px;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 12px;cursor:pointer;max-width:100%;width:280px;}
+  input.stocksel::placeholder{color:var(--muted);}
+  input.stocksel:focus-visible,select.stocksel:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
   .detail{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px 10px;box-shadow:var(--shadow);}
-  .dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:8px;}
+  .dhead{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;margin-bottom:8px;min-height:22px;}
   .dhead .dnm{font-size:16px;font-weight:660;}.dhead .dpx{font-family:var(--num);font-size:15px;font-weight:600;}
   .dhead .dsec{font-size:11px;color:var(--muted);}.dhead .drange{font-size:11px;color:var(--muted);margin-left:auto;}
+  .dhead .dload{font-size:12px;color:var(--muted);}
   .plot{position:relative;}.plot svg{width:100%;height:auto;display:block;touch-action:none;}
+  .plot.loading svg{opacity:.35;}
   .tip{position:absolute;top:6px;left:0;pointer-events:none;opacity:0;transform:translate(-50%,0);background:var(--surface);border:1px solid var(--border);border-radius:9px;box-shadow:var(--shadow);padding:7px 10px;font-size:11.5px;min-width:150px;z-index:5;transition:opacity .08s;}
   .tip .tt{color:var(--muted);font-size:10.5px;margin-bottom:4px;font-family:var(--num);}
   .tip .row{display:flex;justify-content:space-between;gap:14px;line-height:1.6;}
@@ -106,7 +111,7 @@
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
   footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
-  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}}
+  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 
@@ -144,9 +149,12 @@
     <div class="rank" id="rank"></div>
   </section>
   <section>
-    <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note">全46銘柄から選択・足を切替（分足〜月足）</span></div>
+    <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note" id="chartnote">銘柄を検索して選択・足を切替（分足〜月足）</span></div>
     <div class="chartctl">
-      <div class="ctl"><span class="lbl">銘柄</span><select class="stocksel" id="stocksel" aria-label="銘柄選択"></select></div>
+      <div class="ctl"><span class="lbl">銘柄</span>
+        <input class="stocksel" id="stocksel" list="stockdl" autocomplete="off" placeholder="コード/銘柄名で検索" aria-label="銘柄選択">
+        <datalist id="stockdl"></datalist>
+      </div>
       <div class="ctl"><span class="lbl">足</span>
         <div class="seg" id="tfseg">
           <button data-tf="1m">1分</button><button data-tf="5m">5分</button><button data-tf="30m">30分</button>
@@ -177,7 +185,8 @@
 
 <script>const D = __MFR__;
 const D_COMMENT = __COMMENTARY__;
-const D_SUPPLY = __SUPPLY__;</script>
+const D_SUPPLY = __SUPPLY__;
+const D_INITIAL = __INITIAL__;</script>
 <script>
 (function(){
   const $=s=>document.querySelector(s);
@@ -188,126 +197,132 @@ const D_SUPPLY = __SUPPLY__;</script>
   }
   const BC={leader:"var(--b-leader)",core:"var(--b-core)",hot:"var(--b-hot)"};
   const BL={leader:"けん引大型",core:"主力",hot:"話題・噂"};
+  const WINLB={"1m":"1分","5m":"5分","15m":"15分","30m":"30分","60m":"1時間","240m":"4時間","1d":"日足","1w":"週足","1M":"月足"};
+  const TFLB={"1m":"1分足","5m":"5分足","30m":"30分足","60m":"1時間足","240m":"4時間足","1d":"日足","1w":"週足","1M":"月足"};
   const yen=v=>v>=1e12?(v/1e12).toFixed(2)+"兆":v>=1e8?(v/1e8).toFixed(1)+"億":v>=1e4?(v/1e4).toFixed(0)+"万":String(Math.round(v));
-  const master=D.master, dsep=D.day_sep, T=D.tickers, N=master.length;
+  const T=D.tickers;
   const jstD=t=>new Date(t*1000+324e5);
   const jstHM=t=>{const d=jstD(t);return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0");};
   const jstMD=t=>{const d=jstD(t);return (d.getUTCMonth()+1)+"/"+d.getUTCDate();};
   const jstYMD=t=>{const d=jstD(t);return d.getUTCFullYear()+"-"+(d.getUTCMonth()+1)+"-"+d.getUTCDate();};
 
-  const WINS=[{k:"1m",min:1,lb:"1分"},{k:"5m",min:5,lb:"5分"},{k:"15m",min:15,lb:"15分"},{k:"30m",min:30,lb:"30分"},
-    {k:"60m",min:60,lb:"1時間"},{k:"240m",min:240,lb:"4時間"},{k:"1d",days:1,lb:"1日"},{k:"1w",days:5,lb:"1週"},{k:"1M",days:21,lb:"1ヶ月"}];
-  const TFLB={"1m":"1分足","5m":"5分足","30m":"30分足","60m":"1時間足","240m":"4時間足","1d":"日足","1w":"週足","1M":"月足"};
-
-  // ---- intraday turnover (1-min) ----
-  T.forEach(tk=>{tk.to=new Array(N);for(let i=0;i<N;i++){const c=tk.close[i];tk.to[i]=(c==null)?0:c*tk.vol[i];}});
-  T.forEach(tk=>{let s=0;for(let i=0;i<N;i++)s+=tk.to[i];tk.totalTo=s;});
-  const grandTotal=T.reduce((a,tk)=>a+tk.totalTo,0)||1;
-  let lastActive1=N-1;for(let i=N-1;i>=0;i--){let s=0;for(const tk of T)s+=tk.to[i];if(s>0){lastActive1=i;break;}}
-
-  // ---- daily turnover (from daily bars) ----
-  const dset=new Set();T.forEach(tk=>{if(tk.d)tk.d.t.forEach(t=>dset.add(t));});
-  const dayMaster=[...dset].sort((a,b)=>a-b);const dayIdx=new Map(dayMaster.map((t,i)=>[t,i]));const ND=dayMaster.length;
-  T.forEach(tk=>{tk.dto=new Array(ND).fill(0);
-    if(tk.d)for(let i=0;i<tk.d.t.length;i++){const gi=dayIdx.get(tk.d.t[i]);if(gi!=null)tk.dto[gi]=tk.d.c[i]*tk.d.v[i];}
-    let s=0;for(let i=0;i<ND;i++)s+=tk.dto[i];tk.totalToD=s;});
-  const grandTotalD=T.reduce((a,tk)=>a+tk.totalToD,0)||1;
-  let lastActiveD=ND-1;for(let i=ND-1;i>=0;i--){let s=0;for(const tk of T)s+=tk.dto[i];if(s>0){lastActiveD=i;break;}}
-
-  let WKEY="5m", THR=0.5, SEL=null, TF="5m";
-  const curWin=()=>WINS.find(w=>w.k===WKEY);
-
-  function sumIdxA(A,i0,i1){let s=0;const a=Math.max(0,i0),b=Math.min(A.length-1,i1);for(let i=a;i<=b;i++)s+=A[i];return s;}
-  function medBlocksA(A,LA,wb){const bl=[];for(let i=0;i+wb-1<=LA;i+=wb){let s=0;for(let j=i;j<i+wb;j++)s+=A[j];bl.push(s);}
-    if(bl.length>1)bl.pop();if(!bl.length)return 0;bl.sort((a,b)=>a-b);const m=bl.length;return m%2?bl[(m-1)/2]:(bl[m/2-1]+bl[m/2])/2;}
-  function compute(){
-    const win=curWin(),daily=!!win.days,wb=daily?win.days:win.min,LA=daily?lastActiveD:lastActive1;
-    const arrOf=tk=>daily?tk.dto:tk.to,totOf=tk=>daily?tk.totalToD:tk.totalTo,grand=daily?grandTotalD:grandTotal;
-    let sumR=0,sumP=0;
-    T.forEach(tk=>{const A=arrOf(tk);tk._recent=sumIdxA(A,LA-wb+1,LA);tk._prev=sumIdxA(A,LA-2*wb+1,LA-wb);tk._med=medBlocksA(A,LA,wb);sumR+=tk._recent;sumP+=tk._prev;});
-    sumR=sumR||1;sumP=sumP||1;
-    T.forEach(tk=>{tk._surge=tk._med>0?tk._recent/tk._med:0;tk._shareR=tk._recent/sumR*100;tk._shareP=tk._prev/sumP*100;
-      tk._shareBase=totOf(tk)/grand*100;tk._momentum=tk._shareR-tk._shareP;tk._dBase=tk._shareR-tk._shareBase;});
-  }
-  const winLabel=()=>curWin().lb;
+  // ---- 集計窓ごとのランキング/ヒート/勢い統計はビルド時(dashboard/build_dashboard.py)に
+  // Python側で事前計算済み (tk.w[WKEY])。850銘柄規模の生1分足をブラウザに送らないための設計。
+  // ブラウザ側は選ばれたWKEYに対応する事前計算値を読むだけで、再計算はしない。
+  let WKEY=D.meta.default_win||"5m", THR=0.5, SEL=(D_INITIAL&&D_INITIAL.code)||null, TF="5m";
+  const winLabel=()=>WINLB[WKEY]||WKEY;
 
   function render(){
-    compute();
     $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span><span class="chip"><b class="tnum">${T.length}</b> 銘柄</span><span class="chip">売買代金=終値×出来高</span>`;
-    const flagged=T.filter(tk=>tk._momentum>=THR).sort((a,b)=>b._momentum-a._momentum);
+    $("#chartnote").textContent=`全${T.length}銘柄から検索して選択・足を切替（分足〜月足）`;
+
+    const flagged=T.filter(tk=>(tk.w[WKEY]||{}).momentum>=THR).sort((a,b)=>b.w[WKEY].momentum-a.w[WKEY].momentum);
     const al=$("#alert");
     if(flagged.length){
       al.innerHTML=`<div class="alert"><div class="ttl">🚨 急騰検知 — 直近${winLabel()}でシェアが +${THR}pp 以上 急伸（${flagged.length}件）</div>`+
-        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">▲+${tk._momentum.toFixed(2)}pp</span><span class="sec">${tk._surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
+        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">▲+${tk.w[WKEY].momentum.toFixed(2)}pp</span><span class="sec">${tk.w[WKEY].surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
     }else{al.innerHTML=`<div class="alert calm"><div class="ttl">🟢 急騰なし — 直近${winLabel()}でシェア +${THR}pp 以上の急伸銘柄はありません</div></div>`;}
     al.querySelectorAll(".alertpill").forEach(b=>b.onclick=()=>select(b.dataset.code));
 
-    const bk={};T.forEach(tk=>{const b=bk[tk.bucket]||(bk[tk.bucket]={r:0,n:0});b.r+=tk._recent;b.n++;});
+    const bk={};T.forEach(tk=>{const b=bk[tk.bucket]||(bk[tk.bucket]={r:0,n:0});b.r+=(tk.w[WKEY]||{}).recent||0;b.n++;});
     const order=Object.entries(bk).sort((a,b)=>b[1].r-a[1].r);const tot=order.reduce((a,[,v])=>a+v.r,0)||1;
     $("#heatnote").textContent=`直近${winLabel()}の売買代金シェア（＝資金の向き先）`;
     $("#heatbar").innerHTML=order.map(([k,v])=>{const p=v.r/tot*100;return `<div class="heatseg" style="flex:${p||0.01};background:${BC[k]}">${p>=7?BL[k]+" "+p.toFixed(0)+"%":p.toFixed(0)+"%"}</div>`;}).join("");
     $("#legend").innerHTML=order.map(([k,v])=>`<span class="k"><span class="sw" style="background:${BC[k]}"></span>${BL[k]} <span class="tnum" style="color:var(--muted)">${yen(v.r)}円/${v.n}銘柄</span></span>`).join("");
 
-    const rk=T.slice().sort((a,b)=>b._surge-a._surge);const top=rk.slice(0,18);
-    const maxS=Math.max.apply(null,top.map(t=>t._surge).concat([1.2])),scale=maxS*1.05,refPct=1/scale*100;
-    $("#rank").innerHTML=top.map((tk,i)=>{const w=Math.max(1,tk._surge/scale*100);
-      const mom=tk._momentum>=THR?`<span class="flag">🚨+${tk._momentum.toFixed(2)}pp</span>`:`<span class="${tk._dBase>0?'up':tk._dBase<0?'down':''}">Δ${tk._dBase>0?"+":""}${tk._dBase.toFixed(2)}p</span>`;
+    const rk=T.slice().sort((a,b)=>(b.w[WKEY]||{}).surge-(a.w[WKEY]||{}).surge);const top=rk.slice(0,18);
+    const maxS=Math.max.apply(null,top.map(t=>t.w[WKEY].surge).concat([1.2])),scale=maxS*1.05,refPct=1/scale*100;
+    $("#rank").innerHTML=top.map((tk,i)=>{const w=Math.max(1,tk.w[WKEY].surge/scale*100);
+      const mom=tk.w[WKEY].momentum>=THR?`<span class="flag">🚨+${tk.w[WKEY].momentum.toFixed(2)}pp</span>`:`<span class="${tk.w[WKEY].dBase>0?'up':tk.w[WKEY].dBase<0?'down':''}">Δ${tk.w[WKEY].dBase>0?"+":""}${tk.w[WKEY].dBase.toFixed(2)}p</span>`;
       return `<div class="rrow${SEL===tk.code?' sel':''}" tabindex="0" data-code="${tk.code}" role="button">
         <div class="rname"><span class="n">${i+1}. ${tk.name}</span><span class="tags"><span class="c">${tk.code}</span><span class="sect" title="${tk.sector}">${tk.sector}</span></span></div>
         <div class="track"><div class="bar" style="width:${w}%;background:${BC[tk.bucket]}"></div><div class="refline" style="left:${refPct}%"></div></div>
-        <div class="rval"><span class="s">${tk._surge.toFixed(2)}x</span><span class="t">${yen(tk._recent)}円 · ${mom}</span></div></div>`;}).join("");
+        <div class="rval"><span class="s">${tk.w[WKEY].surge.toFixed(2)}x</span><span class="t">${yen(tk.w[WKEY].recent)}円 · ${mom}</span></div></div>`;}).join("");
     $("#rank").querySelectorAll(".rrow").forEach(r=>{r.onclick=()=>select(r.dataset.code);r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(r.dataset.code);}};});
 
-    $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pc=tk.close.filter(x=>x!=null),first=pc[0],lastc=pc[pc.length-1],pct=(lastc/first-1)*100;
-      const mc=tk._momentum>=THR?"flag":(tk._momentum>0?"up":"down");
+    $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pct=tk.pct||0;
+      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
       const sd=D_SUPPLY[tk.code];
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk._surge.toFixed(2)}x</td><td>${yen(tk._recent)}円</td><td class="${mc}">${tk._momentum>0?"+":""}${tk._momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
-    if(!SEL)SEL=rk[0].code;drawDetail(SEL);
+    if(!SEL)SEL=rk[0].code;
+    select(SEL, {skipScroll:true});
   }
 
-  // ---------- chart aggregation ----------
-  function aggIntraday(tk,minv){
-    const c=tk.close,v=tk.vol,bars=[];let ck=null,cur=null;
-    for(let i=0;i<N;i++){if(c[i]==null)continue;const k=Math.floor(master[i]/(minv*60));
-      if(k!==ck){if(cur)bars.push(cur);ck=k;cur={o:c[i],h:c[i],l:c[i],c:c[i],v:v[i]||0,t0:master[i]};}
+  // ---------- 銘柄別チャートデータの遅延読み込み ----------
+  // 850銘柄分の生1分足を index.html に埋め込むと10MB超で破綻するため、
+  // 銘柄選択時に site/data/{code}.json を fetch する (同一オリジンなのでCORS問題なし)。
+  // 初期選択銘柄だけは D_INITIAL としてHTMLに埋め込み済みなので初回はfetch不要。
+  const chartCache={};
+  if(D_INITIAL && D_INITIAL.code) chartCache[D_INITIAL.code]=D_INITIAL;
+
+  async function loadTickerChart(code){
+    if(chartCache[code]) return chartCache[code];
+    const res=await fetch("data/"+code.replace(/\./g,"_")+".json");  // build側は 7203.T → 7203_T.json で出力
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const j=await res.json();
+    chartCache[code]=j;
+    return j;
+  }
+
+  // ---------- chart aggregation (own timeline, master整列なし) ----------
+  function aggIntraday(ck,minv){
+    const t=ck.t,c=ck.close,v=ck.vol,n=t.length,bars=[];let idx=null,cur=null;
+    for(let i=0;i<n;i++){const k=Math.floor(t[i]/(minv*60));
+      if(k!==idx){if(cur)bars.push(cur);idx=k;cur={o:c[i],h:c[i],l:c[i],c:c[i],v:v[i]||0,t0:t[i]};}
       else{cur.h=Math.max(cur.h,c[i]);cur.l=Math.min(cur.l,c[i]);cur.c=c[i];cur.v+=v[i]||0;}}
     if(cur)bars.push(cur);
     const seps=[];let pd=null;bars.forEach((b,i)=>{const d=jstYMD(b.t0);if(d!==pd){seps.push({i,label:jstMD(b.t0)});pd=d;}});
     return {bars,seps,intraday:true};
   }
-  function aggDaily(tk,tf){
-    const Dd=tk.d;if(!Dd||!Dd.t.length)return {bars:[],seps:[]};
+  function aggDaily(ck,tf){
+    const Dd=ck.d;if(!Dd||!Dd.t.length)return {bars:[],seps:[]};
     const keyFn=tf==="1d"?(t=>jstYMD(t)):tf==="1w"?(t=>Math.floor(t/(7*86400))):(t=>{const d=jstD(t);return d.getUTCFullYear()*12+d.getUTCMonth();});
-    const bars=[];let ck=null,cur=null;
+    const bars=[];let ck2=null,cur=null;
     for(let i=0;i<Dd.t.length;i++){const k=keyFn(Dd.t[i]);
-      if(k!==ck){if(cur)bars.push(cur);ck=k;cur={o:Dd.o[i],h:Dd.h[i],l:Dd.l[i],c:Dd.c[i],v:Dd.v[i],t0:Dd.t[i]};}
+      if(k!==ck2){if(cur)bars.push(cur);ck2=k;cur={o:Dd.o[i],h:Dd.h[i],l:Dd.l[i],c:Dd.c[i],v:Dd.v[i],t0:Dd.t[i]};}
       else{cur.h=Math.max(cur.h,Dd.h[i]);cur.l=Math.min(cur.l,Dd.l[i]);cur.c=Dd.c[i];cur.v+=Dd.v[i];}}
     if(cur)bars.push(cur);
-    // separators: 1d/1w → 月 (年跨ぎで年), 1M → 年
     const seps=[];let pk=null;
     bars.forEach((b,i)=>{const d=jstD(b.t0);
       if(tf==="1M"){const y=d.getUTCFullYear();if(y!==pk){seps.push({i,label:y+""});pk=y;}}
       else{const key=d.getUTCFullYear()*12+d.getUTCMonth();if(key!==pk){const lbl=(d.getUTCMonth()===0)?d.getUTCFullYear()+"年":(d.getUTCMonth()+1)+"月";seps.push({i,label:lbl});pk=key;}}});
     return {bars,seps,intraday:false,tf};
   }
-  function aggregate(tk,tf){return (tf==="1d"||tf==="1w"||tf==="1M")?aggDaily(tk,tf):aggIntraday(tk,parseInt(tf));}
+  function aggregate(ck,tf){return (tf==="1d"||tf==="1w"||tf==="1M")?aggDaily(ck,tf):aggIntraday(ck,parseInt(tf));}
 
   // ---------- detail chart ----------
   const PW=1000,PH=320,pl=60,pr=14,pt=12,pb=24,VH=66,vpt=4,vpb=14;
   const svgP=$("#svgPrice"),svgV=$("#svgVol"),tip=$("#tip"),plot=$("#plot");
-  let geom=null;
+  let geom=null, curChart=null, loadToken=0;
   function niceTicks(min,max,n){const s=(max-min)/n,mag=Math.pow(10,Math.floor(Math.log10(s))),nm=s/mag;const st=(nm<1.5?1:nm<3?2:nm<7?5:10)*mag,o=[];let t=Math.ceil(min/st)*st;for(;t<=max+1e-6;t+=st)o.push(Math.round(t*100)/100);return o;}
   const fmtPx=v=>v>=1000?v.toLocaleString("ja-JP",{maximumFractionDigits:0}):v.toLocaleString("ja-JP",{minimumFractionDigits:1,maximumFractionDigits:1});
 
-  function drawDetail(code){
-    const tk=T.find(x=>x.code===code);if(!tk)return;
-    const sd=D_SUPPLY[tk.code];
+  async function drawDetail(code){
+    const myToken=++loadToken;
+    const summary=T.find(x=>x.code===code);
+    plot.classList.add("loading");
+    $("#dhead").innerHTML=`<span class="dload">読み込み中…</span>`;
+    let ck;
+    try{
+      ck=await loadTickerChart(code);
+    }catch(e){
+      if(myToken!==loadToken)return;
+      plot.classList.remove("loading");
+      svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--down-text)" font-size="13">チャートデータの読み込みに失敗しました</text>`;
+      svgV.innerHTML="";geom=null;
+      $("#dhead").innerHTML=`<span class="dnm">${summary?summary.name:code}</span><span class="dsec">${code}</span>`;
+      return;
+    }
+    if(myToken!==loadToken)return;  // 選択が切り替わっていたら古い結果は破棄
+    curChart=ck;
+    plot.classList.remove("loading");
+    const sd=D_SUPPLY[ck.code];
     const sdBadge=sd?`<span class="supplybadge" title="JPX空売り残高報告(大口0.5%以上・日次) ${sd.n}件">空売り残 ${sd.pct.toFixed(2)}%（${sd.date}）</span>`:"";
-    const {bars,seps,intraday}=aggregate(tk,TF);const n=bars.length;
+    const {bars,seps,intraday}=aggregate(ck,TF);const n=bars.length;
     if(!n){svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--muted)" font-size="13">この足のデータがありません</text>`;svgV.innerHTML="";geom=null;
-      $("#chartttl").textContent=`${tk.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector}</span>${sdBadge}`;return;}
+      $("#chartttl").textContent=`${ck.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector}</span>${sdBadge}`;return;}
     let ymin=Infinity,ymax=-Infinity,vmax=0;bars.forEach(b=>{if(b.l<ymin)ymin=b.l;if(b.h>ymax)ymax=b.h;if(b.v>vmax)vmax=b.v;});
     const yp=(ymax-ymin)*0.08||1;ymin-=yp;ymax+=yp;
     const Y=x=>pt+(1-(x-ymin)/(ymax-ymin))*(PH-pt-pb);const VY=x=>vpt+(1-x/(vmax||1))*(VH-vpt-vpb);
@@ -330,11 +345,11 @@ const D_SUPPLY = __SUPPLY__;</script>
     svgP.innerHTML=grid+sepS+body+`<line id="cxV" x1="0" y1="${pt}" x2="0" y2="${PH-pb}" stroke="var(--accent-2)" stroke-width="1" opacity="0"/>`+ylab+xlab;
     svgV.innerHTML=`<path d="${vd}" stroke="var(--axis)" stroke-width="${Math.max(1,bw*0.5).toFixed(1)}" fill="none" opacity="0.7"/><line id="cxV2" x1="0" y1="${vpt}" x2="0" y2="${VH-vpb}" stroke="var(--accent-2)" stroke-width="1" opacity="0"/><text x="${pl-8}" y="${vpt+6}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="var(--num)">出来高</text>`;
     const first=bars[0].o,lastc=bars[n-1].c,pct=(lastc/first-1)*100;
-    $("#chartttl").textContent=`${tk.name} のチャート`;
-    $("#dhead").innerHTML=`<span class="dnm">${tk.name}</span><span class="dsec">${tk.code} · ${tk.sector} · ${BL[tk.bucket]}</span>${sdBadge}`+
+    $("#chartttl").textContent=`${ck.name} のチャート`;
+    $("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector} · ${BL[ck.bucket]}</span>${sdBadge}`+
       `<span class="dpx tnum">¥${fmtPx(lastc)}</span><span class="dpx tnum ${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%（表示範囲）</span>`+
       `<span class="drange tnum">${TFLB[TF]}・${n}本</span>`;
-    const sel=$("#stocksel");if(sel.value!==code)sel.value=code;
+    syncStockInput(ck.code, ck.name);
   }
   function tfLabel(){return TFLB[TF];}
 
@@ -357,23 +372,49 @@ const D_SUPPLY = __SUPPLY__;</script>
   plot.addEventListener("touchstart",e=>{if(e.touches[0])moveHandler(e.touches[0].clientX);},{passive:true});
   plot.addEventListener("touchmove",e=>{if(e.touches[0])moveHandler(e.touches[0].clientX);},{passive:true});
 
-  function select(code){SEL=code;document.querySelectorAll(".rrow").forEach(r=>r.classList.toggle("sel",r.dataset.code===code));drawDetail(code);hide();$("#chartttl").scrollIntoView({behavior:"smooth",block:"nearest"});}
+  function select(code,opts){SEL=code;document.querySelectorAll(".rrow").forEach(r=>r.classList.toggle("sel",r.dataset.code===code));
+    drawDetail(code);hide();
+    if(!(opts&&opts.skipScroll))$("#chartttl").scrollIntoView({behavior:"smooth",block:"nearest"});}
 
-  (function(){const sel=$("#stocksel");const groups={leader:[],core:[],hot:[]};T.forEach(tk=>groups[tk.bucket].push(tk));
-    ["hot","leader","core"].forEach(g=>{const og=document.createElement("optgroup");og.label=BL[g];
-      groups[g].sort((a,b)=>a.code.localeCompare(b.code)).forEach(tk=>{const o=document.createElement("option");o.value=tk.code;o.textContent=`${tk.name}（${tk.code} · ${tk.sector}）`;og.appendChild(o);});sel.appendChild(og);});
-    sel.onchange=()=>select(sel.value);})();
+  // ---------- 銘柄セレクタ (850銘柄規模のためdatalistで検索可能に) ----------
+  const stockInput=$("#stocksel"), stockDL=$("#stockdl");
+  const optLabel=tk=>`${tk.code.replace(".T","")} ${tk.name}`;
+  const codeByLabel=new Map();
+  (function(){
+    const groups={hot:[],leader:[],core:[]};
+    T.forEach(tk=>{(groups[tk.bucket]||groups.core).push(tk);});
+    ["hot","leader","core"].forEach(g=>{
+      groups[g].sort((a,b)=>a.code.localeCompare(b.code)).forEach(tk=>{
+        const label=optLabel(tk);codeByLabel.set(label,tk.code);
+        const o=document.createElement("option");o.value=label;o.label=`${BL[g]}・${tk.sector}`;stockDL.appendChild(o);
+      });
+    });
+  })();
+  function syncStockInput(code,name){
+    const tk=T.find(x=>x.code===code);
+    stockInput.value=tk?optLabel(tk):(name||code);
+  }
+  function resolveStockInput(v){
+    v=(v||"").trim();
+    if(codeByLabel.has(v))return codeByLabel.get(v);
+    const bare=v.replace(/\s.*$/,"");
+    const hit=T.find(tk=>tk.code.replace(".T","")===bare||tk.code===bare);
+    if(hit)return hit.code;
+    const byName=T.find(tk=>tk.name===v||optLabel(tk)===v);
+    return byName?byName.code:null;
+  }
+  stockInput.addEventListener("change",()=>{const c=resolveStockInput(stockInput.value);if(c)select(c);else syncStockInput(SEL);});
 
   $("#winseg").querySelectorAll("button").forEach(b=>b.onclick=()=>{WKEY=b.dataset.w;$("#winseg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();});
   $("#thrseg").querySelectorAll("button").forEach(b=>b.onclick=()=>{THR=+b.dataset.t;$("#thrseg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));render();});
   $("#tfseg").querySelectorAll("button").forEach(b=>b.onclick=()=>{TF=b.dataset.tf;$("#tfseg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));drawDetail(SEL);hide();});
-  $("#winseg").querySelector('[data-w="5m"]').setAttribute("aria-pressed","true");
+  $("#winseg").querySelector(`[data-w="${WKEY}"]`)?.setAttribute("aria-pressed","true");
   $("#thrseg").querySelector('[data-t="0.5"]').setAttribute("aria-pressed","true");
   $("#tfseg").querySelector('[data-tf="5m"]').setAttribute("aria-pressed","true");
 
   $("#footer").innerHTML=
     `<div><b>読み方</b>　「集中度」＝各銘柄の直近窓の売買代金が平常時（履歴の同幅中央値）の何倍か。「勢いΔpp」＝直前の同じ窓と比べたユニバース内シェアの増減（pp）で、急騰しきい値超で🚨アラート。チャートはローソク足（1分のみ終値ライン）。板情報は使わず売買代金の集中で近似（真の板/歩み値リアルタイムは無料枠外）。`+
-    `<div class="warn"><b>データ範囲</b>：分足系（1分〜4時間・集計窓と分足チャート）は直近5営業日の1分足から。<b>日/週/月（集計窓・日足〜月足チャート）は日足2年から集約</b>（週足・月足はYahooの月足APIが新規上場銘柄で不安定なため、信頼できる日足を自前で集約）。<b>空売り残</b>バッジはJPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口投資家のみ・日次）を集計したもので、表示が無い銘柄は空売りが無いのではなく大口報告が無いことを意味する。対象は本番850銘柄の種となる46銘柄の検証セット。データ: Yahoo Finance・JPX / 最新 ${D.meta.end} JST。<b>投資助言ではありません。</b></div>`;
+    `<div class="warn"><b>データ範囲</b>：分足系（1分〜4時間・集計窓と分足チャート）は1分足の保持期間(${D.meta.start} 〜 ${D.meta.end} JST、ローリング窓)から。<b>日/週/月（集計窓・日足〜月足チャート）は日足2年から集約</b>（週足・月足はYahooの月足APIが新規上場銘柄で不安定なため、信頼できる日足を自前で集約）。<b>空売り残</b>バッジはJPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口投資家のみ・日次）を集計したもので、表示が無い銘柄は空売りが無いのではなく大口報告が無いことを意味する。対象は TOPIX500 + 日経225 + 話題枠（JPX/日経の公式構成銘柄一覧から機械的に構築、話題枠は手動シード）で構成する監視ユニバース全${T.length}銘柄。銘柄別チャートは選択時に読み込み(fetch)。データ: Yahoo Finance・JPX・日経 / 最新 ${D.meta.end} JST。<b>投資助言ではありません。</b></div>`;
 
   render();
 })();

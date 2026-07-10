@@ -145,6 +145,32 @@ def window_blocks(rows, win_sec):
     return blocks
 
 
+def window_stats(rows, win_sec):
+    """(recent, prev, baseline_median) を返す汎用窓統計。
+
+    analyze()内の単一WINDOW_MIN向けロジックを他モジュール(dashboard/build_dashboard.py)
+    からも複数の窓幅(1分〜月足)で再利用できるよう関数化したもの。ダッシュボードの
+    「集計窓」セレクタが全銘柄×全窓幅で使うランキング/ヒート統計をサーバー側で
+    事前計算する用途 (850銘柄をブラウザに生の1分足配列で送らないための設計)。
+
+    rows: [(epoch, close, volume, turnover), ...] epoch昇順ソート済み。
+    win_sec: 窓幅(秒)。日足/週足/月足も日数×86400として同じロジックで扱える。
+    戻り値: (recent, prev, baseline_median) — recent=直近窓合計, prev=その直前窓合計
+    (勢いΔの算出用), baseline_median=履歴を窓幅ブロックに区切った中央値(直近ブロック除く)。
+    """
+    if not rows:
+        return 0.0, 0.0, 0.0
+    last_e = rows[-1][0]
+    cut1 = last_e - win_sec
+    cut2 = last_e - 2 * win_sec
+    recent = sum(to for e, c, v, to in rows if e > cut1)
+    prev = sum(to for e, c, v, to in rows if cut2 < e <= cut1)
+    blocks = window_blocks(rows, win_sec)
+    base_blocks = blocks[:-1] if len(blocks) > 1 else blocks
+    med = statistics.median(base_blocks) if base_blocks else 0.0
+    return recent, prev, med
+
+
 def analyze():
     meta = load_universe()
     if not meta:

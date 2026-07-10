@@ -1,0 +1,70 @@
+name: JP Stock Universe Refresh (TOPIX500+日経225+話題枠)
+
+# 監視ユニバース(data/jp_stocks/universe.csv)を月1回、TOPIX500(JPX東証上場銘柄一覧の
+# 規模区分)+日経225(日経公式ウエイトCSV)+話題枠(既存hot手動シード)から機械的に
+# 再構築する (universe_refresh.py)。手打ちでの銘柄追加/削除は行わない設計。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチでの検証は push トリガーで代用 (本体/workflow変更時に1回走る)
+#   - このサンドボックス(Claude Code)からはJPX/Nikkei公式サイトにproxy403で到達不可の
+#     ため、実データ疎通の検証はこのランナー上の実行が初 (jp-stock.ymlと同じ制約)
+#   - JPX東証上場銘柄一覧(data_j.xls)は旧BIFF形式のためopenpyxlではなくxlrdが必要
+#     (jp_supply_demand.pyと同じ設計。未導入でもcore層が空になるだけでクラッシュしない)
+
+on:
+  schedule:
+    # 月初の平日想定。TOPIX/日経225の構成銘柄入替は月末公表が多いため月初に反映。
+    # :00/:15/:30 はGitHub負荷ピークでドロップされやすいため :41 にオフセット。
+    - cron: '41 21 3 * *'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'universe_refresh.py'
+      - '.github/workflows/universe-refresh.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとCSVコミットバックが競合するため直列化
+concurrency:
+  group: universe-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # JPX東証上場銘柄一覧(data_j.xls, 旧BIFF形式)の解析にxlrdが必要
+      # (未導入でもuniverse_refresh.py側でImportErrorを捕捉しTOPIX500ソースのみスキップする設計)
+      - name: Install xlrd (旧xls形式の解析用)
+        run: pip install xlrd
+
+      - name: Refresh universe (TOPIX500 + 日経225 + hot)
+        env:
+          FETCH_DEADLINE_MIN: '5'
+        run: python universe_refresh.py
+
+      # 再構築したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
+      - name: Persist universe.csv
+        run: |
+          git config user.name "jp-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/jp_stocks/universe.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 監視ユニバース再構築 (TOPIX500+日経225+話題枠) $(date -u +'%Y-%m-%d %H:%M')"
+          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
+          # (競合したまま放置するとpushが「Everything up-to-date」となり
+          #  データ喪失がsuccessに見える。2026-07-09に並走runで実際に発生)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "変更なし (構成銘柄に変化なし)"
+          fi
