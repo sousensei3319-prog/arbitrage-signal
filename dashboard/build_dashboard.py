@@ -13,9 +13,14 @@ Dashboard builder — 収集済みCSVから資金集中ダッシュボードHTML
 
 data/jp_stocks/{code}_1m.csv (分足) + {code}_1d.csv (日足) + universe.csv +
 money_flow.json (自動分析コメント) + supply_demand/short_positions.csv を読み、
-dashboard/template.html の __MFR__/__COMMENTARY__/__SUPPLY__/__INITIAL__ を差し込んで
-site/index.html + site/data/*.json を書き出す。GitHub Pagesワークフローがこれを実行して
-デプロイする。
+dashboard/template.html の __MFR__/__COMMENTARY__/__SUPPLY__/__INITIAL__/__GROUPS__ を
+差し込んで site/index.html + site/data/*.json を書き出す。GitHub Pagesワークフローが
+これを実行してデプロイする。
+
+__GROUPS__ (compute_group_windows()) は universe.csv の group 列(JPX正式33業種区分。
+旧ファイルはsectorへフォールバック)で銘柄単位のshareR/dBaseをグループ合算した
+{wkey: [{group, share_pct, delta_pp, n}, ...]} で、ダッシュボードの「業種別シェア」
+パネルが既存の集計窓セレクタと連動して参照する。33業種×窓数程度でサイズは極小。
 
 依存なし (標準ライブラリのみ)。実行: python dashboard/build_dashboard.py
 """
@@ -60,7 +65,11 @@ def load_universe():
         for r in csv.DictReader(f):
             code = r["code"].strip()
             sym = code if "." in code else code + ".T"
-            uni.append((sym, r["name"], r.get("bucket", "core"), r.get("sector", "")))
+            sector = r.get("sector", "")
+            # group = JPX正式33業種区分。旧universe.csv(group列なし)ではsectorに
+            # フォールバックする(jp_money_flow.pyの_group_of()と同じ後方互換規則)。
+            group = (r.get("group") or "").strip() or sector or "不明"
+            uni.append((sym, r["name"], r.get("bucket", "core"), sector, group))
     return uni
 
 
@@ -201,13 +210,40 @@ def compute_all_windows(per_ticker_rows):
     return result
 
 
+def compute_group_windows(summary_tickers):
+    """業種グループ(universe.csvのgroup列、JPX正式33業種区分)別に、
+    集計窓(1分〜月足)ごとの売買代金シェア%とΔpp(通常比)を事前計算する。
+
+    銘柄単位でcompute_all_windows()が既に算出済みのshareR(直近窓シェア)と
+    dBase(=shareR-shareBase、通常比の差分)をグループ内で合算するだけ
+    (二重計算しない。jp_money_flow.pyのgroup集計と同じ「合算するだけ」設計)。
+    戻り値: {wkey: [{group, share_pct, delta_pp, n}, ...]} (share_pct降順)
+    """
+    by_group = {}
+    for tk in summary_tickers:
+        by_group.setdefault(tk["group"], []).append(tk)
+
+    result = {}
+    for w in WINS:
+        k = w["k"]
+        stats = []
+        for g, tks in by_group.items():
+            share = sum(tk["w"].get(k, {}).get("shareR", 0.0) for tk in tks)
+            delta = sum(tk["w"].get(k, {}).get("dBase", 0.0) for tk in tks)
+            stats.append({"group": g, "share_pct": round(share, 3),
+                          "delta_pp": round(delta, 3), "n": len(tks)})
+        stats.sort(key=lambda x: -x["share_pct"])
+        result[k] = stats
+    return result
+
+
 def build(uni):
     per_ticker_rows = {}
     ticker_meta = {}
     latest_ts = 0
     supply = load_supply_demand()
 
-    for sym, name, bucket, sector in uni:
+    for sym, name, bucket, sector, group in uni:
         t, c, v = load_1m(sym)
         if not t:
             continue
@@ -220,7 +256,7 @@ def build(uni):
         }
         pct = (c[-1] / c[0] - 1) * 100 if c and c[0] else 0.0
         ticker_meta[sym] = {
-            "code": sym, "name": name, "bucket": bucket, "sector": sector,
+            "code": sym, "name": name, "bucket": bucket, "sector": sector, "group": group,
             "last": c[-1] if c else None, "pct": round(pct, 2),
             "t": t, "close": c, "vol": v, "d": d,
         }
@@ -235,12 +271,15 @@ def build(uni):
     for sym, meta in ticker_meta.items():
         summary_tickers.append({
             "code": meta["code"], "name": meta["name"], "bucket": meta["bucket"],
-            "sector": meta["sector"], "last": meta["last"], "pct": meta["pct"],
+            "sector": meta["sector"], "group": meta["group"],
+            "last": meta["last"], "pct": meta["pct"],
             "w": windows[sym],
         })
 
     # 初期選択銘柄: 既定窓(5m)でsurgeが最大の銘柄 (旧クライアントの既定挙動を踏襲)
     initial_sym = max(summary_tickers, key=lambda t: t["w"].get(DEFAULT_WKEY, {}).get("surge", 0))["code"]
+
+    group_windows = compute_group_windows(summary_tickers)
 
     d0 = min(m["t"][0] for m in ticker_meta.values() if m["t"])
     d1 = latest_ts
@@ -251,7 +290,7 @@ def build(uni):
         "source": "Yahoo Finance",
         "default_win": DEFAULT_WKEY,
     }
-    return meta, summary_tickers, ticker_meta, initial_sym, supply
+    return meta, summary_tickers, ticker_meta, initial_sym, supply, group_windows
 
 
 def write_ticker_json(out_data_dir, sym, meta):
@@ -267,7 +306,7 @@ def write_ticker_json(out_data_dir, sym, meta):
 def main():
     t0 = time.time()
     uni = load_universe()
-    meta, summary_tickers, ticker_meta, initial_sym, supply = build(uni)
+    meta, summary_tickers, ticker_meta, initial_sym, supply, group_windows = build(uni)
 
     out_data_dir = os.path.join(OUT_DIR, "data")
     os.makedirs(out_data_dir, exist_ok=True)
@@ -293,7 +332,8 @@ def main():
     html = (tpl.replace("__MFR__", json.dumps(rich, ensure_ascii=False, separators=(",", ":")))
                .replace("__COMMENTARY__", json.dumps(commentary, ensure_ascii=False))
                .replace("__SUPPLY__", json.dumps(supply, ensure_ascii=False, separators=(",", ":")))
-               .replace("__INITIAL__", json.dumps(initial_payload, ensure_ascii=False, separators=(",", ":"))))
+               .replace("__INITIAL__", json.dumps(initial_payload, ensure_ascii=False, separators=(",", ":")))
+               .replace("__GROUPS__", json.dumps(group_windows, ensure_ascii=False, separators=(",", ":"))))
     os.makedirs(OUT_DIR, exist_ok=True)
     outp = os.path.join(OUT_DIR, "index.html")
     with open(outp, "w", encoding="utf-8") as f:
