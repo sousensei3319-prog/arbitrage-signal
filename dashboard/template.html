@@ -121,6 +121,13 @@
   .tmap-legend{display:flex;flex-wrap:wrap;align-items:center;gap:5px 7px;margin-top:10px;font-size:10.5px;color:var(--muted);font-family:var(--num);}
   .tmap-legend .sw{width:13px;height:13px;border-radius:3px;}
   .tmap-zero{margin-top:7px;font-size:10.5px;color:var(--muted);}
+  .tmap-gridcap{margin-top:12px;font-size:10.5px;color:var(--muted);}
+  .tmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 16px;margin-top:6px;}
+  .tmap-grid .gg{display:flex;align-items:baseline;gap:6px;font-size:11px;padding:1px 4px;border-radius:5px;}
+  .tmap-grid .gg .nm2{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0;}
+  .tmap-grid .gg .v{font-family:var(--num);font-variant-numeric:tabular-nums;color:var(--ink);}
+  .tmap-grid .gg .d{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:10.5px;}
+  .tmap-grid .gg .nn{font-family:var(--num);font-size:10px;color:var(--muted);white-space:nowrap;}
   #tbl tbody tr{cursor:pointer;transition:background .12s;}
   #tbl tbody tr:hover{background:var(--surface-2);}
   .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
@@ -128,7 +135,7 @@
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
   footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
-  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}.tmap{height:250px;}}
+  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}.tmap{height:250px;}.tmap-grid{grid-template-columns:repeat(2,1fr);gap:2px 10px;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 
@@ -168,6 +175,8 @@
       <div class="tmap" id="gtreemap" role="img" aria-label="業種別シェアの市場マップ（面積=シェア、色=通常時からのシェア変化）"></div>
       <div class="tmap-legend" id="gtlegend"></div>
       <div class="tmap-zero" id="gtzero" style="display:none"></div>
+      <div class="tmap-gridcap">全33業種の数値一覧（シェア% / 通常時比Δpp / 銘柄数、シェア降順）</div>
+      <div class="tmap-grid" id="ggrid"></div>
     </div>
   </section>
   <section>
@@ -312,7 +321,7 @@ const D_GROUPS = __GROUPS__;</script>
     const free=GCOLS.filter(c=>!used.has(c));
     const colorOf=g=>g.other?GOTHER:(gColorMap[g.group]||free.shift()||GOTHER);
     rows.forEach(g=>{g.col=colorOf(g);});
-    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全33業種（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）`;
+    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全33業種（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）。区分はJPX公式33業種（「半導体」区分は存在せず電気機器等に含まれる。銘柄別の詳細タグはタイルにカーソル）`;
     $("#gheatbar").innerHTML=rows.map(g=>{
       const p=g.share_pct;
       return `<div class="heatseg" style="flex:${p||0.01};background:${g.col}" title="${g.group} ${p.toFixed(1)}%（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp・${g.n}銘柄）">${p>=10?g.group+" "+p.toFixed(0)+"%":p>=4?p.toFixed(0)+"%":""}</div>`;
@@ -322,6 +331,15 @@ const D_GROUPS = __GROUPS__;</script>
       return `<span class="k"><span class="sw" style="background:${g.col}"></span>${g.group} <span class="tnum" style="color:var(--muted)">${g.share_pct.toFixed(1)}%</span><span class="tnum ${dcls}">（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp）</span></span>`;
     }).join("");
     renderTreemap(gdata);
+    renderGroupGrid(gdata);
+  }
+
+  // 全33業種の数値一覧グリッド (マップの補助数値表。極小タイルの見落としを数字で担保)
+  function renderGroupGrid(gdata){
+    $("#ggrid").innerHTML=gdata.map(g=>{
+      const dcls=g.delta_pp>0?'up':g.delta_pp<0?'down':'';
+      return `<div class="gg"><span class="nm2">${g.group}</span><span class="v">${g.share_pct.toFixed(2)}%</span><span class="d ${dcls}">${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp</span><span class="nn">${g.n}銘柄</span></div>`;
+    }).join("");
   }
 
   // ---------- 市場マップ (squarified treemap, 全33業種) ----------
@@ -376,7 +394,12 @@ const D_GROUPS = __GROUPS__;</script>
     // 資金流入トップ3銘柄(現在窓のrecent降順)をツールチップに載せる
     const byGroup={};
     T.forEach(tk=>{const g=tk.group||tk.sector||"不明";(byGroup[g]=byGroup[g]||[]).push(tk);});
-    const tiles=squarify(shown.map(g=>({...g,value:g.share_pct})).sort((a,b)=>b.value-a.value),0,0,W,H);
+    // 極小業種の視認性下限: シェア0.3%相当を面積の下限にする(2026-07-10ユーザー指摘
+    // 「33業種が全部反映されていない」対応 — 0.02%級のタイルが数px角になり事実上
+    // 見えなかった)。この分だけタイル面積は厳密なシェア比例から外れる(凡例に明記)。
+    // 正確なシェア値はツールチップと下の全33業種一覧で常に確認できる。
+    const TMAP_FLOOR=0.3;
+    const tiles=squarify(shown.map(g=>({...g,value:Math.max(g.share_pct,TMAP_FLOOR)})).sort((a,b)=>b.value-a.value),0,0,W,H);
     el.innerHTML=tiles.map(t=>{
       const g=t.it;
       const gap=Math.min(1,t.w/4,t.h/4);  // タイル間ギャップ(小タイルは潰さない)
@@ -384,7 +407,12 @@ const D_GROUPS = __GROUPS__;</script>
       const dTxt=`${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp`;
       const top3=(byGroup[g.group]||[]).slice()
         .sort((a,b)=>((b.w[WKEY]||{}).recent||0)-((a.w[WKEY]||{}).recent||0)).slice(0,3)
-        .map((tk,i)=>`${i+1}. ${tk.name} ${yen((tk.w[WKEY]||{}).recent||0)}円`);
+        .map((tk,i)=>{
+          // 手書きの詳細タグ(例: 半導体メモリ(NAND))がJPX区分と異なる銘柄のみ併記
+          // (キオクシア=電気機器のようなJPX公式区分への誤解を防ぐ)
+          const tag=(tk.sector&&tk.sector!==g.group)?`（${tk.sector}）`:"";
+          return `${i+1}. ${tk.name}${tag} ${yen((tk.w[WKEY]||{}).recent||0)}円`;
+        });
       const title=[`${g.group}`,`シェア ${g.share_pct.toFixed(2)}%（${dTxt}・${g.n}銘柄）`,
                    ...(top3.length?["資金流入トップ3:",...top3]:[])].join("&#10;");
       // ラベルはタイルサイズで省略(はみ出し禁止、詳細はツールチップ)
@@ -404,7 +432,7 @@ const D_GROUPS = __GROUPS__;</script>
     [["var(--dv-r3)","≤-1.5"],["var(--dv-r2)","-0.5"],["var(--dv-r1)","-0.1"],
      ["var(--dv-n)","±0"],["var(--dv-g1)","+0.1"],["var(--dv-g2)","+0.5"],["var(--dv-g3)","≥+1.5"]]
     .map(([c,l])=>`<span class="sw" style="background:${c}"></span><span>${l}</span>`).join("")+
-    `<span style="margin-left:6px">面積=シェア%・詳細はタイルにカーソル</span>`;
+    `<span style="margin-left:6px">面積=シェア%（極小業種は視認性のため下限サイズで表示・厳密比例ではない）・詳細はタイルにカーソル</span>`;
 
   // コンテナ幅の変化(ウィンドウリサイズ)でタイル座標を再計算
   let tmapRz=null;
