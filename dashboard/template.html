@@ -106,12 +106,26 @@
   thead th{color:var(--muted);font-weight:600;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;}
   tbody td{font-family:var(--num);font-variant-numeric:tabular-nums;}tbody td.nm{font-family:var(--ui);font-weight:560;}
   .bdot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle;}
+  .gscroll{max-height:420px;overflow-y:auto;}
+  .grow{display:grid;grid-template-columns:170px 1fr 100px;align-items:center;gap:12px;padding:7px 8px;border-radius:9px;cursor:pointer;transition:background .12s;border:1px solid transparent;}
+  .grow:hover{background:var(--surface-2);}
+  .grow:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  .gname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .allstock-filter{margin:10px 0 12px;}
+  .gblock{margin-bottom:14px;}
+  .gblock .ghead{font-size:11.5px;color:var(--muted);font-weight:640;margin-bottom:6px;cursor:pointer;}
+  .gblock .ghead:hover{color:var(--ink-2);}
+  .gchips{display:flex;flex-wrap:wrap;gap:6px;}
+  .gchip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;font-family:var(--ui);color:var(--ink);transition:transform .12s,box-shadow .12s;}
+  .gchip:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
+  .gchip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .gchip .code{font-family:var(--num);font-size:10px;color:var(--muted);}
   .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
   td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
   footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
-  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}}
+  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.grow{grid-template-columns:120px 1fr 80px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 
@@ -145,8 +159,21 @@
     <div class="heat"><div class="heatbar" id="heatbar"></div><div class="legend" id="legend"></div></div>
   </section>
   <section>
+    <div class="sec-head"><h2>業種別シェア（JPX33業種）</h2><span class="note"><b style="color:var(--ink-2)">行クリックで全銘柄一覧を絞り込み</b>。集計窓と連動</span></div>
+    <div class="rank gscroll" id="groupsec"></div>
+  </section>
+  <section>
     <div class="sec-head"><h2>資金集中ランキング</h2><span class="note"><b style="color:var(--ink-2)">行クリックでチャート</b>。集中度 = 直近窓の売買代金 ÷ 履歴中央値</span></div>
     <div class="rank" id="rank"></div>
+  </section>
+  <section>
+    <details class="tbl" id="allstocks">
+      <summary>全銘柄一覧（ランキング外含む・業種グループ別、クリックでチャート）</summary>
+      <div class="allstock-filter">
+        <input class="stocksel" id="allstockfilter" autocomplete="off" placeholder="業種名・銘柄名・コードで絞り込み" aria-label="全銘柄一覧の絞り込み" style="width:280px">
+      </div>
+      <div id="allstocksbody"></div>
+    </details>
   </section>
   <section>
     <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note" id="chartnote">銘柄を検索して選択・足を切替（分足〜月足）</span></div>
@@ -186,7 +213,8 @@
 <script>const D = __MFR__;
 const D_COMMENT = __COMMENTARY__;
 const D_SUPPLY = __SUPPLY__;
-const D_INITIAL = __INITIAL__;</script>
+const D_INITIAL = __INITIAL__;
+const D_GROUPS = __GROUPS__;</script>
 <script>
 (function(){
   const $=s=>document.querySelector(s);
@@ -246,9 +274,60 @@ const D_INITIAL = __INITIAL__;</script>
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
       return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
+    renderGroups();
+
     if(!SEL)SEL=rk[0].code;
     select(SEL, {skipScroll:true});
   }
+
+  // ---------- 業種別シェア (JPX33業種、group列) ----------
+  // 集計窓ごとのグループ別シェア/Δppはビルド時(compute_group_windows)にPython側で
+  // 事前計算済み(D_GROUPS[WKEY])。ブラウザ側では再計算せず表示するだけ。
+  function renderGroups(){
+    const gdata=D_GROUPS[WKEY]||[];
+    if(!gdata.length){$("#groupsec").innerHTML=`<div style="padding:8px;color:var(--muted);font-size:12.5px">業種データがありません</div>`;return;}
+    const maxS=Math.max.apply(null,gdata.map(g=>g.share_pct).concat([1]));const scale=maxS*1.05;
+    $("#groupsec").innerHTML=gdata.map(g=>{
+      const w=Math.max(1,g.share_pct/scale*100);
+      const dcls=g.delta_pp>0?'up':g.delta_pp<0?'down':'';
+      return `<div class="grow" tabindex="0" role="button" data-group="${g.group}">
+        <div class="gname">${g.group}<span class="tnum" style="color:var(--muted);font-size:10.5px;margin-left:5px">${g.n}銘柄</span></div>
+        <div class="track"><div class="bar" style="width:${w}%;background:var(--accent)"></div></div>
+        <div class="rval"><span class="s">${g.share_pct.toFixed(1)}%</span><span class="t ${dcls}">${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp</span></div>
+      </div>`;
+    }).join("");
+    $("#groupsec").querySelectorAll("[data-group]").forEach(el=>{
+      el.onclick=()=>openGroupList(el.dataset.group);
+      el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openGroupList(el.dataset.group);}};
+    });
+  }
+
+  // ---------- 全銘柄一覧 (ランキング外含む、業種グループ別チップ) ----------
+  // クリック時は既存のselect()をそのまま呼ぶ(fetch+キャッシュ+raceトークンの
+  // 銘柄チャート読み込みロジックを二重実装しない)。
+  const groupsOf={};
+  T.forEach(tk=>{const g=tk.group||tk.sector||"不明";(groupsOf[g]=groupsOf[g]||[]).push(tk);});
+  const groupNames=Object.keys(groupsOf).sort((a,b)=>groupsOf[b].length-groupsOf[a].length);
+  function renderAllStocks(filter){
+    const f=(filter||"").trim().toLowerCase();
+    const html=groupNames.map(g=>{
+      const items=groupsOf[g].filter(tk=>!f||g.toLowerCase().includes(f)||tk.name.toLowerCase().includes(f)||tk.code.toLowerCase().includes(f));
+      if(!items.length)return "";
+      return `<div class="gblock"><div class="ghead">${g}（${items.length}銘柄）</div>`+
+        `<div class="gchips">`+items.map(tk=>`<button class="gchip" data-code="${tk.code}"><span>${tk.name}</span><span class="code">${tk.code.replace(".T","")}</span></button>`).join("")+`</div></div>`;
+    }).join("");
+    $("#allstocksbody").innerHTML=html||`<div style="color:var(--muted);font-size:12.5px;padding:8px">該当する銘柄がありません</div>`;
+    $("#allstocksbody").querySelectorAll("[data-code]").forEach(b=>b.onclick=()=>select(b.dataset.code));
+  }
+  function openGroupList(g){
+    const det=document.getElementById("allstocks");
+    det.open=true;
+    $("#allstockfilter").value=g;
+    renderAllStocks(g);
+    det.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  $("#allstockfilter").addEventListener("input",e=>renderAllStocks(e.target.value));
+  renderAllStocks("");
 
   // ---------- 銘柄別チャートデータの遅延読み込み ----------
   // 850銘柄分の生1分足を index.html に埋め込むと10MB超で破綻するため、
