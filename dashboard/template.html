@@ -169,13 +169,13 @@
     <div class="heat"><div class="heatbar" id="heatbar"></div><div class="legend" id="legend"></div></div>
   </section>
   <section>
-    <div class="sec-head"><h2>業種別シェア（JPX33業種）</h2><span class="note" id="groupnote"></span></div>
+    <div class="sec-head"><h2>業種別シェア（JPX33業種＋半導体）</h2><span class="note" id="groupnote"></span></div>
     <div class="heat">
       <div class="heatbar" id="gheatbar"></div><div class="legend" id="glegend"></div>
       <div class="tmap" id="gtreemap" role="img" aria-label="業種別シェアの市場マップ（面積=シェア、色=通常時からのシェア変化）"></div>
       <div class="tmap-legend" id="gtlegend"></div>
       <div class="tmap-zero" id="gtzero" style="display:none"></div>
-      <div class="tmap-gridcap">全33業種の数値一覧（シェア% / 通常時比Δpp / 銘柄数、シェア降順）</div>
+      <div class="tmap-gridcap">全業種の数値一覧（JPX33業種＋独自区分「半導体」、シェア% / 通常時比Δpp / 銘柄数、シェア降順）</div>
       <div class="tmap-grid" id="ggrid"></div>
     </div>
   </section>
@@ -305,6 +305,9 @@ const D_GROUPS = __GROUPS__;</script>
   // 付ける原則)。既定窓の上位8以外から現在窓の上位8に入った業種のみ空き色を使う。
   const GCOLS=["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)","var(--g6)","var(--g7)","var(--g8)"];
   const GOTHER="var(--g-other)", GTOPN=8;
+  // 独自区分(custom_groups.csv由来、例:「半導体」)。ビルド時にmetaへ埋め込まれ、
+  // ツールチップに「独自区分(公式33業種外)」の注記を付けるために使う。
+  const CUSTOMG=new Set(D.meta.custom_groups||[]);
   const gColorMap={};
   ((D_GROUPS[D.meta.default_win]||[]).slice(0,GTOPN)).forEach((g,i)=>{gColorMap[g.group]=GCOLS[i];});
   function renderGroups(){
@@ -321,7 +324,7 @@ const D_GROUPS = __GROUPS__;</script>
     const free=GCOLS.filter(c=>!used.has(c));
     const colorOf=g=>g.other?GOTHER:(gColorMap[g.group]||free.shift()||GOTHER);
     rows.forEach(g=>{g.col=colorOf(g);});
-    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全33業種（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）。区分はJPX公式33業種（「半導体」区分は存在せず電気機器等に含まれる。銘柄別の詳細タグはタイルにカーソル）`;
+    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全${gdata.length}区分（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）。区分はJPX公式33業種＋独自区分「半導体」（公式に半導体区分は無く電気機器等に含まれるため、半導体主力13銘柄を切り出して独立表示。銘柄別の詳細タグはタイルにカーソル）`;
     $("#gheatbar").innerHTML=rows.map(g=>{
       const p=g.share_pct;
       return `<div class="heatseg" style="flex:${p||0.01};background:${g.col}" title="${g.group} ${p.toFixed(1)}%（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp・${g.n}銘柄）">${p>=10?g.group+" "+p.toFixed(0)+"%":p>=4?p.toFixed(0)+"%":""}</div>`;
@@ -413,7 +416,9 @@ const D_GROUPS = __GROUPS__;</script>
           const tag=(tk.sector&&tk.sector!==g.group)?`（${tk.sector}）`:"";
           return `${i+1}. ${tk.name}${tag} ${yen((tk.w[WKEY]||{}).recent||0)}円`;
         });
-      const title=[`${g.group}`,`シェア ${g.share_pct.toFixed(2)}%（${dTxt}・${g.n}銘柄）`,
+      const title=[`${g.group}`,
+                   ...(CUSTOMG.has(g.group)?["独自区分（JPX公式33業種外・custom_groups.csvで定義）"]:[]),
+                   `シェア ${g.share_pct.toFixed(2)}%（${dTxt}・${g.n}銘柄）`,
                    ...(top3.length?["資金流入トップ3:",...top3]:[])].join("&#10;");
       // ラベルはタイルサイズで省略(はみ出し禁止、詳細はツールチップ)
       let label="";
