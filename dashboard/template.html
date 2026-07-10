@@ -8,6 +8,7 @@
     --grid:#e7eaef;--axis:#ccd2db;--border:rgba(17,20,24,.10);
     --accent:#2a78d6;--accent-2:#1c5cab;--accent-soft:rgba(42,120,214,.10);
     --b-leader:#2a78d6;--b-core:#1baf7a;--b-hot:#eb6834;
+    --g1:#2a78d6;--g2:#1baf7a;--g3:#eda100;--g4:#008300;--g5:#4a3aa7;--g6:#e34948;--g7:#e87ba4;--g8:#eb6834;--g-other:#98a0ad;
     --up-mark:#0ca30c;--down-mark:#d03b3b;--up-text:#00760c;--down-text:#b52d2d;--ref:#98a0ad;
     --alert-bg:#fff4ec;--alert-bd:#eb6834;--alert-ink:#b34a1c;
     --shadow:0 1px 2px rgba(17,20,24,.05),0 8px 24px rgba(17,20,24,.05);
@@ -18,18 +19,21 @@
     --plane:#0b0e13;--surface:#151a21;--surface-2:#10141a;--ink:#e8ecf2;--ink-2:#a3adbc;--muted:#6f7887;
     --grid:#212832;--axis:#333b47;--border:rgba(255,255,255,.10);--accent:#3987e5;--accent-2:#6da7ec;--accent-soft:rgba(57,135,229,.14);
     --b-leader:#3987e5;--b-core:#199e70;--b-hot:#d95926;--up-mark:#12b23c;--down-mark:#e66767;--up-text:#3bd45c;--down-text:#f28d8d;--ref:#5a6472;
+    --g1:#3987e5;--g2:#199e70;--g3:#c98500;--g4:#008300;--g5:#9085e9;--g6:#e66767;--g7:#d55181;--g8:#d95926;--g-other:#5a6472;
     --alert-bg:#241610;--alert-bd:#d95926;--alert-ink:#f0915f;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
   }}
   :root[data-theme="light"]{
     --plane:#eef1f5;--surface:#ffffff;--surface-2:#f7f9fb;--ink:#111418;--ink-2:#59606b;--muted:#8b93a1;
     --grid:#e7eaef;--axis:#ccd2db;--border:rgba(17,20,24,.10);--accent:#2a78d6;--accent-2:#1c5cab;--accent-soft:rgba(42,120,214,.10);
     --b-leader:#2a78d6;--b-core:#1baf7a;--b-hot:#eb6834;--up-mark:#0ca30c;--down-mark:#d03b3b;--up-text:#00760c;--down-text:#b52d2d;--ref:#98a0ad;
+    --g1:#2a78d6;--g2:#1baf7a;--g3:#eda100;--g4:#008300;--g5:#4a3aa7;--g6:#e34948;--g7:#e87ba4;--g8:#eb6834;--g-other:#98a0ad;
     --alert-bg:#fff4ec;--alert-bd:#eb6834;--alert-ink:#b34a1c;--shadow:0 1px 2px rgba(17,20,24,.05),0 8px 24px rgba(17,20,24,.05);
   }
   :root[data-theme="dark"]{
     --plane:#0b0e13;--surface:#151a21;--surface-2:#10141a;--ink:#e8ecf2;--ink-2:#a3adbc;--muted:#6f7887;
     --grid:#212832;--axis:#333b47;--border:rgba(255,255,255,.10);--accent:#3987e5;--accent-2:#6da7ec;--accent-soft:rgba(57,135,229,.14);
     --b-leader:#3987e5;--b-core:#199e70;--b-hot:#d95926;--up-mark:#12b23c;--down-mark:#e66767;--up-text:#3bd45c;--down-text:#f28d8d;--ref:#5a6472;
+    --g1:#3987e5;--g2:#199e70;--g3:#c98500;--g4:#008300;--g5:#9085e9;--g6:#e66767;--g7:#d55181;--g8:#d95926;--g-other:#5a6472;
     --alert-bg:#241610;--alert-bd:#d95926;--alert-ink:#f0915f;--shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
   }
   *{box-sizing:border-box}
@@ -106,26 +110,14 @@
   thead th{color:var(--muted);font-weight:600;font-size:10.5px;letter-spacing:.03em;text-transform:uppercase;}
   tbody td{font-family:var(--num);font-variant-numeric:tabular-nums;}tbody td.nm{font-family:var(--ui);font-weight:560;}
   .bdot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle;}
-  .gscroll{max-height:420px;overflow-y:auto;}
-  .grow{display:grid;grid-template-columns:170px 1fr 100px;align-items:center;gap:12px;padding:7px 8px;border-radius:9px;cursor:pointer;transition:background .12s;border:1px solid transparent;}
-  .grow:hover{background:var(--surface-2);}
-  .grow:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
-  .gname{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .allstock-filter{margin:10px 0 12px;}
-  .gblock{margin-bottom:14px;}
-  .gblock .ghead{font-size:11.5px;color:var(--muted);font-weight:640;margin-bottom:6px;cursor:pointer;}
-  .gblock .ghead:hover{color:var(--ink-2);}
-  .gchips{display:flex;flex-wrap:wrap;gap:6px;}
-  .gchip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px;font-family:var(--ui);color:var(--ink);transition:transform .12s,box-shadow .12s;}
-  .gchip:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
-  .gchip:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
-  .gchip .code{font-family:var(--num);font-size:10px;color:var(--muted);}
+  #tbl tbody tr{cursor:pointer;transition:background .12s;}
+  #tbl tbody tr:hover{background:var(--surface-2);}
   .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
   td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
   footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
-  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.grow{grid-template-columns:120px 1fr 80px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}}
+  @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
 </style>
 
@@ -159,21 +151,12 @@
     <div class="heat"><div class="heatbar" id="heatbar"></div><div class="legend" id="legend"></div></div>
   </section>
   <section>
-    <div class="sec-head"><h2>業種別シェア（JPX33業種）</h2><span class="note"><b style="color:var(--ink-2)">行クリックで全銘柄一覧を絞り込み</b>。集計窓と連動</span></div>
-    <div class="rank gscroll" id="groupsec"></div>
+    <div class="sec-head"><h2>業種別シェア（JPX33業種）</h2><span class="note" id="groupnote"></span></div>
+    <div class="heat"><div class="heatbar" id="gheatbar"></div><div class="legend" id="glegend"></div></div>
   </section>
   <section>
     <div class="sec-head"><h2>資金集中ランキング</h2><span class="note"><b style="color:var(--ink-2)">行クリックでチャート</b>。集中度 = 直近窓の売買代金 ÷ 履歴中央値</span></div>
     <div class="rank" id="rank"></div>
-  </section>
-  <section>
-    <details class="tbl" id="allstocks">
-      <summary>全銘柄一覧（ランキング外含む・業種グループ別、クリックでチャート）</summary>
-      <div class="allstock-filter">
-        <input class="stocksel" id="allstockfilter" autocomplete="off" placeholder="業種名・銘柄名・コードで絞り込み" aria-label="全銘柄一覧の絞り込み" style="width:280px">
-      </div>
-      <div id="allstocksbody"></div>
-    </details>
   </section>
   <section>
     <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note" id="chartnote">銘柄を検索して選択・足を切替（分足〜月足）</span></div>
@@ -201,7 +184,7 @@
     </div>
   </section>
   <section>
-    <details class="tbl"><summary>全銘柄を表で見る（現在の窓）</summary>
+    <details class="tbl"><summary>全銘柄を表で見る（現在の窓）— 行クリックでチャート表示</summary>
       <div class="tbl-scroll"><table id="tbl">
         <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
         <tbody></tbody></table></div>
@@ -272,7 +255,7 @@ const D_GROUPS = __GROUPS__;</script>
       const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
       const sd=D_SUPPLY[tk.code];
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
     renderGroups();
 
@@ -280,54 +263,49 @@ const D_GROUPS = __GROUPS__;</script>
     select(SEL, {skipScroll:true});
   }
 
+  // 全銘柄テーブルの行クリック→チャート表示 (ランキング行と同じselect()を再利用)。
+  // 窓切替のたびにtbodyが再描画されるため、ハンドラ張り直し漏れが起きない
+  // イベント委譲(tbodyに1回だけ)で実装する。
+  $("#tbl tbody").addEventListener("click",e=>{
+    const tr=e.target.closest("tr[data-code]");
+    if(tr)select(tr.dataset.code);
+  });
+
   // ---------- 業種別シェア (JPX33業種、group列) ----------
+  // 「どの層に資金が寄っているか」と同じ様式(積み上げ横バー+凡例)。
   // 集計窓ごとのグループ別シェア/Δppはビルド時(compute_group_windows)にPython側で
-  // 事前計算済み(D_GROUPS[WKEY])。ブラウザ側では再計算せず表示するだけ。
+  // 事前計算済み(D_GROUPS[WKEY])。表示は上位8業種+「その他」合算。
+  // 配色は既存トークン系のcategorical 8色(+その他グレー)。色は「業種」に固定割当
+  // (既定窓の順位で決めてから窓を切り替えても塗り直さない。順位でなく実体に色を
+  // 付ける原則)。既定窓の上位8以外から現在窓の上位8に入った業種のみ空き色を使う。
+  const GCOLS=["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)","var(--g6)","var(--g7)","var(--g8)"];
+  const GOTHER="var(--g-other)", GTOPN=8;
+  const gColorMap={};
+  ((D_GROUPS[D.meta.default_win]||[]).slice(0,GTOPN)).forEach((g,i)=>{gColorMap[g.group]=GCOLS[i];});
   function renderGroups(){
     const gdata=D_GROUPS[WKEY]||[];
-    if(!gdata.length){$("#groupsec").innerHTML=`<div style="padding:8px;color:var(--muted);font-size:12.5px">業種データがありません</div>`;return;}
-    const maxS=Math.max.apply(null,gdata.map(g=>g.share_pct).concat([1]));const scale=maxS*1.05;
-    $("#groupsec").innerHTML=gdata.map(g=>{
-      const w=Math.max(1,g.share_pct/scale*100);
+    if(!gdata.length){$("#gheatbar").innerHTML="";$("#glegend").innerHTML=`<span style="color:var(--muted)">業種データがありません</span>`;return;}
+    const top=gdata.slice(0,GTOPN);
+    const rest=gdata.slice(GTOPN);
+    const rows=top.map(g=>({...g}));
+    if(rest.length){
+      rows.push({group:"その他",share_pct:rest.reduce((a,g)=>a+g.share_pct,0),
+                 delta_pp:rest.reduce((a,g)=>a+g.delta_pp,0),n:rest.reduce((a,g)=>a+g.n,0),other:true});
+    }
+    const used=new Set(top.map(g=>gColorMap[g.group]).filter(Boolean));
+    const free=GCOLS.filter(c=>!used.has(c));
+    const colorOf=g=>g.other?GOTHER:(gColorMap[g.group]||free.shift()||GOTHER);
+    rows.forEach(g=>{g.col=colorOf(g);});
+    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア（上位${GTOPN}業種+その他・集計窓と連動）`;
+    $("#gheatbar").innerHTML=rows.map(g=>{
+      const p=g.share_pct;
+      return `<div class="heatseg" style="flex:${p||0.01};background:${g.col}" title="${g.group} ${p.toFixed(1)}%（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp・${g.n}銘柄）">${p>=10?g.group+" "+p.toFixed(0)+"%":p>=4?p.toFixed(0)+"%":""}</div>`;
+    }).join("");
+    $("#glegend").innerHTML=rows.map(g=>{
       const dcls=g.delta_pp>0?'up':g.delta_pp<0?'down':'';
-      return `<div class="grow" tabindex="0" role="button" data-group="${g.group}">
-        <div class="gname">${g.group}<span class="tnum" style="color:var(--muted);font-size:10.5px;margin-left:5px">${g.n}銘柄</span></div>
-        <div class="track"><div class="bar" style="width:${w}%;background:var(--accent)"></div></div>
-        <div class="rval"><span class="s">${g.share_pct.toFixed(1)}%</span><span class="t ${dcls}">${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp</span></div>
-      </div>`;
+      return `<span class="k"><span class="sw" style="background:${g.col}"></span>${g.group} <span class="tnum" style="color:var(--muted)">${g.share_pct.toFixed(1)}%</span><span class="tnum ${dcls}">（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp）</span></span>`;
     }).join("");
-    $("#groupsec").querySelectorAll("[data-group]").forEach(el=>{
-      el.onclick=()=>openGroupList(el.dataset.group);
-      el.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();openGroupList(el.dataset.group);}};
-    });
   }
-
-  // ---------- 全銘柄一覧 (ランキング外含む、業種グループ別チップ) ----------
-  // クリック時は既存のselect()をそのまま呼ぶ(fetch+キャッシュ+raceトークンの
-  // 銘柄チャート読み込みロジックを二重実装しない)。
-  const groupsOf={};
-  T.forEach(tk=>{const g=tk.group||tk.sector||"不明";(groupsOf[g]=groupsOf[g]||[]).push(tk);});
-  const groupNames=Object.keys(groupsOf).sort((a,b)=>groupsOf[b].length-groupsOf[a].length);
-  function renderAllStocks(filter){
-    const f=(filter||"").trim().toLowerCase();
-    const html=groupNames.map(g=>{
-      const items=groupsOf[g].filter(tk=>!f||g.toLowerCase().includes(f)||tk.name.toLowerCase().includes(f)||tk.code.toLowerCase().includes(f));
-      if(!items.length)return "";
-      return `<div class="gblock"><div class="ghead">${g}（${items.length}銘柄）</div>`+
-        `<div class="gchips">`+items.map(tk=>`<button class="gchip" data-code="${tk.code}"><span>${tk.name}</span><span class="code">${tk.code.replace(".T","")}</span></button>`).join("")+`</div></div>`;
-    }).join("");
-    $("#allstocksbody").innerHTML=html||`<div style="color:var(--muted);font-size:12.5px;padding:8px">該当する銘柄がありません</div>`;
-    $("#allstocksbody").querySelectorAll("[data-code]").forEach(b=>b.onclick=()=>select(b.dataset.code));
-  }
-  function openGroupList(g){
-    const det=document.getElementById("allstocks");
-    det.open=true;
-    $("#allstockfilter").value=g;
-    renderAllStocks(g);
-    det.scrollIntoView({behavior:"smooth",block:"start"});
-  }
-  $("#allstockfilter").addEventListener("input",e=>renderAllStocks(e.target.value));
-  renderAllStocks("");
 
   // ---------- 銘柄別チャートデータの遅延読み込み ----------
   // 850銘柄分の生1分足を index.html に埋め込むと10MB超で破綻するため、
