@@ -41,6 +41,7 @@ JST = timezone(timedelta(hours=9))
 WD = ["月", "火", "水", "木", "金", "土", "日"]
 DATA = os.path.join(ROOT, "data", "jp_stocks")
 TEMPLATE = os.path.join(ROOT, "dashboard", "template.html")
+HELP_TEMPLATE = os.path.join(ROOT, "dashboard", "help_template.html")
 OUT_DIR = os.environ.get("SITE_DIR") or os.path.join(ROOT, "site")
 MF_JSON = os.path.join(DATA, "money_flow.json")
 SD_CSV = os.path.join(DATA, "supply_demand", "short_positions.csv")
@@ -346,11 +347,18 @@ def main():
     with open(outp, "w", encoding="utf-8") as f:
         f.write(html)
 
+    # 使い方ガイド (help.html) — 静的ページ。銘柄数と最新時刻だけ差し込む。
+    help_html = (open(HELP_TEMPLATE, encoding="utf-8").read()
+                 .replace("__N__", str(len(summary_tickers)))
+                 .replace("__UPDATED__", str(meta["end"])))
+    with open(os.path.join(OUT_DIR, "help.html"), "w", encoding="utf-8") as f:
+        f.write(help_html)
+
     elapsed = time.time() - t0
     idx_kb = round(os.path.getsize(outp) / 1024, 1)
     data_kb = round(sum(os.path.getsize(os.path.join(out_data_dir, fn))
                          for fn in os.listdir(out_data_dir)) / 1024, 1)
-    print(f"built {outp} ({idx_kb} KB) + site/data/*.json ({len(ticker_meta)}ファイル, 合計{data_kb} KB), "
+    print(f"built {outp} (+ help.html) ({idx_kb} KB) + site/data/*.json ({len(ticker_meta)}ファイル, 合計{data_kb} KB), "
           f"{len(summary_tickers)}銘柄, コメント{len(commentary)}行, 空売り残高データ{len(supply)}銘柄, "
           f"所要{elapsed:.1f}秒")
 

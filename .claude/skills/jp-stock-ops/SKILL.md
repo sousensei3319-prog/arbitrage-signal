@@ -218,7 +218,11 @@ workflowのenvのみで調整する(コード変更不要)。
 ### (6) ダッシュボード改修時の検証手順
 
 1. `python3 dashboard/build_dashboard.py` でローカル生成 → `site/index.html` のサイズ・
-   銘柄数・銘柄別JSON数・コメント行数がログに出る(異常に小さい/0銘柄なら壊れている)
+   銘柄数・銘柄別JSON数・コメント行数がログに出る(異常に小さい/0銘柄なら壊れている)。
+   同時に使い方ガイド `site/help.html` も生成される(`dashboard/help_template.html` に
+   銘柄数 `__N__`・最新時刻 `__UPDATED__` を差し込む静的ページ。ヘッダーの「📖 使い方ガイド」
+   リンクとフッターから遷移。help_template.html を編集したら `__N__`/`__UPDATED__` の
+   差し込み漏れが無いか生成後の help.html で確認する)
 2. **必ず `python3 -m http.server` を立てて http://localhost 経由で確認する**。
    銘柄別チャートは `site/data/{code}.json` をfetchで遅延取得するため、
    `file://` で開くとfetchがCORSで失敗してチャートが出ない(それはバグではない):
