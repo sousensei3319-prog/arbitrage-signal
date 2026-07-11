@@ -133,6 +133,35 @@ run一覧・ジョブ詳細・ログ取得は全て `mcp__github__actions_list` 
 `select:mcp__github__actions_list,mcp__github__get_job_logs,mcp__github__actions_run_trigger` 等を
 ロードすること。
 
+### (3b) GitHubスケジューラ遅延と外部cron (cron-job.org)
+
+**症状**: mainの `chore: JP stock 1m data` コミットが場中(平日9:00〜15:30 JST)に
+30分ごとに増えない / jp-stock.yml の schedule 起点のランが1日2〜3回しか無い
+(実測: 2026-07-10は場中 04:28 と 08:12 UTC の2回のみ)。原因はGitHub Actionsの
+スケジュール間引き(負荷状況による仕様)で、**コードでは直せない**。RANGE=1d設計の
+ため当日データの欠損は起きないが、ダッシュボードの更新頻度が落ちる。
+
+**恒久対策 (2026-07-11導入)**: 外部cron **cron-job.org (ユーザーアカウント)** から
+workflow_dispatch API を直接叩いて場中30分ごとの実行を保証する。
+
+- スケジュール: 平日 9:23〜15:53 JST (Asia/Tokyo) の毎時 23分・53分
+- リクエスト: `POST https://api.github.com/repos/sousensei3319-prog/arbitrage-signal/actions/workflows/jp-stock.yml/dispatches`
+  body `{"ref":"main"}`
+- ヘッダ: `Authorization: Bearer <fine-grained PAT>` (権限は Actions: Read and write のみ・
+  対象リポジトリ限定・期限365日) + `Accept: application/vnd.github+json`
+- **PATは2027-07頃に失効するので再発行が必要**。失効時の症状: cron-job.org側が
+  401を返し、event=workflow_dispatch のランが止まる(データは schedule 分だけに戻る)。
+  対処: ユーザーがPATを再発行し cron-job.org のジョブ設定を更新する
+- **PATをリポジトリにコミットするのは厳禁**(public repoのため。Discord Webhookと
+  同じ扱い — secret scanningの対象になる前に絶対に入れない)
+- GitHub側の schedule トリガーは**保険として残置**。外部cronと二重発火しても
+  concurrency直列化 + epoch重複排除で無害(データは重複しない)
+
+**点検方法**: `mcp__github__actions_list(method="list_workflow_runs",
+resource_id="jp-stock.yml", workflow_runs_filter={"event":"workflow_dispatch"})` で
+event=workflow_dispatch のランが場中30分ごと(毎時23分・53分)に並んでいるか確認する。
+並んでいなければ cron-job.org 側の停止/401(PAT失効)を疑う。
+
 ### (4) 銘柄の追加/削除
 
 universe.csv は `universe_refresh.py` が月1回機械的に再構築する(TOPIX500+日経225+hot)。
@@ -242,8 +271,9 @@ workflowのenvのみで調整する(コード変更不要)。
    `Resource not accessible by integration` 等で失敗する。コード側では検知はできても
    直せないので、発生時は管理者への案内を返すこと
 8. **GitHub Actions の `schedule` は負荷状況により実際の発火が数時間遅れることがある**
-   (本リポジトリの実績で2〜3時間遅延の前例あり)。cron時刻を過ぎても即座に走らないのは
-   異常ではない。cron分を `:00/:15/:30` から避けているのもこの負荷回避策の一環
+   (本リポジトリの実績で2〜3時間遅延の前例あり。jp-stock.ymlでは間引きで場中1日2〜3回
+   まで落ちた実測もあり → §2(3b)の外部cron対策を導入済み)。cron時刻を過ぎても即座に
+   走らないのは異常ではない。cron分を `:00/:15/:30` から避けているのもこの負荷回避策の一環
 9. **JPX空売り残高報告は旧OLE2/BIFF形式(.xls)で配信され、openpyxlでは開けない**
    (`InvalidFileException: openpyxl does not support .bin file format` で失敗する。
    2026-07-09にActionsランナー上の実データで確認。`xlrd`が必要)。また一覧ページの
