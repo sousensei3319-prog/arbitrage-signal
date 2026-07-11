@@ -106,7 +106,19 @@
   .tip .tt{color:var(--muted);font-size:10.5px;margin-bottom:4px;font-family:var(--num);}
   .tip .row{display:flex;justify-content:space-between;gap:14px;line-height:1.6;}
   .tip .row span:first-child{color:var(--ink-2);}.tip .row span:last-child{font-family:var(--num);font-variant-numeric:tabular-nums;font-weight:560;}
-  details.tbl{margin-top:14px;}details.tbl summary{cursor:pointer;font-size:12.5px;color:var(--ink-2);padding:4px 0;}
+  details.tbl{margin-top:14px;}
+  details.tbl summary{cursor:pointer;font-size:14px;font-weight:660;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;box-shadow:var(--shadow);list-style:none;display:flex;align-items:center;gap:10px;transition:background .12s,border-color .12s;}
+  details.tbl summary::-webkit-details-marker{display:none;}
+  details.tbl summary::before{content:"▶";font-size:11px;color:var(--accent);transition:transform .15s;}
+  details.tbl[open] summary::before{transform:rotate(90deg);}
+  details.tbl summary:hover{background:var(--surface-2);border-color:var(--accent);}
+  details.tbl summary .hint{margin-left:auto;font-size:12px;font-weight:500;color:var(--muted);}
+  .ctlhint{margin:-6px 0 0;font-size:12px;line-height:1.7;color:var(--ink-2);background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;padding:9px 13px;}
+  .ctlhint b{color:var(--ink);font-weight:640;}
+  .helplink{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 13px;white-space:nowrap;transition:background .12s,border-color .12s;}
+  .helplink:hover{background:var(--accent-soft);border-color:var(--accent);}
+  #commentary li{margin-bottom:6px;}#commentary li:last-child{margin-bottom:0;}
+  #commentary b{font-weight:680;}
   .tbl-scroll{overflow-x:auto;margin-top:10px;}
   table{border-collapse:collapse;width:100%;font-size:12px;min-width:700px;}
   th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -132,8 +144,8 @@
   #tbl tbody tr:hover{background:var(--surface-2);}
   .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
   td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
-  footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:12px;color:var(--ink-2);display:flex;flex-direction:column;gap:9px;}
-  footer b{color:var(--ink);font-weight:620;}footer .warn{color:var(--muted);}
+  footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;line-height:1.75;color:var(--ink-2);display:flex;flex-direction:column;gap:5px;}
+  footer b{color:var(--ink);font-weight:640;}footer .warn{color:var(--muted);line-height:1.8;}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
   @media (max-width:600px){.wrap{padding:18px 12px 48px;}.meta{margin-left:0;}.rrow{grid-template-columns:150px 1fr 92px;gap:8px;}.sect{max-width:96px;}input.stocksel,select.stocksel{width:100%;}.tmap{height:250px;}.tmap-grid{grid-template-columns:repeat(2,1fr);gap:2px 10px;}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
@@ -143,6 +155,7 @@
   <header>
     <div><div class="eyebrow">Money-Flow Screener · Turnover concentration</div><h1>日本株 資金集中スクリーナー</h1></div>
     <div class="meta" id="meta"></div>
+    <a class="helplink" href="help.html">📖 使い方ガイド</a>
   </header>
 
   <div class="controls">
@@ -158,10 +171,11 @@
       <div class="seg" id="thrseg"><button data-t="0.2">+0.2pp</button><button data-t="0.5">+0.5pp</button><button data-t="1.0">+1.0pp</button></div>
     </div>
   </div>
+  <p class="ctlhint" id="thrhint"></p>
 
   <section id="commentsec" style="display:none">
     <div class="sec-head"><h2>🧭 自動分析コメント</h2><span class="note">収集のたびに更新（事実ベース）</span></div>
-    <div class="heat"><ul id="commentary" style="margin:0;padding-left:18px;font-size:13px;line-height:1.75;"></ul></div>
+    <div class="heat"><ul id="commentary" style="margin:0;padding-left:20px;font-size:14px;line-height:1.9;"></ul></div>
   </section>
   <section><div id="alert"></div></section>
   <section>
@@ -209,7 +223,7 @@
     </div>
   </section>
   <section>
-    <details class="tbl"><summary>全銘柄を表で見る（現在の窓）— 行クリックでチャート表示</summary>
+    <details class="tbl"><summary>📊 全銘柄を表で見る（現在の窓）<span class="hint">行クリックでチャート表示</span></summary>
       <div class="tbl-scroll"><table id="tbl">
         <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
         <tbody></tbody></table></div>
@@ -226,10 +240,23 @@ const D_GROUPS = __GROUPS__;</script>
 <script>
 (function(){
   const $=s=>document.querySelector(s);
+  // 自動分析コメントの読みやすさ強化: HTMLエスケープ→先頭ラベル(コロン前)の太字化→
+  // 符号付き数値(+/-、pp/%/倍付き or 小数)の色付け。事実文言そのものは変えない。
+  const escHtml=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  function fmtComment(t){
+    var s=escHtml(t);
+    if(!/^※/.test(s)) s=s.replace(/^([^:：]{1,16})([:：])/,'<b>$1</b>$2');
+    // 単位(pp/%/倍)付き or 小数を含む符号付き数値のみ着色(日付の -07/-10 等は除外)
+    s=s.replace(/([+＋\-−])((?:\d[\d.]*(?:pp|%|倍))|\d+\.\d+)/g,function(m,sign){
+      var pos=(sign==="+"||sign==="＋");
+      return '<span style="color:var(--'+(pos?"up":"down")+'-text)">'+m+'</span>';
+    });
+    return s;
+  }
   if(Array.isArray(D_COMMENT)&&D_COMMENT.length){
     document.getElementById("commentsec").style.display="";
     document.getElementById("commentary").innerHTML=D_COMMENT.map(function(t){
-      var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+t+"</li>";}).join("");
+      var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+fmtComment(t)+"</li>";}).join("");
   }
   const BC={leader:"var(--b-leader)",core:"var(--b-core)",hot:"var(--b-hot)"};
   const BL={leader:"けん引大型",core:"主力",hot:"話題・噂"};
@@ -605,9 +632,20 @@ const D_GROUPS = __GROUPS__;</script>
   $("#thrseg").querySelector('[data-t="0.5"]').setAttribute("aria-pressed","true");
   $("#tfseg").querySelector('[data-tf="5m"]').setAttribute("aria-pressed","true");
 
+  $("#thrhint").innerHTML=
+    `<b>「急騰しきい値」とは</b>　各銘柄の<b>ユニバース内シェア</b>（全${T.length}銘柄の売買代金に占める割合）が、`+
+    `<b>直前の同じ集計窓</b>と比べて何pp増えたら「急騰」🚨として点灯するかの感度です。`+
+    `<b>+0.2pp</b>＝敏感（小さな動きも多く拾う）／<b>+0.5pp</b>＝標準／<b>+1.0pp</b>＝厳選（大口の動きだけ）。`+
+    `集計窓を切り替えると、その窓での急騰を判定します。`;
+
   $("#footer").innerHTML=
-    `<div><b>読み方</b>　「集中度」＝各銘柄の直近窓の売買代金が平常時（履歴の同幅中央値）の何倍か。「勢いΔpp」＝直前の同じ窓と比べたユニバース内シェアの増減（pp）で、急騰しきい値超で🚨アラート。チャートはローソク足（1分のみ終値ライン）。板情報は使わず売買代金の集中で近似（真の板/歩み値リアルタイムは無料枠外）。`+
-    `<div class="warn"><b>データ範囲</b>：分足系（1分〜4時間・集計窓と分足チャート）は1分足の保持期間(${D.meta.start} 〜 ${D.meta.end} JST、ローリング窓)から。<b>日/週/月（集計窓・日足〜月足チャート）は日足2年から集約</b>（週足・月足はYahooの月足APIが新規上場銘柄で不安定なため、信頼できる日足を自前で集約）。<b>空売り残</b>バッジはJPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口投資家のみ・日次）を集計したもので、表示が無い銘柄は空売りが無いのではなく大口報告が無いことを意味する。対象は TOPIX500 + 日経225 + 話題枠（JPX/日経の公式構成銘柄一覧から機械的に構築、話題枠は手動シード）で構成する監視ユニバース全${T.length}銘柄。銘柄別チャートは選択時に読み込み(fetch)。データ: Yahoo Finance・JPX・日経 / 最新 ${D.meta.end} JST。<b>投資助言ではありません。</b></div>`;
+    `<div><b>用語の読み方</b></div>`+
+    `<div><b>・集中度</b>：各銘柄の直近窓の売買代金が、平常時（履歴の同じ窓幅の中央値）の何倍か。大きいほど「いつもより資金が集まっている」。</div>`+
+    `<div><b>・勢いΔpp</b>：直前の同じ窓と比べたユニバース内シェアの増減（pp）。急騰しきい値を超えると🚨アラート点灯。</div>`+
+    `<div><b>・シェア／通常時比</b>：全${T.length}銘柄の売買代金に占める割合と、その平常水準（履歴中央値）との差。</div>`+
+    `<div><b>・業種別シェア</b>：JPX公式33業種＋独自区分「半導体」。勢力図マップは面積＝シェア、色＝通常時からの増減（緑＝増・赤＝減）。</div>`+
+    `<div><b>・空売り残</b>：JPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口のみ・日次）。表示が無い銘柄は「空売りが無い」のではなく「大口報告が無い」という意味。</div>`+
+    `<div class="warn" style="margin-top:4px"><b>データ範囲</b>：分足系（1分〜4時間の集計窓と分足チャート）は1分足の保持期間（<b>${D.meta.start} 〜 ${D.meta.end} JST</b>のローリング窓）から。日／週／月（日足〜月足）は日足2年から自前で集約（Yahooの月足APIが新規上場銘柄で不安定なため）。板情報は使わず売買代金の集中で資金の向きを近似する（真の板／歩み値のリアルタイムは無料枠の対象外）。監視対象は TOPIX500＋日経225＋話題枠で構成する全${T.length}銘柄。銘柄別チャートは選択時に読み込み。データ出所：Yahoo Finance・JPX・日経／最新 ${D.meta.end} JST。使い方の詳細は<a href="help.html" style="color:var(--accent)">📖 使い方ガイド</a>へ。<b>本ツールは事実の可視化であり、投資助言ではありません。</b></div>`;
 
   render();
 })();
