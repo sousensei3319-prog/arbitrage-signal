@@ -344,6 +344,15 @@ def _commentary(recs, buckets, latest_ts, groups=None):
     lines.append(f"直近{WINDOW_MIN}分の売買代金は全体で {_yen(total_recent)}。"
                  f"最も資金が寄っているのは「{BUCKET_LABEL.get(top_bucket[0],top_bucket[0])}」層で全体の {bshare:.0f}%。")
 
+    # 全体活況度 (直近窓の総代金 vs 履歴中央値の総和) — 過熱/閑散を倍率で事実描写
+    total_base = sum(r["baseline_med"] for r in recs)
+    if total_base > 0:
+        activity = total_recent / total_base
+        act_word = ("平常より活発" if activity >= 1.5
+                    else "ほぼ平常並み" if activity >= 0.7 else "平常より閑散")
+        lines.append(f"全体活況度: 直近{WINDOW_MIN}分の売買代金は平常時（履歴中央値）の "
+                     f"{activity:.1f}倍（{act_word}）。")
+
     # 業種別シェア (JPX33業種区分、group列) — 上位3業種 + 変化幅(Δpp)が突出した業種
     if groups:
         top3 = groups[:3]
@@ -355,6 +364,17 @@ def _commentary(recs, buckets, latest_ts, groups=None):
             parts.append(f"{big_delta['group']} {big_delta['share_pct']:.1f}%"
                          f"（通常{big_delta['base_share_pct']:.1f}%・{big_delta['delta_pp']:+.1f}pp、変化幅で突出）")
         lines.append("業種別シェア: " + "、".join(parts) + "。")
+
+        # 業種別の資金移動 (Δpp増加=流入 / 減少=流出) — 資金がどの業種へ動いたかの方向
+        inflow_g = [g for g in sorted(groups, key=lambda g: -g["delta_pp"])[:2] if g["delta_pp"] > 0]
+        outflow_g = [g for g in sorted(groups, key=lambda g: g["delta_pp"])[:2] if g["delta_pp"] < 0]
+        mv = []
+        if inflow_g:
+            mv.append("流入 " + "・".join(f"{g['group']} {g['delta_pp']:+.1f}pp" for g in inflow_g))
+        if outflow_g:
+            mv.append("流出 " + "・".join(f"{g['group']} {g['delta_pp']:+.1f}pp" for g in outflow_g))
+        if mv:
+            lines.append("業種別の資金移動: " + " / ".join(mv) + "。")
 
     # 上位集中銘柄の時間帯と値動き
     strong = [r for r in recs if r["surge"] >= 1.5][:3]
@@ -374,10 +394,24 @@ def _commentary(recs, buckets, latest_ts, groups=None):
         s, names = clusters[0]
         lines.append(f"業種では「{s}」に資金が広がっている（{len(names)}銘柄が平常比プラス: {'・'.join(names[:4])}）。")
 
-    # 急伸 (勢い) — momentum は share_delta を代理指標として上位を提示
-    movers = sorted([r for r in recs if r["share_delta"] >= 0.3], key=lambda r: -r["share_delta"])[:3]
-    if movers:
-        lines.append("シェア急伸: " + " / ".join(f"{r['name']} +{r['share_delta']:.2f}pp" for r in movers) + "。")
+    # 資金流入 (シェア拡大) 上位 — 銘柄名・シェア増・株価騰落を併記 (事実のみ)
+    inflow_s = sorted([r for r in recs if r["share_delta"] >= 0.3], key=lambda r: -r["share_delta"])[:3]
+    if inflow_s:
+        lines.append("資金流入（シェア拡大）上位: " + " / ".join(
+            f"{r['name']} +{r['share_delta']:.2f}pp（株価{r['pct']:+.1f}%）" for r in inflow_s) + "。")
+
+    # 資金流出 (シェア縮小) 上位 — 資金が抜けている先も事実として提示
+    outflow_s = sorted([r for r in recs if r["share_delta"] <= -0.3], key=lambda r: r["share_delta"])[:3]
+    if outflow_s:
+        lines.append("資金流出（シェア縮小）上位: " + " / ".join(
+            f"{r['name']} {r['share_delta']:.2f}pp（株価{r['pct']:+.1f}%）" for r in outflow_s) + "。")
+
+    # シェア急伸と株価の連動 — 出来高先行か株価連動かを件数で事実描写 (予測はしない)
+    surging = [r for r in recs if r["share_delta"] >= 0.3]
+    if surging:
+        with_price = sum(1 for r in surging if r["pct"] >= 1.0)
+        lines.append(f"シェア急伸（+0.3pp以上）は{len(surging)}銘柄。うち株価も+1%以上を伴うのは "
+                     f"{with_price}銘柄、残り{len(surging) - with_price}銘柄は株価が追随せず出来高先行。")
 
     # JPX空売り残高報告 (大口0.5%以上・日次) — データがある銘柄のみ事実を記載
     short_pos = load_short_positions()
