@@ -141,7 +141,10 @@ python dashboard/build_dashboard.py                 # site/index.html + site/dat
 
 **公開URL: https://sousensei3319-prog.github.io/arbitrage-signal/**
 
-全自動で稼働（`jp-stock.yml` 東証立会時間の平日30分間隔（毎時23分・53分） → `jp_money_flow.py` →
+全自動で稼働（`jp-stock.yml` 東証立会時間の平日30分間隔（毎時23分・53分）。GitHub Actionsの
+scheduleはスケジューラ間引きで1日2〜3回まで落ちる実測があるため、外部cron
+（cron-job.org）からのworkflow_dispatchを併用して場中30分ごとの実行を保証
+（2026-07-11導入、詳細はSKILL.md (3b)節） → `jp_money_flow.py` →
 `jp-stock-history.yml` 引け後1回の日足/週足/月足＋1分足追取り＋ローテーション →
 `jp-supply-demand.yml` 平日18:07 JSTの空売り残高報告収集 → `universe-refresh.yml` 月1回の
 構成銘柄入替 → `pages.yml` が収集完了ごとに再デプロイ）。運用ランブック
