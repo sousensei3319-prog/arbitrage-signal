@@ -148,8 +148,10 @@
   .tmap-grid .gg .v{font-family:var(--num);font-variant-numeric:tabular-nums;color:var(--ink);}
   .tmap-grid .gg .d{font-family:var(--num);font-variant-numeric:tabular-nums;font-size:10.5px;}
   .tmap-grid .gg .nn{font-family:var(--num);font-size:10px;color:var(--muted);white-space:nowrap;}
-  #tbl tbody tr{cursor:pointer;transition:background .12s;}
-  #tbl tbody tr:hover{background:var(--surface-2);}
+  #tbl tbody tr,#hottbl tbody tr{cursor:pointer;transition:background .12s;}
+  #tbl tbody tr:hover,#hottbl tbody tr:hover{background:var(--surface-2);}
+  .hottbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px 10px;box-shadow:var(--shadow);max-height:440px;overflow-y:auto;}
+  #hottbl{min-width:640px;}
   .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
   td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;line-height:1.75;color:var(--ink-2);display:flex;flex-direction:column;gap:5px;}
@@ -208,6 +210,12 @@
   <section>
     <div class="sec-head"><h2>資金集中ランキング</h2><span class="note"><b style="color:var(--ink-2)">行クリックでチャート</b>。集中度 = 直近窓の売買代金 ÷ 履歴中央値</span></div>
     <div class="rank" id="rank"></div>
+  </section>
+  <section>
+    <div class="sec-head"><h2>🔥 話題枠 一覧（全<span id="hotcount">-</span>銘柄）</h2><span class="note"><b style="color:var(--ink-2)">行クリックでチャート</b>。毎週月曜 自動入替・集中度順</span></div>
+    <div class="tbl-scroll hottbl-wrap"><table id="hottbl">
+      <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
+      <tbody></tbody></table></div>
   </section>
   <section>
     <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note" id="chartnote">銘柄を検索して選択・足を切替（分足〜月足）</span></div>
@@ -344,6 +352,15 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
       return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
+    // 話題枠 一覧 (bucket=hot のみ・集中度順)。全銘柄表と同じ行→チャートの動線。
+    const hotList=rk.filter(tk=>tk.bucket==="hot");
+    $("#hotcount").textContent=hotList.length;
+    $("#hottbl tbody").innerHTML=hotList.map((tk,i)=>{const pct=tk.pct||0;
+      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
+      const sd=D_SUPPLY[tk.code];
+      const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span></td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+
     renderGroups();
 
     if(!SEL)SEL=rk[0].code;
@@ -354,6 +371,11 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   // 窓切替のたびにtbodyが再描画されるため、ハンドラ張り直し漏れが起きない
   // イベント委譲(tbodyに1回だけ)で実装する。
   $("#tbl tbody").addEventListener("click",e=>{
+    const tr=e.target.closest("tr[data-code]");
+    if(tr)select(tr.dataset.code);
+  });
+  // 話題枠一覧テーブルも同じ動線 (イベント委譲)
+  $("#hottbl tbody").addEventListener("click",e=>{
     const tr=e.target.closest("tr[data-code]");
     if(tr)select(tr.dataset.code);
   });
