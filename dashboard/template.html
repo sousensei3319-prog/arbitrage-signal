@@ -119,6 +119,14 @@
   .helplink:hover{background:var(--accent-soft);border-color:var(--accent);}
   #commentary li{margin-bottom:6px;}#commentary li:last-child{margin-bottom:0;}
   #commentary b{font-weight:680;}
+  .hotchg{display:flex;flex-direction:column;gap:8px;}
+  .hotchg .row{display:flex;gap:9px;align-items:baseline;font-size:13.5px;line-height:1.7;}
+  .hotchg .tag{flex:none;font-size:11px;font-weight:700;border-radius:6px;padding:2px 9px;font-family:var(--ui);white-space:nowrap;}
+  .hotchg .tag.add{color:#fff;background:var(--up-mark);}
+  .hotchg .tag.rm{color:#fff;background:var(--down-mark);}
+  .hotchg .nm{font-weight:660;}
+  .hotchg .rs{color:var(--ink-2);}
+  .hotchg .none{color:var(--muted);font-size:12.5px;}
   .tbl-scroll{overflow-x:auto;margin-top:10px;}
   table{border-collapse:collapse;width:100%;font-size:12px;min-width:700px;}
   th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -178,6 +186,10 @@
     <div class="heat"><ul id="commentary" style="margin:0;padding-left:20px;font-size:14px;line-height:1.9;"></ul></div>
   </section>
   <section><div id="alert"></div></section>
+  <section id="hotchangesec" style="display:none">
+    <div class="sec-head"><h2>🔁 今週の話題枠 入れ替え</h2><span class="note" id="hotchangenote"></span></div>
+    <div class="heat" id="hotchangebody"></div>
+  </section>
   <section>
     <div class="sec-head"><h2>どの層に資金が寄っているか</h2><span class="note" id="heatnote"></span></div>
     <div class="heat"><div class="heatbar" id="heatbar"></div><div class="legend" id="legend"></div></div>
@@ -236,7 +248,8 @@
 const D_COMMENT = __COMMENTARY__;
 const D_SUPPLY = __SUPPLY__;
 const D_INITIAL = __INITIAL__;
-const D_GROUPS = __GROUPS__;</script>
+const D_GROUPS = __GROUPS__;
+const D_HOTCHANGES = __HOTCHANGES__;</script>
 <script>
 (function(){
   const $=s=>document.querySelector(s);
@@ -257,6 +270,24 @@ const D_GROUPS = __GROUPS__;</script>
     document.getElementById("commentsec").style.display="";
     document.getElementById("commentary").innerHTML=D_COMMENT.map(function(t){
       var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+fmtComment(t)+"</li>";}).join("");
+  }
+  // 今週の話題枠 入れ替え (hot_refresh.py の出力。追加/除外の根拠付き)
+  if(D_HOTCHANGES){
+    var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[];
+    if(_add.length||_rm.length){
+      document.getElementById("hotchangesec").style.display="";
+      document.getElementById("hotchangenote").textContent=
+        (D_HOTCHANGES.week||"")+" 時点・話題枠 全"+(D_HOTCHANGES.hot_total||"?")+"銘柄（毎週月曜 自動更新）";
+      var rowHtml=function(kind,x){
+        return '<div class="row"><span class="tag '+(kind==="add"?"add":"rm")+'">'+(kind==="add"?"＋追加":"－除外")+
+          '</span><span><span class="nm">'+escHtml(x.name)+'</span> <span class="tnum" style="color:var(--muted)">'+
+          escHtml(x.code)+'</span> <span class="rs">— '+escHtml(x.reason)+'</span></span></div>';};
+      var h='<div class="hotchg">';
+      h+=_add.length?_add.map(function(a){return rowHtml("add",a);}).join(""):'<div class="none">今週の新規追加はありません。</div>';
+      h+=_rm.length?_rm.map(function(r){return rowHtml("rm",r);}).join(""):'<div class="none">今週の除外はありません。</div>';
+      h+='</div>';
+      document.getElementById("hotchangebody").innerHTML=h;
+    }
   }
   const BC={leader:"var(--b-leader)",core:"var(--b-core)",hot:"var(--b-hot)"};
   const BL={leader:"けん引大型",core:"主力",hot:"話題・噂"};
