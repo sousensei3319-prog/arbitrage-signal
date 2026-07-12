@@ -6,7 +6,7 @@ name: Deploy Dashboard (GitHub Pages)
 
 on:
   workflow_run:
-    workflows: ["JP Stock 1m Collector"]
+    workflows: ["JP Stock 1m Collector", "JP Hot Bucket Refresh (話題枠の週次自動入れ替え)"]
     types: [completed]
   workflow_dispatch:
   schedule:

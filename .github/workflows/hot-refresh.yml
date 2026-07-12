@@ -31,7 +31,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 18
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -47,17 +47,37 @@ jobs:
           FETCH_DEADLINE_MIN: '5'
         run: python hot_refresh.py
 
-      # 更新した universe.csv と状態/ログをコミットバック (1ファイルずつ add)
+      # 新規追加した話題株の履歴(日足2y/週足5y/月足max/1分足5d)を即取得する。
+      # これをしないと「今週の話題枠 入れ替え」欄には出るのに、収集が回るまで
+      # 資金集中ランキング/全銘柄表/チャートに出ないタイムラグが生じる (2026-07-13対応)。
+      - name: Fetch initial history for newly added stocks
+        env:
+          SLEEP_SEC: '0.4'
+          FETCH_DEADLINE_MIN: '8'
+        run: |
+          NEW=$(python3 -c "import json;print(','.join(a['code'] for a in json.load(open('data/jp_stocks/hot_changes_latest.json')).get('added',[])))" 2>/dev/null || true)
+          if [ -z "$NEW" ]; then echo "新規追加なし・初期取得スキップ"; exit 0; fi
+          echo "新規話題株の初期履歴を取得: $NEW"
+          JP_TICKERS="$NEW" INTERVAL=1d  RANGE=2y  python jp_stock_fetch.py || true
+          JP_TICKERS="$NEW" INTERVAL=1wk RANGE=5y  python jp_stock_fetch.py || true
+          JP_TICKERS="$NEW" INTERVAL=1mo RANGE=max python jp_stock_fetch.py || true
+          JP_TICKERS="$NEW" INTERVAL=1m  RANGE=5d  python jp_stock_fetch.py || true
+
+      # 新規銘柄込みで資金集中スクリーナーを再計算 (ダッシュボードに即反映させる)
+      - name: Screen money flow (include new stocks)
+        env:
+          WINDOW_MIN: '30'
+        run: python jp_money_flow.py
+
+      # universe.csv・状態/ログ・新規銘柄の履歴CSV・money_flow をまとめてコミットバック
+      # (data/jp_stocks ディレクトリ指定は未存在でもabortしない)
       - name: Persist hot bucket changes
         run: |
           git config user.name "jp-stock-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -- data/jp_stocks/universe.csv 2>/dev/null || true
-          git add -- data/jp_stocks/hot_state.json 2>/dev/null || true
-          git add -- data/jp_stocks/hot_changes_log.csv 2>/dev/null || true
-          git add -- data/jp_stocks/hot_changes_latest.json 2>/dev/null || true
+          git add -- data/jp_stocks 2>/dev/null || true
           if ! git diff --cached --quiet; then
-            git commit -m "chore: 話題枠 週次入れ替え $(date -u +'%Y-%m-%d')"
+            git commit -m "chore: 話題枠 週次入れ替え+新規銘柄の初期履歴 $(date -u +'%Y-%m-%d')"
           # rebase競合時はabortして push failed を正しく踏ませる (データ喪失をsuccessに見せない)
             git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
             git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
