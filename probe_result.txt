@@ -1,0 +1,36 @@
+
+===== Yahoo JP 売買代金 =====
+https://finance.yahoo.co.jp/stocks/ranking/tradingValue?market=all&term=daily
+  HTTPError 400
+
+===== Yahoo JP 出来高 =====
+https://finance.yahoo.co.jp/stocks/ranking/volume?market=all&term=daily
+  status=200 bytes=226202 コード様トークン=363 ユニーク=57
+  先頭ユニークコード20: ['48b5', '413a', '46e6', '4281', '2026', '8918', '1360', '4564', '9432', '4597', '9984', '9434', '7211', '8729', '6740', '5803', '3350', '285A', '7201', '8306']
+  (code,近傍文字列)サンプル: [('8918', '(株)ランド'), ('1360', '日経平均ベア2倍上場投信'), ('4564', 'オンコセラピー・サイエンス(株)'), ('9432', 'ＮＴＴ(株)'), ('4597', 'ソレイジア・ファーマ(株)'), ('9984', 'ソフトバンクグループ(株)'), ('9434', 'ソフトバンク(株)'), ('7211', '三菱自動車(株)')]
+
+===== Yahoo JP 値上がり率 =====
+https://finance.yahoo.co.jp/stocks/ranking/up?market=all&term=daily
+  status=200 bytes=224086 コード様トークン=365 ユニーク=59
+  先頭ユニークコード20: ['48b5', '413a', '46e6', '2Fup', '2465', '2026', '5240', '4381', '4424', '4833', '2997', '5018', '9399', '6327', '6227', '472A', '3436', '4575', '278A', '4935']
+  (code,近傍文字列)サンプル: [('5240', 'ｍｏｎｏＡＩ\u3000ｔｅｃｈｎｏｌｏｇｙ(株)'), ('4381', 'ビープラッツ(株)'), ('4424', '(株)Ａｍａｚｉａ'), ('4833', '(株)Ｄｅｆ\u3000ｃｏｎｓｕｌｔｉｎｇ'), ('2997', '(株)ストレージ王'), ('5018', '(株)ＭＯＲＥＳＣＯ'), ('9399', 'ビート・ホールディングス・リミテッド'), ('6327', '北川精機(株)')]
+
+===== kabutan 値上がり率 =====
+https://kabutan.jp/warning/?mode=2_1
+  HTTPError 405
+
+===== kabutan 出来高 =====
+https://kabutan.jp/warning/?mode=3_1
+  HTTPError 405
+
+===== kabutan 売買代金 =====
+https://kabutan.jp/warning/?mode=4_1
+  HTTPError 405
+
+===== minkabu 人気 =====
+https://minkabu.jp/stock/ranking/pv
+  HTTPError 403
+
+===== minkabu 値上がり =====
+https://minkabu.jp/stock/ranking/rise
+  HTTPError 403
