@@ -307,7 +307,11 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   const winLabel=()=>WINLB[WKEY]||WKEY;
 
   function render(){
-    $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span><span class="chip"><b class="tnum">${T.length}</b> 銘柄</span><span class="chip">売買代金=終値×出来高</span>`;
+    const hotN=D.meta.hot_n||0;
+    $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span>`+
+      `<span class="chip"><b class="tnum">${T.length}</b> 銘柄</span>`+
+      (hotN>0?`<span class="chip" title="TOPIX500+日経225の指数母数に、話題枠(自動入替)を加えた分">話題枠 <b class="tnum">+${hotN}</b></span>`:``)+
+      `<span class="chip">売買代金=終値×出来高</span>`;
     $("#chartnote").textContent=`全${T.length}銘柄から検索して選択・足を切替（分足〜月足）`;
 
     const flagged=T.filter(tk=>(tk.w[WKEY]||{}).momentum>=THR).sort((a,b)=>b.w[WKEY].momentum-a.w[WKEY].momentum);
