@@ -1,0 +1,66 @@
+name: JP Hot Bucket Refresh (話題枠の週次自動入れ替え)
+
+# 話題枠(hot bucket)を毎週月曜の寄り前に自動入れ替え (hot_refresh.py)。
+# Yahoo Finance Japan の出来高・値上がり率ランキング上位から、ユニバース外の話題株を
+# hot に追加し、話題でなくなった古い hot 銘柄を外す。TOPIX500/日経225 は絶対に外さない。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチ検証は push トリガーで代用 (実データ検証はランナー上が初)
+#   - サンドボックスからは Yahoo JP へ proxy403 で到達不可のため、本体の疎通確認は
+#     このランナー上の実行が唯一の手段
+#   - 週次のため schedule 遅延(数時間)は許容範囲
+
+on:
+  schedule:
+    # 月曜 07:11 JST = 日曜 22:11 UTC (寄り前)。:00/:15/:30 を避けオフセット。
+    - cron: '11 22 * * 0'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'hot_refresh.py'
+      - '.github/workflows/hot-refresh.yml'
+
+permissions:
+  contents: write
+
+# 収集/他のコミットバックと競合しないよう直列化
+concurrency:
+  group: hot-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ)
+      - name: Refresh hot bucket from trending rankings
+        env:
+          RANK_TOP: '30'
+          ABSENT_WEEKS: '4'
+          KEEP_SURGE: '1.3'
+          FETCH_DEADLINE_MIN: '5'
+        run: python hot_refresh.py
+
+      # 更新した universe.csv と状態/ログをコミットバック (1ファイルずつ add)
+      - name: Persist hot bucket changes
+        run: |
+          git config user.name "jp-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/jp_stocks/universe.csv 2>/dev/null || true
+          git add -- data/jp_stocks/hot_state.json 2>/dev/null || true
+          git add -- data/jp_stocks/hot_changes_log.csv 2>/dev/null || true
+          git add -- data/jp_stocks/hot_changes_latest.json 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 話題枠 週次入れ替え $(date -u +'%Y-%m-%d')"
+          # rebase競合時はabortして push failed を正しく踏ませる (データ喪失をsuccessに見せない)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "話題枠に変更なし"
+          fi
