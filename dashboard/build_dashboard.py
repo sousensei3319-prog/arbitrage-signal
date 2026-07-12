@@ -293,6 +293,9 @@ def build(uni):
         "start": datetime.fromtimestamp(d0, JST).strftime("%Y-%m-%d %H:%M"),
         "end": datetime.fromtimestamp(d1, JST).strftime("%Y-%m-%d %H:%M") if d1 else "-",
         "n": len(summary_tickers),
+        # 話題枠(hot)銘柄数 — ヘッダーの「話題枠 +N」表示用。leader/core(TOPIX500/日経225)は
+        # 固定の指数母数で、増減するのは話題枠だけなので、その分を可視化する。
+        "hot_n": sum(1 for t in summary_tickers if t.get("bucket") == "hot"),
         "source": "Yahoo Finance",
         "default_win": DEFAULT_WKEY,
         # 独自区分の名前一覧 (テンプレート側がツールチップに「独自区分」注記を
