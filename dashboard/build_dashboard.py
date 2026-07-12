@@ -44,6 +44,7 @@ TEMPLATE = os.path.join(ROOT, "dashboard", "template.html")
 HELP_TEMPLATE = os.path.join(ROOT, "dashboard", "help_template.html")
 OUT_DIR = os.environ.get("SITE_DIR") or os.path.join(ROOT, "site")
 MF_JSON = os.path.join(DATA, "money_flow.json")
+HOT_CHANGES_JSON = os.path.join(DATA, "hot_changes_latest.json")
 SD_CSV = os.path.join(DATA, "supply_demand", "short_positions.csv")
 
 # 集計窓の定義 (旧クライアント側WINSと同じ粒度)。secは秒、daily=Trueは日足配列を使う。
@@ -335,13 +336,22 @@ def main():
         except (ValueError, OSError):
             commentary = []
 
+    # 今週の話題枠 入れ替え (hot_refresh.py が出力。無ければ空)
+    hot_changes = {}
+    if os.path.exists(HOT_CHANGES_JSON):
+        try:
+            hot_changes = json.load(open(HOT_CHANGES_JSON, encoding="utf-8"))
+        except (ValueError, OSError):
+            hot_changes = {}
+
     rich = {"meta": meta, "tickers": summary_tickers, "wins": [w["k"] for w in WINS]}
     tpl = open(TEMPLATE, encoding="utf-8").read()
     html = (tpl.replace("__MFR__", json.dumps(rich, ensure_ascii=False, separators=(",", ":")))
                .replace("__COMMENTARY__", json.dumps(commentary, ensure_ascii=False))
                .replace("__SUPPLY__", json.dumps(supply, ensure_ascii=False, separators=(",", ":")))
                .replace("__INITIAL__", json.dumps(initial_payload, ensure_ascii=False, separators=(",", ":")))
-               .replace("__GROUPS__", json.dumps(group_windows, ensure_ascii=False, separators=(",", ":"))))
+               .replace("__GROUPS__", json.dumps(group_windows, ensure_ascii=False, separators=(",", ":")))
+               .replace("__HOTCHANGES__", json.dumps(hot_changes, ensure_ascii=False, separators=(",", ":"))))
     os.makedirs(OUT_DIR, exist_ok=True)
     outp = os.path.join(OUT_DIR, "index.html")
     with open(outp, "w", encoding="utf-8") as f:
