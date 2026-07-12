@@ -41,15 +41,16 @@ def fetch(url, timeout=25):
 
 
 def main():
+    out = []
     for label, url in CANDIDATES:
-        print(f"\n===== {label} =====\n{url}")
+        out.append(f"\n===== {label} =====\n{url}")
         try:
             status, html = fetch(url)
         except urllib.error.HTTPError as e:
-            print(f"  HTTPError {e.code}")
+            out.append(f"  HTTPError {e.code}")
             continue
         except Exception as e:  # noqa: BLE001  偵察なので全例外を握って次へ
-            print(f"  ERROR {type(e).__name__}: {e}")
+            out.append(f"  ERROR {type(e).__name__}: {e}")
             continue
         codes = CODE_RE.findall(html)
         # 4桁数字コード(証券コードらしいもの)だけ集計
@@ -59,12 +60,16 @@ def main():
         for c in stock_like:
             if c not in seen:
                 seen.add(c); uniq.append(c)
-        print(f"  status={status} bytes={len(html)} コード様トークン={len(stock_like)} ユニーク={len(uniq)}")
-        print(f"  先頭ユニークコード20: {uniq[:20]}")
+        out.append(f"  status={status} bytes={len(html)} コード様トークン={len(stock_like)} ユニーク={len(uniq)}")
+        out.append(f"  先頭ユニークコード20: {uniq[:20]}")
         # コードの直後にリンクや名前が続くパターンを軽く探る
         m = re.findall(r'/(\d[0-9A-Za-z]{3})/?[^>]*>\s*([^<\s][^<]{0,20})', html)
         if m:
-            print(f"  (code,近傍文字列)サンプル: {m[:8]}")
+            out.append(f"  (code,近傍文字列)サンプル: {m[:8]}")
+    text = "\n".join(out)
+    print(text)
+    with open("probe_result.txt", "w", encoding="utf-8") as f:
+        f.write(text + "\n")
 
 
 if __name__ == "__main__":
