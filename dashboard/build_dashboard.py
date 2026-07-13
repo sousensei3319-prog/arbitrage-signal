@@ -273,14 +273,30 @@ def build(uni):
     windows = compute_all_windows(per_ticker_rows)
 
     # サマリー用 tickers[] (site/index.htmlに埋め込む。生配列(t/close/vol/d)は含めない)
+    # 「本日約定なし」判定: 銘柄の最終1分足バーの日付が、市場全体の最新日付より前なら、
+    # その銘柄は最新セッションで一度も約定していない(ストップ高/ストップ安/売買停止等)。
+    # 初心者が「チャートが止まっている=不具合?」と誤解しないための注記に使う。
+    mkt_date = datetime.fromtimestamp(latest_ts, JST).date() if latest_ts else None
     summary_tickers = []
     for sym, meta in ticker_meta.items():
-        summary_tickers.append({
+        entry = {
             "code": meta["code"], "name": meta["name"], "bucket": meta["bucket"],
             "sector": meta["sector"], "group": meta["group"],
             "last": meta["last"], "pct": meta["pct"],
             "w": windows[sym],
-        })
+        }
+        t = meta["t"]
+        st_date = datetime.fromtimestamp(t[-1], JST).date() if t else None
+        if mkt_date and st_date and st_date < mkt_date:
+            d = meta.get("d") or {}
+            oo, cc = d.get("o") or [], d.get("c") or []
+            # 最終取引日の寄り→引けの騰落で方向を推定(ストップ高/安の可能性)
+            move = ((cc[-1] / oo[-1] - 1) * 100) if (oo and cc and oo[-1]) else 0.0
+            entry["stale"] = True
+            entry["last_date"] = f"{st_date.month}/{st_date.day}"
+            entry["move_pct"] = round(move, 1)
+            entry["sdir"] = "up" if move >= 10 else "down" if move <= -10 else ""
+        summary_tickers.append(entry)
 
     # 初期選択銘柄: 既定窓(5m)でsurgeが最大の銘柄 (旧クライアントの既定挙動を踏襲)
     initial_sym = max(summary_tickers, key=lambda t: t["w"].get(DEFAULT_WKEY, {}).get("surge", 0))["code"]
