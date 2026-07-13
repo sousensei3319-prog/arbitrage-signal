@@ -100,6 +100,11 @@
   .dhead .dnm{font-size:16px;font-weight:660;}.dhead .dpx{font-family:var(--num);font-size:15px;font-weight:600;}
   .dhead .dsec{font-size:11px;color:var(--muted);}.dhead .drange{font-size:11px;color:var(--muted);margin-left:auto;}
   .dhead .dload{font-size:12px;color:var(--muted);}
+  .stalebadge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#fff;background:var(--alert-bd);border-radius:6px;padding:2px 9px;white-space:nowrap;}
+  #chartwarn{background:var(--alert-bg);border:1px solid var(--alert-bd);border-radius:10px;padding:10px 13px;margin-bottom:10px;font-size:12.5px;line-height:1.7;color:var(--alert-ink);}
+  #chartwarn b{color:var(--alert-ink);font-weight:700;}
+  #chartwarn .def{color:var(--ink-2);font-size:11.5px;}
+  .stalemark{font-size:10px;color:var(--alert-ink);font-weight:700;white-space:nowrap;}
   .plot{position:relative;}.plot svg{width:100%;height:auto;display:block;touch-action:none;}
   .plot.loading svg{opacity:.35;}
   .tip{position:absolute;top:6px;left:0;pointer-events:none;opacity:0;transform:translate(-50%,0);background:var(--surface);border:1px solid var(--border);border-radius:9px;box-shadow:var(--shadow);padding:7px 10px;font-size:11.5px;min-width:150px;z-index:5;transition:opacity .08s;}
@@ -235,6 +240,7 @@
     </div>
     <div class="detail">
       <div class="dhead" id="dhead"></div>
+      <div id="chartwarn" style="display:none"></div>
       <div class="plot" id="plot">
         <svg id="svgPrice" viewBox="0 0 1000 320" preserveAspectRatio="none" role="img" aria-label="価格"></svg>
         <svg id="svgVol" viewBox="0 0 1000 66" preserveAspectRatio="none" role="img" aria-label="出来高"></svg>
@@ -350,7 +356,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
       const sd=D_SUPPLY[tk.code];
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
     // 話題枠 一覧 (bucket=hot のみ・集中度順)。全銘柄表と同じ行→チャートの動線。
     const hotList=rk.filter(tk=>tk.bucket==="hot");
@@ -359,7 +365,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
       const sd=D_SUPPLY[tk.code];
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span></td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
     renderGroups();
 
@@ -576,6 +582,22 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   function niceTicks(min,max,n){const s=(max-min)/n,mag=Math.pow(10,Math.floor(Math.log10(s))),nm=s/mag;const st=(nm<1.5?1:nm<3?2:nm<7?5:10)*mag,o=[];let t=Math.ceil(min/st)*st;for(;t<=max+1e-6;t+=st)o.push(Math.round(t*100)/100);return o;}
   const fmtPx=v=>v>=1000?v.toLocaleString("ja-JP",{maximumFractionDigits:0}):v.toLocaleString("ja-JP",{minimumFractionDigits:1,maximumFractionDigits:1});
 
+  // 「本日約定なし」注記 (ストップ高/安/売買停止で最新セッションに約定が無い銘柄)。
+  // 初心者が「チャートが止まっている=不具合?」と誤解しないための説明。stale判定は
+  // ビルド時にPython側(最終バー日付 < 市場最新日付)で付与済み(summary.stale)。
+  function showStaleWarn(summary){
+    const wEl=document.getElementById("chartwarn");
+    if(!summary||!summary.stale){wEl.style.display="none";return;}
+    const dir=summary.sdir==="up"?"ストップ高":summary.sdir==="down"?"ストップ安":"";
+    const mv=summary.move_pct, ld=summary.last_date;
+    let msg;
+    if(dir==="ストップ高") msg=`直近 ${ld} に <b>+${mv}% 急騰</b>し、買い注文が殺到して値幅制限の上限（<b>ストップ高</b>）に達した可能性があります。売り物が無いと売買が成立せず、チャートは最後の約定（${ld}）で止まって見えます。`;
+    else if(dir==="ストップ安") msg=`直近 ${ld} に <b>${mv}% 急落</b>し、売り注文が殺到して値幅制限の下限（<b>ストップ安</b>）に達した可能性があります。買い手が無いと売買が成立せず、チャートは最後の約定（${ld}）で止まって見えます。`;
+    else msg=`最新の取引日にまだ売買が成立していません（ストップ高・ストップ安・売買停止などの可能性）。最後の約定は ${ld} です。`;
+    wEl.innerHTML=`<b>⏸ 本日まだ約定がありません。</b> ${msg} 売買が再開すれば自動で続きが描かれます。<br><span class="def">※「ストップ高」＝その日に上がれる株価の上限。買いが集中して上限に張り付くと、それ以上では約定しません（下限は「ストップ安」）。<b>不具合ではありません。</b></span>`;
+    wEl.style.display="";
+  }
+
   async function drawDetail(code){
     const myToken=++loadToken;
     const summary=T.find(x=>x.code===code);
@@ -590,6 +612,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--down-text)" font-size="13">チャートデータの読み込みに失敗しました</text>`;
       svgV.innerHTML="";geom=null;
       $("#dhead").innerHTML=`<span class="dnm">${summary?summary.name:code}</span><span class="dsec">${code}</span>`;
+      showStaleWarn(null);
       return;
     }
     if(myToken!==loadToken)return;  // 選択が切り替わっていたら古い結果は破棄
@@ -599,7 +622,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const sdBadge=sd?`<span class="supplybadge" title="JPX空売り残高報告(大口0.5%以上・日次) ${sd.n}件">空売り残 ${sd.pct.toFixed(2)}%（${sd.date}）</span>`:"";
     const {bars,seps,intraday}=aggregate(ck,TF);const n=bars.length;
     if(!n){svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--muted)" font-size="13">この足のデータがありません</text>`;svgV.innerHTML="";geom=null;
-      $("#chartttl").textContent=`${ck.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector}</span>${sdBadge}`;return;}
+      $("#chartttl").textContent=`${ck.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector}</span>${sdBadge}`;showStaleWarn(summary);return;}
     let ymin=Infinity,ymax=-Infinity,vmax=0;bars.forEach(b=>{if(b.l<ymin)ymin=b.l;if(b.h>ymax)ymax=b.h;if(b.v>vmax)vmax=b.v;});
     const yp=(ymax-ymin)*0.08||1;ymin-=yp;ymax+=yp;
     const Y=x=>pt+(1-(x-ymin)/(ymax-ymin))*(PH-pt-pb);const VY=x=>vpt+(1-x/(vmax||1))*(VH-vpt-vpb);
@@ -623,9 +646,11 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     svgV.innerHTML=`<path d="${vd}" stroke="var(--axis)" stroke-width="${Math.max(1,bw*0.5).toFixed(1)}" fill="none" opacity="0.7"/><line id="cxV2" x1="0" y1="${vpt}" x2="0" y2="${VH-vpb}" stroke="var(--accent-2)" stroke-width="1" opacity="0"/><text x="${pl-8}" y="${vpt+6}" text-anchor="end" font-size="9" fill="var(--muted)" font-family="var(--num)">出来高</text>`;
     const first=bars[0].o,lastc=bars[n-1].c,pct=(lastc/first-1)*100;
     $("#chartttl").textContent=`${ck.name} のチャート`;
-    $("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector} · ${BL[ck.bucket]}</span>${sdBadge}`+
+    const staleBadge=(summary&&summary.stale)?`<span class="stalebadge">⏸ 本日約定なし</span>`:"";
+    $("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector} · ${BL[ck.bucket]}</span>${sdBadge}${staleBadge}`+
       `<span class="dpx tnum">¥${fmtPx(lastc)}</span><span class="dpx tnum ${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%（表示範囲）</span>`+
       `<span class="drange tnum">${TFLB[TF]}・${n}本</span>`;
+    showStaleWarn(summary);
     syncStockInput(ck.code, ck.name);
   }
   function tfLabel(){return TFLB[TF];}
