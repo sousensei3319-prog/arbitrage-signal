@@ -1,8 +1,11 @@
 name: Deploy Dashboard (GitHub Pages)
 
 # 資金集中ダッシュボードを自動生成して GitHub Pages に配信する。
-# 収集(JP Stock 1m Collector)が完了するたびに再ビルド → 「開けば最新」になる。
-# schedule はバックアップ (引け後1回)。dispatch で手動再デプロイも可。
+# 収集(JP Stock 1m Collector)完了ごとに発火するが、5分間隔の収集で毎回デプロイすると
+# GitHub Pages のデプロイが前のデプロイを取り消し合い、公開が永久に完了しない事象が発生
+# (2026-07-14 に発生。全runが cancelled)。そのため gate ジョブで「前回デプロイから
+# THROTTLE_MIN 分未満なら今回はスキップ」してデプロイ間隔を空け、取り消し合いを防ぐ。
+# 手動(dispatch)/スケジュールは常にデプロイ。
 
 on:
   workflow_run:
@@ -16,6 +19,8 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  deployments: read
+  actions: read
 
 # デプロイは直列化 (同時実行不可)
 concurrency:
@@ -23,7 +28,41 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 前回のPages公開からの経過時間で「今回デプロイするか」を判定 (storm防止スロットル)
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          THROTTLE_MIN: '8'
+        run: |
+          # 手動/スケジュールは常にデプロイ (収集完了トリガーのときだけ間引く)
+          if [ "${{ github.event_name }}" != "workflow_run" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "手動/スケジュール実行のためデプロイする"; exit 0
+          fi
+          LAST=$(gh api "repos/${{ github.repository }}/deployments?environment=github-pages&per_page=1" \
+                   --jq '.[0].created_at' 2>/dev/null || echo "")
+          if [ -z "$LAST" ] || [ "$LAST" = "null" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "過去のPages公開が見つからないためデプロイする"; exit 0
+          fi
+          DIFF=$(( ( $(date -u +%s) - $(date -u -d "$LAST" +%s) ) / 60 ))
+          echo "前回のPages公開から ${DIFF} 分経過 (しきい値 ${THROTTLE_MIN} 分)"
+          if [ "$DIFF" -ge "${THROTTLE_MIN}" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "→ デプロイする"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "→ 直近に公開済みのためスキップ (取り消し合い防止)"
+          fi
+
   build-deploy:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
