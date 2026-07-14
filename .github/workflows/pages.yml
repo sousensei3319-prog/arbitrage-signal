@@ -1,68 +1,36 @@
 name: Deploy Dashboard (GitHub Pages)
 
 # 資金集中ダッシュボードを自動生成して GitHub Pages に配信する。
-# 収集(JP Stock 1m Collector)完了ごとに発火するが、5分間隔の収集で毎回デプロイすると
-# GitHub Pages のデプロイが前のデプロイを取り消し合い、公開が永久に完了しない事象が発生
-# (2026-07-14 に発生。全runが cancelled)。そのため gate ジョブで「前回デプロイから
-# THROTTLE_MIN 分未満なら今回はスキップ」してデプロイ間隔を空け、取り消し合いを防ぐ。
-# 手動(dispatch)/スケジュールは常にデプロイ。
+#
+# 【重要】収集完了ごと(workflow_run)に発火させると、5分間隔の収集で公開が毎回発火し、
+# GitHub Pages が前の公開を完了前に取り消し合って公開が永久に完了しない事象が発生した
+# (2026-07-14・全runが cancelled。しかも新しい待機runが古い待機runをキュー段階で取り消す
+# ため gate では防げなかった)。対策として workflow_run トリガーを廃止し、
+# schedule(場中10分ごと)+ 手動 で公開する。これにより公開間隔が最低10分空き、
+# Pages が取り消し合わなくなる。データ収集(jp-stock.yml)は従来どおり5分ごとで無関係。
+# より確実・高頻度に公開したい場合は cron-job.org から pages.yml を10分ごとに叩く
+# (収集と同じ要領。運用手順は SKILL.md)。
 
 on:
-  workflow_run:
-    workflows: ["JP Stock 1m Collector", "JP Hot Bucket Refresh (話題枠の週次自動入れ替え)"]
-    types: [completed]
   workflow_dispatch:
   schedule:
-    - cron: '37 6 * * 1-5'   # 引け(06:30 UTC)後のバックアップ
+    # 東証立会時間(00:00-06:00 UTC=9:00-15:00 JST)の平日、10分ごとに再公開。
+    # GitHub schedule は取りこぼしがあるため実効は15〜20分程度。確実性が要るなら外部cron併用。
+    - cron: '3,13,23,33,43,53 0-6 * * 1-5'
+    - cron: '37 6 * * 1-5'   # 引け後のバックアップ
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  deployments: read
-  actions: read
 
-# デプロイは直列化 (同時実行不可)
+# デプロイは直列化 (同時実行不可)。scheduleは最短10分間隔なのでデプロイ(数分)は重ならない。
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  # 前回のPages公開からの経過時間で「今回デプロイするか」を判定 (storm防止スロットル)
-  gate:
-    runs-on: ubuntu-latest
-    outputs:
-      run: ${{ steps.check.outputs.run }}
-    steps:
-      - id: check
-        env:
-          GH_TOKEN: ${{ github.token }}
-          THROTTLE_MIN: '8'
-        run: |
-          # 手動/スケジュールは常にデプロイ (収集完了トリガーのときだけ間引く)
-          if [ "${{ github.event_name }}" != "workflow_run" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "手動/スケジュール実行のためデプロイする"; exit 0
-          fi
-          LAST=$(gh api "repos/${{ github.repository }}/deployments?environment=github-pages&per_page=1" \
-                   --jq '.[0].created_at' 2>/dev/null || echo "")
-          if [ -z "$LAST" ] || [ "$LAST" = "null" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "過去のPages公開が見つからないためデプロイする"; exit 0
-          fi
-          DIFF=$(( ( $(date -u +%s) - $(date -u -d "$LAST" +%s) ) / 60 ))
-          echo "前回のPages公開から ${DIFF} 分経過 (しきい値 ${THROTTLE_MIN} 分)"
-          if [ "$DIFF" -ge "${THROTTLE_MIN}" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "→ デプロイする"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "→ 直近に公開済みのためスキップ (取り消し合い防止)"
-          fi
-
   build-deploy:
-    needs: gate
-    if: needs.gate.outputs.run == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
