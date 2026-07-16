@@ -25,8 +25,13 @@ permissions:
   id-token: write
 
 # デプロイは直列化 (同時実行不可)。scheduleは最短10分間隔なのでデプロイ(数分)は重ならない。
+# 【重要】2026-07-14の取り消し嵐で concurrency group "pages" のスロットが
+# ゾンビ化し、以後の run が実体のいない占有者を待って永久に pending(job数0)に
+# なる事象が発生した(2026-07-16確認: dispatchしたrunが3分経ってもjob 0)。
+# グループ名を "pages-publish" に変更して未ロックの新グループへ移し、ロックを解除する。
+# 嵐の原因(workflow_runトリガー)はPR #23で既に除去済みなので再ロックは起きない。
 concurrency:
-  group: pages
+  group: pages-publish
   cancel-in-progress: false
 
 jobs:
