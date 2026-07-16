@@ -9,9 +9,13 @@ data/us_stocks/universe.csv (code,name,bucket,sector,group) を、S&P500 + Nasda
   1. S&P500 = "List of S&P 500 companies"
      https://en.wikipedia.org/wiki/List_of_S%26P_500_companies
      constituentsテーブル (列: Symbol, Security, GICS Sector, GICS Sub-Industry)
-  2. Nasdaq-100 = "Nasdaq-100"
-     https://en.wikipedia.org/wiki/Nasdaq-100
-     componentsテーブル (列: Ticker, Company, GICS Sector, GICS Sub-Industry)
+  2. Nasdaq-100 = slickcharts.com/nasdaq100 (列: #, Company, Symbol, Weight, Price, Chg)
+     【経緯 2026-07-16 ランナー上プローブで確定】Wikipediaの"Nasdaq-100"ページは
+     現在構成銘柄テーブルを掲載しておらず(外部リンクのみ)、Invesco QQQ保有CSVの
+     ダウンロードURLもHTMLアプリページを返すため機械取得不可。slickchartsは
+     素直なHTMLテーブルで104行(ヘッダー+構成銘柄)が取れることを実測済み。
+     GICS業種列は無いため、S&P500と重複しない銘柄のsector/groupは空になる
+     (ダッシュボードでは「不明」グループ扱い — 捏造はしない)。
   3. 話題枠(hot) = 既存 universe.csv の bucket=hot 行 (無条件温存)。
 
 bucket割当の優先順位: hot(既存温存) > leader(Nasdaq-100) > core(S&P500の残り)。
@@ -67,7 +71,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 
 SP500_URL = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
-NASDAQ100_URL = "https://en.wikipedia.org/wiki/Nasdaq-100"
+NASDAQ100_URL = "https://www.slickcharts.com/nasdaq100"
 
 # シンボルの緩い妥当性チェック (Wikipediaのドット表記 BRK.B 等を許容してから正規化する)
 CODE_RE = re.compile(r"^[A-Z][A-Z0-9.\-]{0,9}$")
@@ -224,8 +228,14 @@ def fetch_sp500():
 
 
 def fetch_nasdaq100():
-    """Nasdaq-100構成銘柄を取得し (codes, sub_industry_map, group_map, name_map) を返す。
-    取得/解析失敗時は (set(), {}, {}, {})。"""
+    """Nasdaq-100構成銘柄を slickcharts.com/nasdaq100 から取得し
+    (codes, sub_industry_map, group_map, name_map) を返す。取得/解析失敗時は
+    (set(), {}, {}, {})。
+
+    slickchartsのテーブルは [#, Company, Symbol, Weight, Price, Chg] で
+    GICS業種列を持たない → sub_map/group_mapは常に空。S&P500と重複する銘柄
+    (Nasdaq-100の大半)はS&P500側のGICSが使われ、重複しない銘柄のみ業種が
+    「不明」になる (S&P500一覧に無い銘柄の業種を勝手に推定・捏造しない)。"""
     try:
         html = _fetch(NASDAQ100_URL, timeout=25).decode("utf-8", errors="replace")
     except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError, OSError) as e:
@@ -235,42 +245,31 @@ def fetch_nasdaq100():
     try:
         parser = _TableParser()
         parser.feed(html)
-        # 列名は歴史的に "Ticker" だが "Symbol" へ変わる可能性に備えて両方試す
-        table = (_find_table(parser.tables, ["ticker", "gics sector"])
-                 or _find_table(parser.tables, ["symbol", "gics sector"]))
+        table = _find_table(parser.tables, ["symbol", "company"])
         if not table or len(table) < 2:
-            print("Nasdaq-100一覧: componentsテーブルが見つからなかった (構造変更の可能性)。leaderソースをスキップ。")
+            print("Nasdaq-100一覧: 構成銘柄テーブルが見つからなかった (構造変更の可能性)。leaderソースをスキップ。")
             return set(), {}, {}, {}
         header = table[0]
-        i_sym = _col_index(header, "Ticker")
-        if i_sym is None:
-            i_sym = _col_index(header, "Symbol")
+        i_sym = _col_index(header, "Symbol")
         i_name = _col_index(header, "Company")
-        i_sector = _col_index(header, "GICS Sector")
-        i_sub = _col_index(header, "GICS Sub-Industry")
-        if i_sym is None or i_sector is None:
-            print("Nasdaq-100一覧: 列構成が想定と異なる (Ticker/GICS Sector)。leaderソースをスキップ。")
+        if i_sym is None:
+            print("Nasdaq-100一覧: 列構成が想定と異なる (Symbol列なし)。leaderソースをスキップ。")
             return set(), {}, {}, {}
 
-        codes, sub_map, group_map, name_map = set(), {}, {}, {}
+        codes, name_map = set(), {}
         for row in table[1:]:
-            if len(row) <= i_sym or len(row) <= i_sector:
+            if len(row) <= i_sym:
                 continue
             code = normalize_symbol(row[i_sym])
             if not code:
                 continue
             codes.add(code)
-            if i_sub is not None and i_sub < len(row) and row[i_sub].strip():
-                sub_map[code] = row[i_sub].strip()
-            sector = row[i_sector].strip()
-            if sector:
-                group_map[code] = SECTOR_JA.get(sector, sector)
             if i_name is not None and i_name < len(row) and row[i_name].strip():
                 name_map[code] = row[i_name].strip()
         if len(codes) < 80:
             print(f"⚠️ Nasdaq-100一覧の解析結果が{len(codes)}銘柄と少なすぎる"
                   "(テーブル構造が変わった可能性)。念のためこのまま使用するが要確認。")
-        return codes, sub_map, group_map, name_map
+        return codes, {}, {}, name_map
     except Exception as e:
         print(f"Nasdaq-100一覧の解析失敗: {type(e).__name__}: {e}。leaderソースをスキップ。")
         return set(), {}, {}, {}
