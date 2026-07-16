@@ -1,0 +1,80 @@
+name: US Universe Refresh (S&P500+Nasdaq-100+話題枠)
+
+# 監視ユニバース(data/us_stocks/universe.csv)を月1回、S&P500(Wikipedia)+Nasdaq-100
+# (Wikipedia)+話題枠(既存hotシード)から機械的に再構築する (us_universe_refresh.py)。
+# 手打ちでの銘柄追加/削除は行わない設計。custom_groups.csv(半導体)もあわせて機械生成。
+# jp版(universe-refresh.yml)の構造を踏襲。xlrd等の追加依存は不要 (Wikipediaを
+# html.parserのみで解析するため pip install ステートなし)。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチでの検証は push トリガーで代用
+#   - このサンドボックス(Claude Code)からはWikipediaにproxy403で到達不可のため、
+#     実データ疎通の検証はこのランナー上の実行が初 (JP版と同じ制約)
+
+on:
+  schedule:
+    # 月初想定。S&P500/Nasdaq-100の構成銘柄入替は不定期だが月1回の再構築で十分。
+    # :00/:15/:30 はGitHub負荷ピークでドロップされやすいため :41 にオフセット。
+    - cron: '41 20 4 * *'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'us_universe_refresh.py'
+      - '.github/workflows/us-universe-refresh.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとCSVコミットバックが競合するため直列化
+concurrency:
+  group: us-universe-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ、html.parserでWikipediaテーブルを解析) — pip installは不要
+      - name: Refresh universe (S&P500 + Nasdaq-100 + hot)
+        env:
+          FETCH_DEADLINE_MIN: '5'
+        run: python us_universe_refresh.py
+
+      # 再構築したCSV(universe.csv + custom_groups.csv)をコミットバック
+      # (GH Actionsはステートレスなので永続化が必要。1ファイルずつadd)
+      - name: Persist universe.csv
+        run: |
+          git config user.name "us-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/us_stocks/universe.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 米国株 監視ユニバース再構築 (S&P500+Nasdaq-100+話題枠) $(date -u +'%Y-%m-%d %H:%M')"
+          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "変更なし (universe.csvは構成銘柄に変化なし)"
+          fi
+
+      # custom_groups.csv(半導体、機械生成)は別ファイルとして1ファイルずつadd
+      # (CLAUDE.md規約: git addは1ファイルずつ、複数まとめると未存在ファイルで全体abort実績あり)
+      - name: Persist custom_groups.csv
+        run: |
+          git config user.name "us-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/us_stocks/custom_groups.csv 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 米国株 custom_groups.csv(半導体)再生成 $(date -u +'%Y-%m-%d %H:%M')"
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "変更なし (custom_groups.csvに変化なし)"
+          fi

@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>日本株 資金集中スクリーナー</title>
+<title>米国株 資金集中スクリーナー</title>
 <style>
   :root{
     --plane:#eef1f5;--surface:#ffffff;--surface-2:#f7f9fb;
@@ -156,9 +156,7 @@
   #tbl tbody tr,#hottbl tbody tr{cursor:pointer;transition:background .12s;}
   #tbl tbody tr:hover,#hottbl tbody tr:hover{background:var(--surface-2);}
   .hottbl-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px 10px;box-shadow:var(--shadow);max-height:440px;overflow-y:auto;}
-  #hottbl{min-width:640px;}
-  .supplybadge{display:inline-flex;align-items:center;font-size:10.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;white-space:nowrap;font-family:var(--num);}
-  td.supply{font-family:var(--num);font-size:11px;color:var(--ink-2);}
+  #hottbl{min-width:560px;}
   footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--border);font-size:13px;line-height:1.75;color:var(--ink-2);display:flex;flex-direction:column;gap:5px;}
   footer b{color:var(--ink);font-weight:640;}footer .warn{color:var(--muted);line-height:1.8;}
   footer code{font-family:var(--num);font-size:11.5px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 5px;}
@@ -168,9 +166,9 @@
 
 <div class="wrap">
   <header>
-    <div><div class="eyebrow">Money-Flow Screener · Turnover concentration</div><h1>日本株 資金集中スクリーナー</h1></div>
+    <div><div class="eyebrow">Money-Flow Screener · Turnover concentration</div><h1>米国株 資金集中スクリーナー</h1></div>
     <div class="meta" id="meta"></div>
-    <a class="helplink" href="us/">🇺🇸 米国株版</a>
+    <a class="helplink" href="../">🇯🇵 日本株版</a>
     <a class="helplink" href="help.html">📖 使い方ガイド</a>
   </header>
 
@@ -203,13 +201,13 @@
     <div class="heat"><div class="heatbar" id="heatbar"></div><div class="legend" id="legend"></div></div>
   </section>
   <section>
-    <div class="sec-head"><h2>業種別シェア（JPX33業種＋半導体）</h2><span class="note" id="groupnote"></span></div>
+    <div class="sec-head"><h2>業種別シェア（GICS 11セクター＋半導体）</h2><span class="note" id="groupnote"></span></div>
     <div class="heat">
       <div class="heatbar" id="gheatbar"></div><div class="legend" id="glegend"></div>
       <div class="tmap" id="gtreemap" role="img" aria-label="業種別シェアの市場マップ（面積=シェア、色=通常時からのシェア変化）"></div>
       <div class="tmap-legend" id="gtlegend"></div>
       <div class="tmap-zero" id="gtzero" style="display:none"></div>
-      <div class="tmap-gridcap">全業種の数値一覧（JPX33業種＋独自区分「半導体」、シェア% / 通常時比Δpp / 銘柄数、シェア降順）</div>
+      <div class="tmap-gridcap">全業種の数値一覧（GICS 11セクター＋独自区分「半導体」、シェア% / 通常時比Δpp / 銘柄数、シェア降順）</div>
       <div class="tmap-grid" id="ggrid"></div>
     </div>
   </section>
@@ -220,14 +218,14 @@
   <section>
     <div class="sec-head"><h2>🔥 話題枠 一覧（全<span id="hotcount">-</span>銘柄）</h2><span class="note"><b style="color:var(--ink-2)">行クリックでチャート</b>。毎週月曜 自動入替・集中度順</span></div>
     <div class="tbl-scroll hottbl-wrap"><table id="hottbl">
-      <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
+      <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th></tr></thead>
       <tbody></tbody></table></div>
   </section>
   <section>
     <div class="sec-head"><h2 id="chartttl">銘柄チャート</h2><span class="note" id="chartnote">銘柄を検索して選択・足を切替（分足〜月足）</span></div>
     <div class="chartctl">
       <div class="ctl"><span class="lbl">銘柄</span>
-        <input class="stocksel" id="stocksel" list="stockdl" autocomplete="off" placeholder="コード/銘柄名で検索" aria-label="銘柄選択">
+        <input class="stocksel" id="stocksel" list="stockdl" autocomplete="off" placeholder="ティッカー/銘柄名で検索" aria-label="銘柄選択">
         <datalist id="stockdl"></datalist>
       </div>
       <div class="ctl"><span class="lbl">足</span>
@@ -252,7 +250,7 @@
   <section>
     <details class="tbl"><summary>📊 全銘柄を表で見る（現在の窓）<span class="hint">行クリックでチャート表示</span></summary>
       <div class="tbl-scroll"><table id="tbl">
-        <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th><th>空売り残</th></tr></thead>
+        <thead><tr><th>#</th><th>銘柄</th><th>業種</th><th>層</th><th>集中度</th><th>直近売買代金</th><th>勢いΔpp</th><th>期間騰落</th></tr></thead>
         <tbody></tbody></table></div>
     </details>
   </section>
@@ -261,7 +259,6 @@
 
 <script>const D = __MFR__;
 const D_COMMENT = __COMMENTARY__;
-const D_SUPPLY = __SUPPLY__;
 const D_INITIAL = __INITIAL__;
 const D_GROUPS = __GROUPS__;
 const D_HOTCHANGES = __HOTCHANGES__;</script>
@@ -286,7 +283,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     document.getElementById("commentary").innerHTML=D_COMMENT.map(function(t){
       var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+fmtComment(t)+"</li>";}).join("");
   }
-  // 今週の話題枠 入れ替え (hot_refresh.py の出力。追加/除外の根拠付き)
+  // 今週の話題枠 入れ替え (us_hot_refresh.py の出力。追加/除外の根拠付き)
   if(D_HOTCHANGES){
     var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[];
     if(_add.length||_rm.length){
@@ -305,18 +302,29 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     }
   }
   const BC={leader:"var(--b-leader)",core:"var(--b-core)",hot:"var(--b-hot)"};
-  const BL={leader:"けん引大型",core:"主力",hot:"話題・噂"};
+  const BL={leader:"ナスダック100",core:"S&P500主力",hot:"話題・噂"};
   const WINLB={"1m":"1分","5m":"5分","15m":"15分","30m":"30分","60m":"1時間","240m":"4時間","1d":"日足","1w":"週足","1M":"月足"};
   const TFLB={"1m":"1分足","5m":"5分足","30m":"30分足","60m":"1時間足","240m":"4時間足","1d":"日足","1w":"週足","1M":"月足"};
-  const yen=v=>v>=1e12?(v/1e12).toFixed(2)+"兆":v>=1e8?(v/1e8).toFixed(1)+"億":v>=1e4?(v/1e4).toFixed(0)+"万":String(Math.round(v));
+  const usd=v=>v>=1e12?(v/1e12).toFixed(2)+"兆ドル":v>=1e8?(v/1e8).toFixed(1)+"億ドル":v>=1e4?(v/1e4).toFixed(0)+"万ドル":String(Math.round(v))+"ドル";
   const T=D.tickers;
-  const jstD=t=>new Date(t*1000+324e5);
-  const jstHM=t=>{const d=jstD(t);return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0");};
-  const jstMD=t=>{const d=jstD(t);return (d.getUTCMonth()+1)+"/"+d.getUTCDate();};
-  const jstYMD=t=>{const d=jstD(t);return d.getUTCFullYear()+"-"+(d.getUTCMonth()+1)+"-"+d.getUTCDate();};
 
-  // ---- 集計窓ごとのランキング/ヒート/勢い統計はビルド時(dashboard/build_dashboard.py)に
-  // Python側で事前計算済み (tk.w[WKEY])。850銘柄規模の生1分足をブラウザに送らないための設計。
+  // ---- ET(America/New_York)への変換。JP版は固定+9hオフセットで済んだが、米国は
+  // 夏時間(DST)があるため固定オフセットが使えない。Intl.DateTimeFormatをキャッシュし、
+  // "YYYY-MM-DD HH:MM:SS"(sv-SEロケール、パース容易)を取得→そのままUTCとみなした
+  // 疑似Dateを組み立てることで、以降はJP版と同じgetUTCFullYear()等のAPIで扱えるようにする。
+  const _etF=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false});
+  function etD(t){
+    const s=_etF.format(new Date(t*1000));
+    const m=s.match(/^(\d+)-(\d+)-(\d+)[ ,T]+(\d+):(\d+):(\d+)/);
+    if(!m)return new Date(t*1000);
+    return new Date(Date.UTC(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]));
+  }
+  const etHM=t=>{const d=etD(t);return String(d.getUTCHours()).padStart(2,"0")+":"+String(d.getUTCMinutes()).padStart(2,"0");};
+  const etMD=t=>{const d=etD(t);return (d.getUTCMonth()+1)+"/"+d.getUTCDate();};
+  const etYMD=t=>{const d=etD(t);return d.getUTCFullYear()+"-"+(d.getUTCMonth()+1)+"-"+d.getUTCDate();};
+
+  // ---- 集計窓ごとのランキング/ヒート/勢い統計はビルド時(dashboard/build_us_dashboard.py)に
+  // Python側で事前計算済み (tk.w[WKEY])。多数銘柄規模の生1分足をブラウザに送らないための設計。
   // ブラウザ側は選ばれたWKEYに対応する事前計算値を読むだけで、再計算はしない。
   let WKEY=D.meta.default_win||"5m", THR=0.5, SEL=(D_INITIAL&&D_INITIAL.code)||null, TF="5m";
   const winLabel=()=>WINLB[WKEY]||WKEY;
@@ -325,7 +333,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const hotN=D.meta.hot_n||0;
     $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span>`+
       `<span class="chip"><b class="tnum">${T.length}</b> 銘柄</span>`+
-      (hotN>0?`<span class="chip" title="TOPIX500+日経225の指数母数に、話題枠(自動入替)を加えた分">話題枠 <b class="tnum">+${hotN}</b></span>`:``)+
+      (hotN>0?`<span class="chip" title="S&P500+Nasdaq-100の指数母数に、話題枠(自動入替)を加えた分">話題枠 <b class="tnum">+${hotN}</b></span>`:``)+
       `<span class="chip">売買代金=終値×出来高</span>`;
     $("#chartnote").textContent=`全${T.length}銘柄から検索して選択・足を切替（分足〜月足）`;
 
@@ -341,7 +349,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const order=Object.entries(bk).sort((a,b)=>b[1].r-a[1].r);const tot=order.reduce((a,[,v])=>a+v.r,0)||1;
     $("#heatnote").textContent=`直近${winLabel()}の売買代金シェア（＝資金の向き先）`;
     $("#heatbar").innerHTML=order.map(([k,v])=>{const p=v.r/tot*100;return `<div class="heatseg" style="flex:${p||0.01};background:${BC[k]}">${p>=7?BL[k]+" "+p.toFixed(0)+"%":p.toFixed(0)+"%"}</div>`;}).join("");
-    $("#legend").innerHTML=order.map(([k,v])=>`<span class="k"><span class="sw" style="background:${BC[k]}"></span>${BL[k]} <span class="tnum" style="color:var(--muted)">${yen(v.r)}円/${v.n}銘柄</span></span>`).join("");
+    $("#legend").innerHTML=order.map(([k,v])=>`<span class="k"><span class="sw" style="background:${BC[k]}"></span>${BL[k]} <span class="tnum" style="color:var(--muted)">${usd(v.r)}/${v.n}銘柄</span></span>`).join("");
 
     const rk=T.slice().sort((a,b)=>(b.w[WKEY]||{}).surge-(a.w[WKEY]||{}).surge);const top=rk.slice(0,18);
     const maxS=Math.max.apply(null,top.map(t=>t.w[WKEY].surge).concat([1.2])),scale=maxS*1.05,refPct=1/scale*100;
@@ -350,23 +358,19 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       return `<div class="rrow${SEL===tk.code?' sel':''}" tabindex="0" data-code="${tk.code}" role="button">
         <div class="rname"><span class="n">${i+1}. ${tk.name}</span><span class="tags"><span class="c">${tk.code}</span><span class="sect" title="${tk.sector}">${tk.sector}</span></span></div>
         <div class="track"><div class="bar" style="width:${w}%;background:${BC[tk.bucket]}"></div><div class="refline" style="left:${refPct}%"></div></div>
-        <div class="rval"><span class="s">${tk.w[WKEY].surge.toFixed(2)}x</span><span class="t">${yen(tk.w[WKEY].recent)}円 · ${mom}</span></div></div>`;}).join("");
+        <div class="rval"><span class="s">${tk.w[WKEY].surge.toFixed(2)}x</span><span class="t">${usd(tk.w[WKEY].recent)} · ${mom}</span></div></div>`;}).join("");
     $("#rank").querySelectorAll(".rrow").forEach(r=>{r.onclick=()=>select(r.dataset.code);r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(r.dataset.code);}};});
 
     $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pct=tk.pct||0;
       const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      const sd=D_SUPPLY[tk.code];
-      const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     // 話題枠 一覧 (bucket=hot のみ・集中度順)。全銘柄表と同じ行→チャートの動線。
     const hotList=rk.filter(tk=>tk.bucket==="hot");
     $("#hotcount").textContent=hotList.length;
     $("#hottbl tbody").innerHTML=hotList.map((tk,i)=>{const pct=tk.pct||0;
       const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      const sd=D_SUPPLY[tk.code];
-      const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     renderGroups();
 
@@ -387,7 +391,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     if(tr)select(tr.dataset.code);
   });
 
-  // ---------- 業種別シェア (JPX33業種、group列) ----------
+  // ---------- 業種別シェア (GICS 11セクター、group列) ----------
   // 「どの層に資金が寄っているか」と同じ様式(積み上げ横バー+凡例)。
   // 集計窓ごとのグループ別シェア/Δppはビルド時(compute_group_windows)にPython側で
   // 事前計算済み(D_GROUPS[WKEY])。表示は上位8業種+「その他」合算。
@@ -397,7 +401,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   const GCOLS=["var(--g1)","var(--g2)","var(--g3)","var(--g4)","var(--g5)","var(--g6)","var(--g7)","var(--g8)"];
   const GOTHER="var(--g-other)", GTOPN=8;
   // 独自区分(custom_groups.csv由来、例:「半導体」)。ビルド時にmetaへ埋め込まれ、
-  // ツールチップに「独自区分(公式33業種外)」の注記を付けるために使う。
+  // ツールチップに「独自区分」注記を付けるために使う。
   const CUSTOMG=new Set(D.meta.custom_groups||[]);
   const gColorMap={};
   ((D_GROUPS[D.meta.default_win]||[]).slice(0,GTOPN)).forEach((g,i)=>{gColorMap[g.group]=GCOLS[i];});
@@ -415,7 +419,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const free=GCOLS.filter(c=>!used.has(c));
     const colorOf=g=>g.other?GOTHER:(gColorMap[g.group]||free.shift()||GOTHER);
     rows.forEach(g=>{g.col=colorOf(g);});
-    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全${gdata.length}区分（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）。区分はJPX公式33業種＋独自区分「半導体」（公式に半導体区分は無く電気機器等に含まれるため、半導体主力13銘柄を切り出して独立表示。銘柄別の詳細タグはタイルにカーソル）`;
+    $("#groupnote").textContent=`直近${winLabel()}の売買代金シェア。バー=上位${GTOPN}+その他 / マップ=全${gdata.length}区分（面積=シェア、色=通常時からのシェア変化: 緑=シェアを奪っている・赤=奪われている）。区分はGICS公式11セクター＋独自区分「半導体」（GICS公式には独立した半導体セクターは無く情報技術セクターの半導体・半導体製造装置サブ業種に含まれるため、半導体関連銘柄を切り出して独立表示。銘柄別の詳細タグはタイルにカーソル）`;
     $("#gheatbar").innerHTML=rows.map(g=>{
       const p=g.share_pct;
       return `<div class="heatseg" style="flex:${p||0.01};background:${g.col}" title="${g.group} ${p.toFixed(1)}%（${g.delta_pp>0?"+":""}${g.delta_pp.toFixed(2)}pp・${g.n}銘柄）">${p>=10?g.group+" "+p.toFixed(0)+"%":p>=4?p.toFixed(0)+"%":""}</div>`;
@@ -428,7 +432,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     renderGroupGrid(gdata);
   }
 
-  // 全33業種の数値一覧グリッド (マップの補助数値表。極小タイルの見落としを数字で担保)
+  // 全業種の数値一覧グリッド (マップの補助数値表。極小タイルの見落としを数字で担保)
   function renderGroupGrid(gdata){
     $("#ggrid").innerHTML=gdata.map(g=>{
       const dcls=g.delta_pp>0?'up':g.delta_pp<0?'down':'';
@@ -436,7 +440,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     }).join("");
   }
 
-  // ---------- 市場マップ (squarified treemap, 全33業種) ----------
+  // ---------- 市場マップ (squarified treemap, 全GICSセクター) ----------
   // finviz型: 面積=現在窓のシェア(share_pct)、色=Δpp(通常時からのシェア変化)の
   // ダイバージング配色(緑=奪う/赤=奪われる、±0.1/±0.5/±1.5ppの3段+ニュートラル。
   // 上限キャップあり)。連続グラデでなくステップにするのは、色の微差で誤読させない
@@ -488,10 +492,10 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     // 資金流入トップ3銘柄(現在窓のrecent降順)をツールチップに載せる
     const byGroup={};
     T.forEach(tk=>{const g=tk.group||tk.sector||"不明";(byGroup[g]=byGroup[g]||[]).push(tk);});
-    // 極小業種の視認性下限: シェア0.3%相当を面積の下限にする(2026-07-10ユーザー指摘
-    // 「33業種が全部反映されていない」対応 — 0.02%級のタイルが数px角になり事実上
-    // 見えなかった)。この分だけタイル面積は厳密なシェア比例から外れる(凡例に明記)。
-    // 正確なシェア値はツールチップと下の全33業種一覧で常に確認できる。
+    // 極小業種の視認性下限: シェア0.3%相当を面積の下限にする(JP版と同じ対応 —
+    // 0.02%級のタイルが数px角になり事実上見えなくなるのを防ぐ)。この分だけタイル面積は
+    // 厳密なシェア比例から外れる(凡例に明記)。正確なシェア値はツールチップと下の
+        // 全業種一覧で常に確認できる。
     const TMAP_FLOOR=0.3;
     const tiles=squarify(shown.map(g=>({...g,value:Math.max(g.share_pct,TMAP_FLOOR)})).sort((a,b)=>b.value-a.value),0,0,W,H);
     el.innerHTML=tiles.map(t=>{
@@ -502,13 +506,12 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       const top3=(byGroup[g.group]||[]).slice()
         .sort((a,b)=>((b.w[WKEY]||{}).recent||0)-((a.w[WKEY]||{}).recent||0)).slice(0,3)
         .map((tk,i)=>{
-          // 手書きの詳細タグ(例: 半導体メモリ(NAND))がJPX区分と異なる銘柄のみ併記
-          // (キオクシア=電気機器のようなJPX公式区分への誤解を防ぐ)
+          // 手書きの詳細タグ(GICS Sub-Industry)がgroup(GICSセクター)と異なる銘柄のみ併記
           const tag=(tk.sector&&tk.sector!==g.group)?`（${tk.sector}）`:"";
-          return `${i+1}. ${tk.name}${tag} ${yen((tk.w[WKEY]||{}).recent||0)}円`;
+          return `${i+1}. ${tk.name}${tag} ${usd((tk.w[WKEY]||{}).recent||0)}`;
         });
       const title=[`${g.group}`,
-                   ...(CUSTOMG.has(g.group)?["独自区分（JPX公式33業種外・custom_groups.csvで定義）"]:[]),
+                   ...(CUSTOMG.has(g.group)?["独自区分（GICS公式11セクター外・custom_groups.csvで定義）"]:[]),
                    `シェア ${g.share_pct.toFixed(2)}%（${dTxt}・${g.n}銘柄）`,
                    ...(top3.length?["資金流入トップ3:",...top3]:[])].join("&#10;");
       // ラベルはタイルサイズで省略(はみ出し禁止、詳細はツールチップ)
@@ -535,15 +538,15 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   window.addEventListener("resize",()=>{clearTimeout(tmapRz);tmapRz=setTimeout(()=>renderTreemap(D_GROUPS[WKEY]||[]),150);});
 
   // ---------- 銘柄別チャートデータの遅延読み込み ----------
-  // 850銘柄分の生1分足を index.html に埋め込むと10MB超で破綻するため、
-  // 銘柄選択時に site/data/{code}.json を fetch する (同一オリジンなのでCORS問題なし)。
+  // 多数銘柄分の生1分足を index.html に埋め込むと肥大化するため、
+  // 銘柄選択時に data/{code}.json を fetch する (同一オリジンなのでCORS問題なし)。
   // 初期選択銘柄だけは D_INITIAL としてHTMLに埋め込み済みなので初回はfetch不要。
   const chartCache={};
   if(D_INITIAL && D_INITIAL.code) chartCache[D_INITIAL.code]=D_INITIAL;
 
   async function loadTickerChart(code){
     if(chartCache[code]) return chartCache[code];
-    const res=await fetch("data/"+code.replace(/\./g,"_")+".json");  // build側は 7203.T → 7203_T.json で出力
+    const res=await fetch("data/"+code.replace(/\./g,"_")+".json");  // build側は AAPL → AAPL.json で出力
     if(!res.ok) throw new Error("HTTP "+res.status);
     const j=await res.json();
     chartCache[code]=j;
@@ -557,19 +560,19 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       if(k!==idx){if(cur)bars.push(cur);idx=k;cur={o:c[i],h:c[i],l:c[i],c:c[i],v:v[i]||0,t0:t[i]};}
       else{cur.h=Math.max(cur.h,c[i]);cur.l=Math.min(cur.l,c[i]);cur.c=c[i];cur.v+=v[i]||0;}}
     if(cur)bars.push(cur);
-    const seps=[];let pd=null;bars.forEach((b,i)=>{const d=jstYMD(b.t0);if(d!==pd){seps.push({i,label:jstMD(b.t0)});pd=d;}});
+    const seps=[];let pd=null;bars.forEach((b,i)=>{const d=etYMD(b.t0);if(d!==pd){seps.push({i,label:etMD(b.t0)});pd=d;}});
     return {bars,seps,intraday:true};
   }
   function aggDaily(ck,tf){
     const Dd=ck.d;if(!Dd||!Dd.t.length)return {bars:[],seps:[]};
-    const keyFn=tf==="1d"?(t=>jstYMD(t)):tf==="1w"?(t=>Math.floor(t/(7*86400))):(t=>{const d=jstD(t);return d.getUTCFullYear()*12+d.getUTCMonth();});
+    const keyFn=tf==="1d"?(t=>etYMD(t)):tf==="1w"?(t=>Math.floor(t/(7*86400))):(t=>{const d=etD(t);return d.getUTCFullYear()*12+d.getUTCMonth();});
     const bars=[];let ck2=null,cur=null;
     for(let i=0;i<Dd.t.length;i++){const k=keyFn(Dd.t[i]);
       if(k!==ck2){if(cur)bars.push(cur);ck2=k;cur={o:Dd.o[i],h:Dd.h[i],l:Dd.l[i],c:Dd.c[i],v:Dd.v[i],t0:Dd.t[i]};}
       else{cur.h=Math.max(cur.h,Dd.h[i]);cur.l=Math.min(cur.l,Dd.l[i]);cur.c=Dd.c[i];cur.v+=Dd.v[i];}}
     if(cur)bars.push(cur);
     const seps=[];let pk=null;
-    bars.forEach((b,i)=>{const d=jstD(b.t0);
+    bars.forEach((b,i)=>{const d=etD(b.t0);
       if(tf==="1M"){const y=d.getUTCFullYear();if(y!==pk){seps.push({i,label:y+""});pk=y;}}
       else{const key=d.getUTCFullYear()*12+d.getUTCMonth();if(key!==pk){const lbl=(d.getUTCMonth()===0)?d.getUTCFullYear()+"年":(d.getUTCMonth()+1)+"月";seps.push({i,label:lbl});pk=key;}}});
     return {bars,seps,intraday:false,tf};
@@ -581,21 +584,18 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   const svgP=$("#svgPrice"),svgV=$("#svgVol"),tip=$("#tip"),plot=$("#plot");
   let geom=null, curChart=null, loadToken=0;
   function niceTicks(min,max,n){const s=(max-min)/n,mag=Math.pow(10,Math.floor(Math.log10(s))),nm=s/mag;const st=(nm<1.5?1:nm<3?2:nm<7?5:10)*mag,o=[];let t=Math.ceil(min/st)*st;for(;t<=max+1e-6;t+=st)o.push(Math.round(t*100)/100);return o;}
-  const fmtPx=v=>v>=1000?v.toLocaleString("ja-JP",{maximumFractionDigits:0}):v.toLocaleString("ja-JP",{minimumFractionDigits:1,maximumFractionDigits:1});
+  const fmtPx=v=>v>=1000?v.toLocaleString("en-US",{maximumFractionDigits:0}):v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 
-  // 「本日約定なし」注記 (ストップ高/安/売買停止で最新セッションに約定が無い銘柄)。
-  // 初心者が「チャートが止まっている=不具合?」と誤解しないための説明。stale判定は
-  // ビルド時にPython側(最終バー日付 < 市場最新日付)で付与済み(summary.stale)。
+  // 「本日約定なし」注記。米国株には日本のような値幅制限(ストップ高/安)が無いため、
+  // JP版のような「ストップ高/安の可能性」推定は行わず、売買停止・データ遅延等の
+  // 一般的な理由のみを事実として示す。stale判定はビルド時にPython側
+  // (最終バー日付 < 市場最新日付)で付与済み(summary.stale)。
   function showStaleWarn(summary){
     const wEl=document.getElementById("chartwarn");
     if(!summary||!summary.stale){wEl.style.display="none";return;}
-    const dir=summary.sdir==="up"?"ストップ高":summary.sdir==="down"?"ストップ安":"";
     const mv=summary.move_pct, ld=summary.last_date;
-    let msg;
-    if(dir==="ストップ高") msg=`直近 ${ld} に <b>+${mv}% 急騰</b>し、買い注文が殺到して値幅制限の上限（<b>ストップ高</b>）に達した可能性があります。売り物が無いと売買が成立せず、チャートは最後の約定（${ld}）で止まって見えます。`;
-    else if(dir==="ストップ安") msg=`直近 ${ld} に <b>${mv}% 急落</b>し、売り注文が殺到して値幅制限の下限（<b>ストップ安</b>）に達した可能性があります。買い手が無いと売買が成立せず、チャートは最後の約定（${ld}）で止まって見えます。`;
-    else msg=`最新の取引日にまだ売買が成立していません（ストップ高・ストップ安・売買停止などの可能性）。最後の約定は ${ld} です。`;
-    wEl.innerHTML=`<b>⏸ 本日まだ約定がありません。</b> ${msg} 売買が再開すれば自動で続きが描かれます。<br><span class="def">※「ストップ高」＝その日に上がれる株価の上限。買いが集中して上限に張り付くと、それ以上では約定しません（下限は「ストップ安」）。<b>不具合ではありません。</b></span>`;
+    const mvTxt=(mv>0?"+":"")+mv+"%";
+    wEl.innerHTML=`<b>⏸ 本日まだ約定がありません。</b> 最後の約定は ${ld}（同日の騰落 ${mvTxt}）です。売買停止・データ遅延・上場廃止などの可能性があります。売買が再開すれば自動で続きが描かれます。<br><span class="def">※米国株には日本のような値幅制限（ストップ高/安）は無く、サーキットブレーカー等の一時停止を除けば通常は毎営業日約定します。<b>不具合ではありません。</b></span>`;
     wEl.style.display="";
   }
 
@@ -619,11 +619,9 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     if(myToken!==loadToken)return;  // 選択が切り替わっていたら古い結果は破棄
     curChart=ck;
     plot.classList.remove("loading");
-    const sd=D_SUPPLY[ck.code];
-    const sdBadge=sd?`<span class="supplybadge" title="JPX空売り残高報告(大口0.5%以上・日次) ${sd.n}件">空売り残 ${sd.pct.toFixed(2)}%（${sd.date}）</span>`:"";
     const {bars,seps,intraday}=aggregate(ck,TF);const n=bars.length;
     if(!n){svgP.innerHTML=`<text x="${PW/2}" y="${PH/2}" text-anchor="middle" fill="var(--muted)" font-size="13">この足のデータがありません</text>`;svgV.innerHTML="";geom=null;
-      $("#chartttl").textContent=`${ck.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector}</span>${sdBadge}`;showStaleWarn(summary);return;}
+      $("#chartttl").textContent=`${ck.name} のチャート`;$("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector}</span>`;showStaleWarn(summary);return;}
     let ymin=Infinity,ymax=-Infinity,vmax=0;bars.forEach(b=>{if(b.l<ymin)ymin=b.l;if(b.h>ymax)ymax=b.h;if(b.v>vmax)vmax=b.v;});
     const yp=(ymax-ymin)*0.08||1;ymin-=yp;ymax+=yp;
     const Y=x=>pt+(1-(x-ymin)/(ymax-ymin))*(PH-pt-pb);const VY=x=>vpt+(1-x/(vmax||1))*(VH-vpt-vpb);
@@ -648,8 +646,8 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const first=bars[0].o,lastc=bars[n-1].c,pct=(lastc/first-1)*100;
     $("#chartttl").textContent=`${ck.name} のチャート`;
     const staleBadge=(summary&&summary.stale)?`<span class="stalebadge">⏸ 本日約定なし</span>`:"";
-    $("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector} · ${BL[ck.bucket]}</span>${sdBadge}${staleBadge}`+
-      `<span class="dpx tnum">¥${fmtPx(lastc)}</span><span class="dpx tnum ${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%（表示範囲）</span>`+
+    $("#dhead").innerHTML=`<span class="dnm">${ck.name}</span><span class="dsec">${ck.code} · ${ck.sector} · ${BL[ck.bucket]}</span>${staleBadge}`+
+      `<span class="dpx tnum">$${fmtPx(lastc)}</span><span class="dpx tnum ${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%（表示範囲）</span>`+
       `<span class="drange tnum">${TFLB[TF]}・${n}本</span>`;
     showStaleWarn(summary);
     syncStockInput(ck.code, ck.name);
@@ -663,11 +661,11 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     svgP.querySelector("#cxV").setAttribute("x1",X);svgP.querySelector("#cxV").setAttribute("x2",X);svgP.querySelector("#cxV").setAttribute("opacity","0.8");
     const v2=svgV.querySelector("#cxV2");v2.setAttribute("x1",X);v2.setAttribute("x2",X);v2.setAttribute("opacity","0.8");
     const to=b.c*b.v,chg=(b.c/b.o-1)*100;
-    const tl=(TF==="1d"||TF==="1w"||TF==="1M")?jstYMD(b.t0):(jstMD(b.t0)+" "+jstHM(b.t0));
+    const tl=(TF==="1d"||TF==="1w"||TF==="1M")?etYMD(b.t0):(etMD(b.t0)+" "+etHM(b.t0));
     tip.innerHTML=`<div class="tt">${tl} · ${tfLabel()}</div>`+
       (TF==="1m"?`<div class="row"><span>終値</span><span>${fmtPx(b.c)}</span></div>`:
         `<div class="row"><span>始値 O</span><span>${fmtPx(b.o)}</span></div><div class="row"><span>高値 H</span><span>${fmtPx(b.h)}</span></div><div class="row"><span>安値 L</span><span>${fmtPx(b.l)}</span></div><div class="row"><span>終値 C</span><span>${fmtPx(b.c)}</span></div>`)+
-      `<div class="row"><span>騰落</span><span style="color:${chg>0?'var(--up-text)':chg<0?'var(--down-text)':'inherit'}">${chg>0?'+':''}${chg.toFixed(2)}%</span></div><div class="row"><span>出来高</span><span>${b.v.toLocaleString()}</span></div><div class="row"><span>売買代金</span><span>${yen(to)}円</span></div>`;
+      `<div class="row"><span>騰落</span><span style="color:${chg>0?'var(--up-text)':chg<0?'var(--down-text)':'inherit'}">${chg>0?'+':''}${chg.toFixed(2)}%</span></div><div class="row"><span>出来高</span><span>${b.v.toLocaleString()}</span></div><div class="row"><span>売買代金</span><span>${usd(to)}</span></div>`;
     const pr2=plot.getBoundingClientRect();let left=X/PW*pr2.width;const tw=tip.offsetWidth;left=Math.max(tw/2+4,Math.min(pr2.width-tw/2-4,left));tip.style.left=left+"px";tip.style.opacity="1";
   }
   function hide(){tip.style.opacity="0";const a=svgP.querySelector("#cxV");if(a)a.setAttribute("opacity","0");const c=svgV.querySelector("#cxV2");if(c)c.setAttribute("opacity","0");}
@@ -679,9 +677,9 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     drawDetail(code);hide();
     if(!(opts&&opts.skipScroll))$("#chartttl").scrollIntoView({behavior:"smooth",block:"nearest"});}
 
-  // ---------- 銘柄セレクタ (850銘柄規模のためdatalistで検索可能に) ----------
+  // ---------- 銘柄セレクタ (多数銘柄規模のためdatalistで検索可能に) ----------
   const stockInput=$("#stocksel"), stockDL=$("#stockdl");
-  const optLabel=tk=>`${tk.code.replace(".T","")} ${tk.name}`;
+  const optLabel=tk=>`${tk.code} ${tk.name}`;
   const codeByLabel=new Map();
   (function(){
     const groups={hot:[],leader:[],core:[]};
@@ -701,7 +699,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     v=(v||"").trim();
     if(codeByLabel.has(v))return codeByLabel.get(v);
     const bare=v.replace(/\s.*$/,"");
-    const hit=T.find(tk=>tk.code.replace(".T","")===bare||tk.code===bare);
+    const hit=T.find(tk=>tk.code===bare);
     if(hit)return hit.code;
     const byName=T.find(tk=>tk.name===v||optLabel(tk)===v);
     return byName?byName.code:null;
@@ -726,9 +724,8 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     `<div><b>・集中度</b>：各銘柄の直近窓の売買代金が、平常時（履歴の同じ窓幅の中央値）の何倍か。大きいほど「いつもより資金が集まっている」。</div>`+
     `<div><b>・勢いΔpp</b>：直前の同じ窓と比べたユニバース内シェアの増減（pp）。急騰しきい値を超えると🚨アラート点灯。</div>`+
     `<div><b>・シェア／通常時比</b>：全${T.length}銘柄の売買代金に占める割合と、その平常水準（履歴中央値）との差。</div>`+
-    `<div><b>・業種別シェア</b>：JPX公式33業種＋独自区分「半導体」。勢力図マップは面積＝シェア、色＝通常時からの増減（緑＝増・赤＝減）。</div>`+
-    `<div><b>・空売り残</b>：JPX公式「空売りの残高に関する情報」（発行済株式数0.5%以上を報告した大口のみ・日次）。表示が無い銘柄は「空売りが無い」のではなく「大口報告が無い」という意味。</div>`+
-    `<div class="warn" style="margin-top:4px"><b>データ範囲</b>：分足系（1分〜4時間の集計窓と分足チャート）は1分足の保持期間（<b>${D.meta.start} 〜 ${D.meta.end} JST</b>のローリング窓）から。日／週／月（日足〜月足）は日足2年から自前で集約（Yahooの月足APIが新規上場銘柄で不安定なため）。板情報は使わず売買代金の集中で資金の向きを近似する（真の板／歩み値のリアルタイムは無料枠の対象外）。監視対象は TOPIX500＋日経225＋話題枠で構成する全${T.length}銘柄。銘柄別チャートは選択時に読み込み。データ出所：Yahoo Finance・JPX・日経／最新 ${D.meta.end} JST。使い方の詳細は<a href="help.html" style="color:var(--accent)">📖 使い方ガイド</a>へ。<b>本ツールは事実の可視化であり、投資助言ではありません。</b></div>`;
+    `<div><b>・業種別シェア</b>：GICS公式11セクター＋独自区分「半導体」。勢力図マップは面積＝シェア、色＝通常時からの増減（緑＝増・赤＝減）。</div>`+
+    `<div class="warn" style="margin-top:4px"><b>データ範囲</b>：分足系（1分〜4時間の集計窓と分足チャート）は1分足の保持期間（<b>${D.meta.start} 〜 ${D.meta.end} ET</b>のローリング窓）から。日／週／月（日足〜月足）は日足2年から自前で集約（Yahooの月足APIが新規上場銘柄で不安定なため）。板情報は使わず売買代金の集中で資金の向きを近似する（真の板／歩み値のリアルタイムは無料枠の対象外）。米国には日本のJPX空売り残高報告に相当する日次の公的個別開示が無いため需給レイヤーは未収録。監視対象は S&P500＋Nasdaq-100＋話題枠で構成する全${T.length}銘柄。銘柄別チャートは選択時に読み込み。データ出所：Yahoo Finance／最新 ${D.meta.end} ET。使い方の詳細は<a href="help.html" style="color:var(--accent)">📖 使い方ガイド</a>へ。<b>本ツールは事実の可視化であり、投資助言ではありません。</b></div>`;
 
   render();
 })();

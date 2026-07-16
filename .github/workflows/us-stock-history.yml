@@ -1,0 +1,78 @@
+name: US Stock History (daily/weekly/monthly/1m backfill/rotate)
+
+# jp-stock-history.yml の構造をそのまま踏襲。週足・月足および長期日足チャート/集計窓の
+# ためのデータ収集。us_stock_fetch.py を INTERVAL/RANGE を変えて4回呼び、
+#   {code}_1d.csv (日足2年) / {code}_1wk.csv (週足5年) / {code}_1mo.csv (月足max)
+#   / {code}_1m.csv (1分足RANGE=5dで追取り — 日中cadence(us-stock.yml)がRANGE=1dに
+#     軽量化された分、日をまたいだ欠損をここで回収する)
+# を data/us_stocks/ に差分蓄積したあと、us_stock_rotate.py で1分足ライブファイルを
+# 直近ROLLING_DAYS営業日に切り詰め、溢れた分を月次gzipアーカイブへ退避する
+# (リポジトリ肥大化対策)。日/週/月足・1分足backfillは場中に動かないため1日1回(引け後)で十分。
+
+on:
+  schedule:
+    # NY市場引け(16:00 ET)の後。夏時間20:00 UTC・冬時間21:00 UTCのどちらでも引け後に
+    # なるよう 21:23 UTC に設定 (:00/:30 を避けオフセット)。平日のみ。
+    - cron: '23 21 * * 1-5'
+  workflow_dispatch:
+  # フィーチャーブランチ検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'us_stock_fetch.py'
+      - 'us_stock_rotate.py'
+      - '.github/workflows/us-stock-history.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: us-stock-history-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ)。取得対象は data/us_stocks/universe.csv
+      - name: Fetch daily bars (2y)
+        env: { INTERVAL: '1d',  RANGE: '2y',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
+        run: python us_stock_fetch.py
+      - name: Fetch weekly bars (5y)
+        env: { INTERVAL: '1wk', RANGE: '5y',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
+        run: python us_stock_fetch.py
+      - name: Fetch monthly bars (max)
+        env: { INTERVAL: '1mo', RANGE: 'max', SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '10' }
+        run: python us_stock_fetch.py
+      # 日中cadence(us-stock.yml)はRANGE=1dに軽量化したため、日をまたいだ欠損
+      # (実行ドロップ・ジョブ失敗等)をここでRANGE=5dの取り直しにより回収する。
+      - name: Fetch 1m bars (5d backfill)
+        env: { INTERVAL: '1m',  RANGE: '5d',  SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '16' }
+        run: python us_stock_fetch.py
+
+      # 1分足ライブファイルを直近ROLLING_DAYS営業日に切り詰め、溢れた分を
+      # 月次gzipアーカイブ({code}_1m_YYYYMM.csv.gz)へ退避 (リポジトリ肥大化対策)
+      - name: Rotate 1m live files to monthly archive
+        env: { ROLLING_DAYS: '7' }
+        run: python us_stock_rotate.py
+
+      - name: Persist collected data
+        run: |
+          git config user.name "us-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/us_stocks 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: US stock history (d/w/m/1m backfill/rotate) $(date -u +'%Y-%m-%d %H:%M')"
+          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
+          # (競合したまま放置するとpushが「Everything up-to-date」となり
+          #  データ喪失がsuccessに見える。JP版と同じ既知の落とし穴)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "新規バーなし"
+          fi
