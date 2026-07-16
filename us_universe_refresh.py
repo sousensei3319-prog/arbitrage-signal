@@ -108,49 +108,46 @@ def _fetch(url, timeout=25):
 class _TableParser(HTMLParser):
     """WikipediaのHTMLからtable要素を抽出する最小限のパーサ (標準ライブラリのみ)。
 
-    ネストしたtable(画像キャプション等)は深さ管理で除外し、トップレベルのtableだけを
-    [[cell_text, ...], ...] のリストとして self.tables に蓄積する。"""
+    【重要】トップレベルのtableだけを見る旧実装では、Nasdaq-100ページの構成銘柄
+    テーブルを取りこぼした (2026-07-16 ランナー上のプローブで実測: レイアウト用
+    ラッパー等の内側にネストしており、トップレベル11個の中に存在しなかった)。
+    そこでスタック方式で**全深さのtable**をそれぞれ独立に収集する。セルのテキストは
+    最も内側の開いているtableにのみ割り当てるため、ネストしても混ざらない。
+    ヘッダー照合(_find_table)で目的のテーブルだけを選ぶので、ノイズ増は無害。"""
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.tables = []
-        self._depth = 0
-        self._cur_table = None
-        self._cur_row = None
-        self._cur_cell = None
-        self._in_cell = False
+        self.tables = []   # 完了した全table (ネスト含む、閉じた順)
+        self._stack = []   # 開いているtable: {"rows": [...], "row": None, "cell": None}
 
     def handle_starttag(self, tag, attrs):
         if tag == "table":
-            self._depth += 1
-            if self._depth == 1:
-                self._cur_table = []
-        elif tag == "tr" and self._depth == 1:
-            self._cur_row = []
-        elif tag in ("td", "th") and self._depth == 1:
-            self._in_cell = True
-            self._cur_cell = []
+            self._stack.append({"rows": [], "row": None, "cell": None})
+        elif self._stack:
+            t = self._stack[-1]
+            if tag == "tr":
+                t["row"] = []
+            elif tag in ("td", "th"):
+                t["cell"] = []
 
     def handle_endtag(self, tag):
         if tag == "table":
-            if self._depth == 1 and self._cur_table is not None:
-                self.tables.append(self._cur_table)
-            self._depth = max(0, self._depth - 1)
-            if self._depth == 0:
-                self._cur_table = None
-        elif tag == "tr" and self._depth == 1:
-            if self._cur_row is not None and self._cur_table is not None:
-                self._cur_table.append(self._cur_row)
-            self._cur_row = None
-        elif tag in ("td", "th") and self._depth == 1:
-            if self._in_cell and self._cur_row is not None:
-                self._cur_row.append("".join(self._cur_cell).strip())
-            self._in_cell = False
-            self._cur_cell = None
+            if self._stack:
+                self.tables.append(self._stack.pop()["rows"])
+        elif self._stack:
+            t = self._stack[-1]
+            if tag == "tr":
+                if t["row"] is not None:
+                    t["rows"].append(t["row"])
+                t["row"] = None
+            elif tag in ("td", "th"):
+                if t["cell"] is not None and t["row"] is not None:
+                    t["row"].append("".join(t["cell"]).strip())
+                t["cell"] = None
 
     def handle_data(self, data):
-        if self._in_cell and self._cur_cell is not None:
-            self._cur_cell.append(data)
+        if self._stack and self._stack[-1]["cell"] is not None:
+            self._stack[-1]["cell"].append(data)
 
 
 def _find_table(tables, required_headers):
@@ -238,12 +235,16 @@ def fetch_nasdaq100():
     try:
         parser = _TableParser()
         parser.feed(html)
-        table = _find_table(parser.tables, ["ticker", "gics sector"])
+        # 列名は歴史的に "Ticker" だが "Symbol" へ変わる可能性に備えて両方試す
+        table = (_find_table(parser.tables, ["ticker", "gics sector"])
+                 or _find_table(parser.tables, ["symbol", "gics sector"]))
         if not table or len(table) < 2:
             print("Nasdaq-100一覧: componentsテーブルが見つからなかった (構造変更の可能性)。leaderソースをスキップ。")
             return set(), {}, {}, {}
         header = table[0]
         i_sym = _col_index(header, "Ticker")
+        if i_sym is None:
+            i_sym = _col_index(header, "Symbol")
         i_name = _col_index(header, "Company")
         i_sector = _col_index(header, "GICS Sector")
         i_sub = _col_index(header, "GICS Sub-Industry")
