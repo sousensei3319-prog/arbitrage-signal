@@ -1,0 +1,88 @@
+name: US Hot Bucket Refresh (話題枠の週次自動入れ替え)
+
+# 話題枠(hot bucket)を毎週月曜のNY寄り前に自動入れ替え (us_hot_refresh.py)。
+# Yahoo Finance US の predefined screener API (most_actives/day_gainers) 上位から、
+# ユニバース外の話題株を hot に追加し、話題でなくなった古い hot 銘柄を外す。
+# S&P500/Nasdaq-100 は絶対に外さない。hot-refresh.yml(JP版)の構造を踏襲。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチ検証は push トリガーで代用 (実データ検証はランナー上が初)
+#   - サンドボックスからは Yahoo へ proxy403 で到達不可のため、本体の疎通確認は
+#     このランナー上の実行が唯一の手段
+#   - 週次のため schedule 遅延(数時間)は許容範囲
+
+on:
+  schedule:
+    # 月曜 11:11 UTC。NY市場寄り(夏13:30 UTC/冬14:30 UTC)より十分前。
+    # :00/:15/:30 を避けオフセット。
+    - cron: '11 11 * * 1'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'us_hot_refresh.py'
+      - '.github/workflows/us-hot-refresh.yml'
+
+permissions:
+  contents: write
+
+# 収集/他のコミットバックと競合しないよう直列化
+concurrency:
+  group: us-hot-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ)
+      - name: Refresh hot bucket from trending screeners
+        env:
+          RANK_TOP: '30'
+          ABSENT_WEEKS: '4'
+          KEEP_SURGE: '1.3'
+          FETCH_DEADLINE_MIN: '5'
+        run: python us_hot_refresh.py
+
+      # 新規追加した話題株の履歴(日足2y/週足5y/月足max/1分足5d)を即取得する。
+      # これをしないと「今週の話題枠 入れ替え」欄には出るのに、収集が回るまで
+      # 資金集中ランキング/全銘柄表/チャートに出ないタイムラグが生じる (JP版と同じ対応)。
+      - name: Fetch initial history for newly added stocks
+        env:
+          SLEEP_SEC: '0.4'
+          FETCH_DEADLINE_MIN: '8'
+        run: |
+          NEW=$(python3 -c "import json;print(','.join(a['code'] for a in json.load(open('data/us_stocks/hot_changes_latest.json')).get('added',[])))" 2>/dev/null || true)
+          if [ -z "$NEW" ]; then echo "新規追加なし・初期取得スキップ"; exit 0; fi
+          echo "新規話題株の初期履歴を取得: $NEW"
+          US_TICKERS="$NEW" INTERVAL=1d  RANGE=2y  python us_stock_fetch.py || true
+          US_TICKERS="$NEW" INTERVAL=1wk RANGE=5y  python us_stock_fetch.py || true
+          US_TICKERS="$NEW" INTERVAL=1mo RANGE=max python us_stock_fetch.py || true
+          US_TICKERS="$NEW" INTERVAL=1m  RANGE=5d  python us_stock_fetch.py || true
+
+      # 新規銘柄込みで資金集中スクリーナーを再計算 (ダッシュボードに即反映させる)
+      - name: Screen money flow (include new stocks)
+        env:
+          WINDOW_MIN: '30'
+        run: python us_money_flow.py
+
+      # universe.csv・状態/ログ・新規銘柄の履歴CSV・money_flow をまとめてコミットバック
+      # (data/us_stocks ディレクトリ指定は未存在でもabortしない)
+      - name: Persist hot bucket changes
+        run: |
+          git config user.name "us-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/us_stocks 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: 米国株 話題枠 週次入れ替え+新規銘柄の初期履歴 $(date -u +'%Y-%m-%d')"
+          # rebase競合時はabortして push failed を正しく踏ませる (データ喪失をsuccessに見せない)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "話題枠に変更なし"
+          fi

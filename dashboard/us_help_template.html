@@ -1,0 +1,189 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>使い方ガイド — 米国株 資金集中スクリーナー</title>
+<style>
+  :root{
+    --plane:#eef1f5;--surface:#ffffff;--surface-2:#f7f9fb;--ink:#111418;--ink-2:#59606b;--muted:#8b93a1;
+    --border:rgba(17,20,24,.10);--accent:#2a78d6;--accent-soft:rgba(42,120,214,.10);
+    --up:#00760c;--down:#b52d2d;
+    --shadow:0 1px 2px rgba(17,20,24,.05),0 8px 24px rgba(17,20,24,.05);
+    --ui:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Noto Sans JP",sans-serif;
+    --num:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --plane:#0b0e13;--surface:#151a21;--surface-2:#10141a;--ink:#e8ecf2;--ink-2:#a3adbc;--muted:#6f7887;
+    --border:rgba(255,255,255,.10);--accent:#3987e5;--accent-soft:rgba(57,135,229,.14);--up:#3bd45c;--down:#f28d8d;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }}
+  :root[data-theme="light"]{
+    --plane:#eef1f5;--surface:#ffffff;--surface-2:#f7f9fb;--ink:#111418;--ink-2:#59606b;--muted:#8b93a1;
+    --border:rgba(17,20,24,.10);--accent:#2a78d6;--accent-soft:rgba(42,120,214,.10);--up:#00760c;--down:#b52d2d;
+    --shadow:0 1px 2px rgba(17,20,24,.05),0 8px 24px rgba(17,20,24,.05);
+  }
+  :root[data-theme="dark"]{
+    --plane:#0b0e13;--surface:#151a21;--surface-2:#10141a;--ink:#e8ecf2;--ink-2:#a3adbc;--muted:#6f7887;
+    --border:rgba(255,255,255,.10);--accent:#3987e5;--accent-soft:rgba(57,135,229,.14);--up:#3bd45c;--down:#f28d8d;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--ink);font-family:var(--ui);line-height:1.75;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:820px;margin:0 auto;padding:26px 20px 72px;}
+  .top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+  .back{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:6px 14px;}
+  .back:hover{background:var(--accent-soft);}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;}
+  h1{margin:14px 0 4px;font-size:25px;font-weight:700;letter-spacing:-.01em;}
+  .lead{color:var(--ink-2);font-size:15px;margin:0 0 6px;}
+  h2{margin:30px 0 10px;font-size:18px;font-weight:680;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  h3{margin:20px 0 6px;font-size:15px;font-weight:660;}
+  p{margin:8px 0;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin:10px 0;}
+  ul{margin:8px 0;padding-left:22px;}li{margin:5px 0;}
+  b{font-weight:660;}
+  code{font-family:var(--num);font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px;}
+  .term{display:grid;grid-template-columns:130px 1fr;gap:6px 14px;margin:10px 0;}
+  .term dt{font-weight:660;color:var(--ink);}
+  .term dd{margin:0;color:var(--ink-2);}
+  .up{color:var(--up);font-weight:640;}.down{color:var(--down);font-weight:640;}
+  .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px;margin:6px 0;}
+  .flow .st{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 11px;white-space:nowrap;}
+  .flow .ar{color:var(--muted);font-weight:700;}
+  .note{font-size:13px;color:var(--muted);}
+  .warn{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:13px 16px;font-size:13.5px;color:var(--ink-2);margin:10px 0;}
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted);}
+  @media (max-width:600px){.term{grid-template-columns:1fr;gap:2px 0;}.term dd{margin-bottom:6px;}}
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <a class="back" href="index.html">← ダッシュボードへ戻る</a>
+    <span class="note">最新データ: <b>__UPDATED__</b> ET</span>
+  </div>
+  <div class="eyebrow">Money-Flow Screener · User Guide</div>
+  <h1>使い方ガイド</h1>
+  <p class="lead">このダッシュボードが何を見せているのか、各パネルの読み方、用語の意味をまとめています。</p>
+
+  <h2>1. このツールの目的</h2>
+  <div class="card">
+    <p>米国株 <b>__N__銘柄</b>（S&P500＋Nasdaq-100＋話題枠）の売買代金を<b>1分足から集計</b>し、
+    「<b>いま、どこに資金が集まりだしているか</b>」を可視化するためのダッシュボードです。</p>
+    <p>株価そのものの上下ではなく、<b>売買代金（終値×出来高）の集中</b>に注目します。
+    価格が動く前に出来高が先に膨らむことは多く、「資金の向き先」を早めに捉えるのが狙いです。
+    真の板情報（気配値）や歩み値のリアルタイムは無料の範囲では取得できないため、
+    <b>売買代金の集中で近似</b>している点にご留意ください。</p>
+    <p>画面右上には <b>「◯◯ 銘柄」</b>（現在の監視総数）と <b>「話題枠 ＋N」</b>
+    （指数母数〈S&P500＋Nasdaq-100〉に上乗せされた話題枠の銘柄数）を表示します。
+    話題枠は毎週入れ替わるので、この数は変動します。</p>
+  </div>
+
+  <h2>2. データの流れと更新頻度</h2>
+  <div class="card">
+    <div class="flow">
+      <span class="st">Yahoo Finance（1分足）</span><span class="ar">→</span>
+      <span class="st">NY市場中に定期収集</span><span class="ar">→</span>
+      <span class="st">資金集中スクリーニング</span><span class="ar">→</span>
+      <span class="st">自動デプロイ</span>
+    </div>
+    <ul>
+      <li>NY市場の立会時間（平日9:30〜16:00 ET、日本時間では夏時間22:30〜5:00・冬時間23:30〜6:00）に
+      定期的に収集・再計算し、ページが自動更新されます。アラートが出るまでの遅れは
+      Yahoo自体の遅延＋収集＋デプロイの合計でおよそ数分〜十数分です。</li>
+      <li><b>1分足</b>は直近およそ<b>7営業日分</b>を保持（それより前は月次アーカイブへ退避）。</li>
+      <li><b>日足・週足・月足</b>は引け後に1回更新（日足2年分から自前で集約）。</li>
+      <li><b>話題枠</b>は毎週月曜のNY寄り前に自動で入れ替わります（下記「今週の話題枠 入れ替え」）。</li>
+      <li>更新はGitHub Actionsで自動化。休場日・時間外に走っても新規バーが無いだけです。</li>
+      <li>秒単位の真のリアルタイムや板情報（気配値）は無料の範囲では扱えないため、
+      <b>売買代金の集中で資金の向きを近似</b>しています。</li>
+    </ul>
+  </div>
+
+  <h2>3. 各パネルの読み方</h2>
+
+  <h3>集計窓 / 急騰しきい値（画面上部の切替）</h3>
+  <p><b>集計窓</b>は「どのくらいの時間幅で資金の集中を見るか」の選択です（1分〜4時間、日足・週足・月足）。
+  すべてのパネルがこの窓に連動します。<b>急騰しきい値</b>は、各銘柄の<b>ユニバース内シェア</b>
+  （全__N__銘柄の売買代金に占める割合）が<b>直前の同じ窓</b>と比べて何pp増えたら「急騰🚨」とみなすかの感度です
+  （<b>+0.2</b>＝敏感／<b>+0.5</b>＝標準／<b>+1.0</b>＝厳選）。</p>
+
+  <h3>🧭 自動分析コメント</h3>
+  <p>収集のたびに、<b>算出できた事実だけ</b>を日本語でまとめます。主な行は次のとおりです：</p>
+  <ul>
+    <li><b>全体活況度</b>：直近窓の売買代金が平常時（履歴中央値）の何倍か（過熱／閑散）。</li>
+    <li><b>業種別シェア／業種別の資金移動</b>：どの業種が資金を集めているか、どこへ流入・どこから流出したか。</li>
+    <li><b>資金流入／流出の上位銘柄</b>：シェアが拡大／縮小した銘柄（株価の騰落も併記）。</li>
+    <li><b>シェア急伸と株価の連動</b>：シェアが急伸した銘柄のうち、株価も伴うものと「出来高先行」の件数。</li>
+  </ul>
+  <p><b>ニュースの理由や反転予測などの推測は書きません</b>（データで裏づけられないため）。
+  各行の先頭ラベルは太字、増減の数値は<span class="up">緑（+）</span>／<span class="down">赤（−）</span>で色分けしています。</p>
+
+  <h3>どの層に資金が寄っているか</h3>
+  <p>銘柄を3つの層に分けたシェアです。<b>ナスダック100</b>＝Nasdaq-100、<b>S&P500主力</b>＝S&P500、
+  <b>話題・噂</b>＝話題枠（毎週月曜に自動入替、下記参照）。</p>
+
+  <h3>業種別シェア（GICS 11セクター＋半導体）</h3>
+  <ul>
+    <li><b>積み上げバー</b>：上位8業種＋その他のシェアをひと目で。</li>
+    <li><b>勢力図マップ</b>：全区分を敷き詰めた市場マップ。<b>タイルの面積＝シェア</b>、
+    <b>色＝通常時からのシェア変化</b>（<span class="up">緑＝シェアを奪っている</span>／
+    <span class="down">赤＝奪われている</span>）。タイルにカーソルを合わせると、
+    その業種の資金流入トップ3銘柄まで表示します。</li>
+    <li>区分はGICS公式11セクターに、公式には独立していない<b>独自区分「半導体」</b>
+    （情報技術セクターの半導体・半導体製造装置サブ業種に散っている半導体関連銘柄を切り出し）を加えたものです。</li>
+    <li>極小の業種はタイルが潰れないよう<b>下限サイズで表示</b>するため、面積は厳密なシェア比例ではありません。正確な数値はマップ下の一覧で確認できます。</li>
+  </ul>
+
+  <h3>資金集中ランキング</h3>
+  <p><b>集中度＝直近窓の売買代金 ÷ 平常時（履歴の同じ窓幅の中央値）</b>。
+  「いつもの何倍の資金が集まっているか」を表します。これは<b>集中度が高い上位18銘柄の絞り込みリスト</b>で、
+  どの銘柄も<b>資金が集中したときにここへ自動で現れます</b>。行をクリックするとその銘柄のチャートに切り替わります。</p>
+
+  <h3>🔁 今週の話題枠 入れ替え</h3>
+  <p>話題枠（下記）は<b>毎週月曜のNY寄り前に自動で入れ替わり</b>、その週の<b>追加／除外を根拠付きで表示</b>します。</p>
+  <ul>
+    <li><b>追加</b>：Yahoo Finance の<b>取引高上位・値上がり率上位ランキング</b>に登場した、監視ユニバース外の
+    普通株（EQUITY。ETF・投信などは自動的に除外）。「どのランキングの何位か」を根拠として表示します。</li>
+    <li><b>除外</b>：<b>4週連続でランキング圏外</b>かつ<b>直近の集中度が平常（1.3倍未満）</b>になった古い話題株。
+    「何週圏外・集中度何倍か」を根拠として表示します。</li>
+    <li><b>S&P500・Nasdaq-100の銘柄は絶対に外しません。</b>半導体などの恒久テーマ銘柄と、今まさに集中している銘柄も保護します。</li>
+  </ul>
+
+  <h3>🔥 話題枠 一覧</h3>
+  <p>話題枠の<b>全銘柄を集中度順に常時一覧</b>します（集中度・直近売買代金・勢いΔpp・期間騰落）。
+  行をクリックするとチャートが開きます。追加されたばかりの銘柄の業種欄は「—」で、翌月の月次更新でGICSセクターが付きます。</p>
+
+  <h3>銘柄チャート / 全銘柄を表で見る</h3>
+  <p>チャートは足（1分〜月足）を切替可能（1分のみ終値ライン、他はローソク足）。
+  <b>「全銘柄を表で見る」</b>を開くと、ランキング外を含む全__N__銘柄が並び、
+  <b>どの行をクリックしてもその銘柄のチャートが開きます</b>。</p>
+
+  <h2>4. 用語集</h2>
+  <div class="card">
+    <dl class="term">
+      <dt>シェア</dt><dd>全__N__銘柄の売買代金に占める、その銘柄／業種の割合（%）。</dd>
+      <dt>Δpp（デルタpp）</dt><dd>シェアの差（パーセントポイント）。通常時や直前の窓と比べてどれだけ増減したか。</dd>
+      <dt>集中度（surge）</dt><dd>直近窓の売買代金 ÷ 平常時（履歴中央値）。1.0で平常並み、大きいほど資金が集中。</dd>
+      <dt>勢いΔpp（momentum）</dt><dd>直前の同じ窓と比べたユニバース内シェアの増減。急騰しきい値超で🚨。</dd>
+      <dt>通常時 / 平常時</dt><dd>履歴を同じ窓幅で区切ったときの中央値。その銘柄・業種の「いつも」の水準。</dd>
+      <dt>出来高先行</dt><dd>売買代金（シェア）は増えているのに株価がまだ追随していない状態の事実描写。</dd>
+      <dt>話題枠（hot）</dt><dd>S&P500・Nasdaq-100に含まれない「今話題の個別株」。取引高・値上がり率ランキングから毎週月曜に自動入替。</dd>
+      <dt>ナスダック100／S&P500主力</dt><dd>ナスダック100＝Nasdaq-100、S&P500主力＝S&P500（話題枠を除く）。</dd>
+    </dl>
+  </div>
+
+  <h2>5. 制約と免責</h2>
+  <div class="warn">
+    <ul style="margin:0;padding-left:20px;">
+      <li>非公式・無認証APIを利用しているため、<b>遅延や一時的な欠測</b>が起こり得ます。</li>
+      <li>「急騰」は<b>売買代金集中という事実の検知</b>であり、値上がりの予測でも売買の推奨でもありません。</li>
+      <li>米国には日本のJPX空売り残高報告に相当する<b>日次の公的個別開示が無い</b>ため、需給レイヤー（空売り残高等）は未収録です。</li>
+      <li>話題枠の自動選定は外部ランキング由来のため、取得できない週は前週の話題枠を維持します。</li>
+      <li>板情報・歩み値のリアルタイムは扱っていません（売買代金の集中で近似）。</li>
+      <li><b>本ツールは事実の可視化であり、投資助言ではありません。</b>投資判断はご自身の責任で行ってください。</li>
+    </ul>
+  </div>
+
+  <footer>
+    データ出所: Yahoo Finance ／ 最新 __UPDATED__ ET ／
+    <a class="back" style="padding:3px 10px;font-size:12px" href="index.html">← ダッシュボードへ戻る</a>
+  </footer>
+</div>

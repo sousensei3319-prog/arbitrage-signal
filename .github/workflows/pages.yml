@@ -18,6 +18,10 @@ on:
     # GitHub schedule は取りこぼしがあるため実効は15〜20分程度。確実性が要るなら外部cron併用。
     - cron: '3,13,23,33,43,53 0-6 * * 1-5'
     - cron: '37 6 * * 1-5'   # 引け後のバックアップ
+    # 米国市場対応: NY市場 9:30-16:00 ET (夏13:30-20:00 UTC/冬14:30-21:00 UTC) の平日、
+    # 10分ごとに再公開 (JP側と同じ「取り消し合い」対策で最低10分間隔を維持)。
+    - cron: '7,17,27,37,47,57 13-20 * * 1-5'
+    - cron: '7,37 21 * * 1-5'   # 米国引け後のバックアップ
 
 permissions:
   contents: read
@@ -56,6 +60,14 @@ jobs:
       # 収集済みCSV + コメントから site/index.html を生成
       - name: Build dashboard HTML
         run: python dashboard/build_dashboard.py
+
+      # 米国株版 (data/us_stocks/ が無い/空でもJP公開を止めないよう || echo でガード)
+      - name: Run US money-flow screener
+        env: { WINDOW_MIN: '30' }
+        run: python us_money_flow.py || echo "us screener skipped (no data yet)"
+
+      - name: Build US dashboard HTML
+        run: python dashboard/build_us_dashboard.py || echo "us dashboard skipped (no data yet)"
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

@@ -1,0 +1,83 @@
+name: US Stock 1m Collector
+
+# 米国株1分足コレクター (us_stock_fetch.py)
+# jp-stock.yml の構造をそのまま踏襲 (checkout/setup-python/concurrency/commit-back)。
+# Yahoo Financeの非公式チャートAPIからS&P500+Nasdaq-100+話題枠銘柄の1分足を取得し
+# data/us_stocks/ に差分蓄積する。RANGE=1dで当日分のみ軽量取得し、日をまたぐ欠損は
+# us-stock-history.ymlのRANGE=5d追取りで埋める (JP版と同じ設計)。
+# 注意:
+#   - schedule はデフォルトブランチ(main)にマージ後のみ有効 (GitHub仕様)
+#   - フィーチャーブランチでの検証は push トリガーで代用
+#   - このサンドボックス(Claude Code)からはYahooがproxyブロックで到達不可のため、
+#     実データ疎通の検証はこのランナー上の実行が初となる
+
+on:
+  schedule:
+    # NY市場 9:30-16:00 ET は UTC換算で 夏時間(EDT)13:30-20:00 / 冬時間(EST)14:30-21:00。
+    # 年間を通してどちらもカバーするため 13-20時台は毎時:09/:39、21時台は:09のみを追加。
+    # :00/:30 はGitHub負荷ピークでドロップされやすいため :09/:39 にオフセット。
+    - cron: '9,39 13-20 * * 1-5'
+    - cron: '9 21 * * 1-5'
+  workflow_dispatch:
+  # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
+  push:
+    paths:
+      - 'us_stock_fetch.py'
+      - '.github/workflows/us-stock.yml'
+
+permissions:
+  contents: write
+
+# 同時実行するとCSVコミットバックが競合するため直列化
+concurrency:
+  group: us-stock-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ) — pip installは不要
+      - name: Fetch US stock 1m bars
+        env:
+          # 取得対象は data/us_stocks/universe.csv (code列) で管理。
+          # 単発で上書きしたい時だけ US_TICKERS='AAPL,NVDA,...' を渡す。
+          # RANGE=1d: 多数銘柄規模でcadenceに収めるための軽量化 (当日分のみ取得)。
+          # 日をまたぐ欠損はus-stock-history.ymlのRANGE=5d追取りステップで埋める。
+          RANGE: '1d'
+          INTERVAL: '1m'
+          SLEEP_SEC: '0.4'
+          FETCH_DEADLINE_MIN: '16'
+        run: python us_stock_fetch.py
+
+      # 収集した1分足から売買代金の異常集中をスクリーニング
+      # (data/us_stocks/money_flow.{csv,json} を出力 → 資金の向き先を近似)
+      - name: Screen money flow
+        env:
+          WINDOW_MIN: '30'
+        run: python us_money_flow.py
+
+      # 蓄積したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
+      # data/us_stocks/ 配下をまとめてadd (ディレクトリ指定は未存在でもabortしない・念のため保護)
+      - name: Persist collected data
+        run: |
+          git config user.name "us-stock-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -- data/us_stocks 2>/dev/null || true
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: US stock 1m data $(date -u +'%Y-%m-%d %H:%M')"
+          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
+          # (競合したまま放置するとpushが「Everything up-to-date」となり
+          #  データ喪失がsuccessに見える。JP版と同じ既知の落とし穴)
+            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
+          else
+            echo "新規バーなし (立会時間外/休場日/既に取得済み)"
+          fi
