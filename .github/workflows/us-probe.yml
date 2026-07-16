@@ -1,0 +1,45 @@
+name: US Probe Wikipedia Tables (temporary)
+
+# 【一時ファイル】Nasdaq-100 のcomponentsテーブルがヘッダー不一致で取得できなかった
+# (2026-07-16 ブランチ検証 run で実測: 「componentsテーブルが見つからなかった」) ため、
+# 実際のテーブル構造 (トップレベルtable数と各ヘッダー行) をランナー上からダンプする。
+# 原因特定して us_universe_refresh.py を修正したらこのファイルは削除する。
+# (JP版開発時の「Probe Trending Sources (temporary)」と同じ手法)
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/us-probe.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Dump top-level table headers from Wikipedia
+        run: |
+          python3 - <<'EOF'
+          import us_universe_refresh as u
+          for name, url in [("NQ100", u.NASDAQ100_URL), ("SP500", u.SP500_URL)]:
+              try:
+                  html = u._fetch(url, timeout=25).decode("utf-8", errors="replace")
+              except Exception as e:
+                  print(f"=== {name}: 取得失敗 {type(e).__name__}: {e} ===")
+                  continue
+              p = u._TableParser()
+              p.feed(html)
+              print(f"=== {name}: トップレベルtable {len(p.tables)}個 ===")
+              for i, t in enumerate(p.tables):
+                  if t and t[0]:
+                      print(f"[{i}] rows={len(t)} header={t[0][:8]}")
+                  else:
+                      print(f"[{i}] rows={len(t)} (ヘッダー行なし)")
+          EOF

@@ -124,6 +124,13 @@ def parse_screener(quotes, top=RANK_TOP):
 
 
 def load_universe_rows():
+    # universe.csv 未生成 (初回ブートストラップで us_universe_refresh.py より先に
+    # 走った場合等) は traceback で落とさず、正直にスキップして正常終了する。
+    # 2026-07-16 のブランチ検証で並走ブートストラップの FileNotFoundError を実測。
+    if not os.path.exists(UNIVERSE_FILE):
+        print(f"{UNIVERSE_FILE} が無い。先に us_universe_refresh.py を実行すること。"
+              "話題枠の更新をスキップして終了する。")
+        sys.exit(0)
     rows = []
     with open(UNIVERSE_FILE, encoding="utf-8") as f:
         for r in csv.DictReader(f):
