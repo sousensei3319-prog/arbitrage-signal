@@ -21,7 +21,6 @@ fr_scanner v2 との違い:
   Bitget:/api/v2/mix/market/tickers + /contracts (FR間隔)
 
 注意: 表示FRは「現行期(予測含む)」。決済前に縮むことがある。
-      実弾は2〜3回の決済で継続を確認してから (RULES.md参照)。
 """
 
 import csv
@@ -600,11 +599,9 @@ def main():
                        f" (通知はクールダウン{COOLDOWN_H:.0f}h適用後)\n"
                        f"取引所: {' | '.join(('✅ ' if ex_status[n] else '❌ ') + n for n in sources)}"),
              "inline": False},
-            {"name": "⚠️ 入る前の3チェック",
-             "value": ("1. **継続性**: 表示FRは現行期。決済2〜3回の継続を見てから\n"
-                       "2. **手数料**: 往復" + f"{FEE_RT_PCT:.2f}%" + "想定。損益分岐表示を確認\n"
-                       "3. **10万円の現実**: 両建ては各レッグ証拠金が薄くなる。"
-                       "レバ2x以下・1銘柄集中禁止 (RULES.md)"),
+            {"name": "ℹ️ 表示について",
+             "value": ("表示FRは現行期の時点値(決済前に縮むことがある)。"
+                       "損益分岐は往復" + f"{FEE_RT_PCT:.2f}%" + "の手数料想定で併記"),
              "inline": False},
         ],
         "footer": {"text": "FR Extreme Monitor v1 | ②FRアービ点灯型 | 履歴はfr_signals_log.csvに蓄積中"},

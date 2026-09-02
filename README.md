@@ -64,7 +64,7 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 - クールダウン8h（`fr_monitor_state.json`をActionsがコミットバック）、
   発火履歴は`fr_signals_log.csv`に蓄積 → 将来の「FR極端の持続性」検証素材
 - workflow: `.github/workflows/fr-extreme.yml`（30分ごと）。点灯時のみDiscord通知
-- ⚠️ 表示FRは現行期の時点値。**実弾は決済2〜3回の継続確認後**（RULES.md）
+- ⚠️ 表示FRは現行期の時点値（決済前に縮むことがある）
 
 ## ④ スマートマネー追跡（`smart_money/` + `smart_money_tracker.py`） — 2026-07-03 追加
 
@@ -90,7 +90,7 @@ DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/..." python screener.py
 - **拒否権フィルター**: `smart_money/sm_filter.py` — unified_signal/long_signal が
   スマートマネーの合算ネットポジション($2M+)に逆らう候補を自動除外
 - Webhook: Secrets の `SMART_MONEY_WEBHOOK_URL`（未設定なら `DISCORD_WEBHOOK_URL`）
-- ⚠️ シグナルは監視リスト入り候補。追随は常に彼らより悪い価格（RULES.md ④の運用ルール参照）
+- ℹ️ シグナルは監視リスト入り候補の通知（自動エントリーはしない）
 
 ## ⑤ 日本株 資金集中スクリーナー（`jp_stock_fetch.py` 他） — 全自動稼働中
 
