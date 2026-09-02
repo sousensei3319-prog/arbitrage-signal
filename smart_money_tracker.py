@@ -27,9 +27,8 @@ data/smart_money/leaderboard_top2000.csv (smart-money.yml が生成) の
   - 発火履歴は smart_money_signals_log.csv に追記 (後でエッジ検証する素材)。
   - 状態は smart_money_state.json (GH Actionsがコミットバック)。
 
-注意 (RULES.md準拠):
-  - これは「候補の点灯」であって自動エントリー命令ではない。
-  - 勝ち組の後追いは常に彼らより悪い価格。パクるのは銘柄選択であって執行ではない。
+注意:
+  - これは「候補の点灯」であって自動エントリーはしない。
 
 依存なし (Python標準ライブラリのみ)。
 実行: python smart_money_tracker.py  (DISCORD_WEBHOOK_URL未設定ならDRY-RUN)
@@ -475,11 +474,9 @@ def main():
         "fields": [
             {"name": "📊 追跡ウォレット合算ネットポジション上位",
              "value": "\n".join(exp_lines)[:1000] or "-", "inline": False},
-            {"name": "⚠️ 使い方",
-             "value": ("これは**銘柄の監視リスト入り候補**であって追随命令ではない。\n"
-                       "1. 彼らのentry価格より不利なら追わない (遅行データ)\n"
-                       "2. RULES.mdのマクロ環境 (FGI/BTC方向) と整合してから\n"
-                       "3. 検証: コンセンサスは+24hで平均+1.4%/勝率60% (30日, n=51)"),
+            {"name": "ℹ️ 補足",
+             "value": ("銘柄の監視リスト入り候補の通知(自動エントリーはしない)。\n"
+                       "検証: コンセンサスは+24hで平均+1.4%/勝率60% (30日, n=51)"),
              "inline": False},
             {"name": "🔎 ソース元",
              "value": (f"データ: [Hyperliquid 公式リーダーボード]({HL_LEADERBOARD_URL}) の"

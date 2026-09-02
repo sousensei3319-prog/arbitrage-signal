@@ -440,22 +440,20 @@ def build_macro_embed(fgi, label, fgi_prev, btc_chg, btc_price, ml, scan_time):
 
 def build_rules_embed():
     return {
-        "title": "📖 ロング3戦略 使い分け & ルール",
+        "title": "📖 ロング3戦略の定義",
         "color": 0x607D8B,
         "fields": [
             {"name": "A. 踏み上げ逆張り (Short Squeeze)",
              "value": ("**条件**: FRマイナス過熱 + L/Sショート偏り + 暴落後の底値\n"
                        "**入**: 下げ止まり確認 (1h終値が直近高値/EMA上抜け)\n"
                        "**利確**: TP1=直近戻り高値 / TP2=暴落の半値戻し\n"
-                       "**損切**: 直近安値割れ\n"
-                       "**注意**: 落ちるナイフ厳禁。下げ止まり確認してから入る"),
+                       "**損切**: 直近安値割れ"),
              "inline": False},
             {"name": "B. モメンタム順張り (Breakout)",
              "value": ("**条件**: 初動(1h+3〜12%) + OI増 + 出来高急増 + 上昇トレンド\n"
                        "**入**: レジスタンス上抜けの1h終値確定\n"
                        "**利確**: トレイリング or 直近の値幅分(measured move)\n"
-                       "**損切**: ブレイク水準割れ (浅く・速く)\n"
-                       "**注意**: 勝率低め。損切り厳守。BTC地合い必須"),
+                       "**損切**: ブレイク水準割れ (浅く・速く)"),
              "inline": False},
             {"name": "C. マクロスイング (統計最強)",
              "value": ("**条件**: FGI<25 (極度の恐怖) + ETFフロー回復\n"
@@ -470,7 +468,7 @@ def build_rules_embed():
                        "中立(30-70) = 個別銘柄の歪み次第で両建て判断"),
              "inline": False},
         ],
-        "footer": {"text": "実弾前に必ずペーパーで検証。200ドルはCマクロ中心推奨"},
+        "footer": {"text": "3戦略の定義(参考)"},
     }
 
 def build_signal_embed(c, scan_time):

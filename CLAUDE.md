@@ -74,7 +74,7 @@
 - 全自動: tracker毎時 / デイリー21:07 / 週次(月)21:23 — 通知が無い=大きな動きが無い
 - **月1回だけ手動**: Actions → Smart Money Collect (追跡リスト/VIP入れ替え, 約16分)
 - 閾値調整はworkflowのenvのみ (MIN_WALLETS, MIN_POS_USD, VIP_MIN_POS_USD, MIN_RISE_USD)
-- 運用ルール (通知が来た時の手順・禁止事項) は RULES.md ④節
+- シグナル種別の説明は RULES.md ④節
 
 ### ハマりどころ (再発防止)
 
