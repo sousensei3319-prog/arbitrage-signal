@@ -334,6 +334,7 @@ V,Visa Inc.,core,Transaction & Payment Processing Services,金融,3.820,2.14,304
 EXPD,Expeditors International,core,Air Freight & Logistics,資本財,3.817,1.81,27605039,7232125,0.042,0.030,+0.012,188.7,-0.84
 CHD,Church & Dwight,core,Household Products,生活必需品,3.812,2.41,21547846,5652557,0.032,0.021,+0.012,95.6,-0.44
 SBUX,Starbucks,leader,Restaurants,一般消費財,3.807,2.10,112436421,29532782,0.169,0.118,+0.052,95.3,-3.22
+AIZ,Assurant,core,Multi-line Insurance,金融,3.804,2.11,18263830,4801494,0.027,0.018,+0.010,263.7,-7.21
 UHS,Universal Health Services,core,Health Care Facilities,ヘルスケア,3.800,3.13,27468361,7229034,0.041,0.025,+0.016,177.5,-2.77
 W,Wayfair Inc.,hot,,不明,3.791,1.87,40048525,10564938,0.060,0.043,+0.017,98.6,-7.92
 AXGN,"AxoGen, Inc.",hot,,不明,3.784,0.97,5469444,1445602,0.008,0.008,+0.001,43.4,-5.01
@@ -345,7 +346,6 @@ ERAS,"Erasca, Inc.",hot,,不明,3.752,1.17,9310734,2481767,0.014,0.011,+0.003,14
 FDX,FedEx,core,Air Freight & Logistics,資本財,3.748,2.59,90435480,24131200,0.136,0.084,+0.052,289.7,-5.56
 PGR,Progressive Corporation,core,Property & Casualty Insurance,金融,3.744,2.33,118674519,31696950,0.179,0.122,+0.057,209.5,-3.19
 U,Unity Software Inc.,hot,,不明,3.737,0.69,67935742,18178709,0.102,0.097,+0.006,39.9,-5.96
-AIZ,Assurant,core,Multi-line Insurance,金融,3.736,2.05,17937035,4801494,0.027,0.018,+0.009,263.7,-7.21
 AFL,Aflac,core,Life & Health Insurance,金融,3.735,2.08,29531426,7906452,0.044,0.030,+0.014,113.6,-2.98
 ITW,Illinois Tool Works,core,Industrial Machinery & Supplies & Components,資本財,3.734,2.29,39691008,10630126,0.060,0.040,+0.020,273.9,+1.35
 KIM,Kimco Realty,core,Retail REITs,不動産,3.732,2.28,16789549,4498678,0.025,0.016,+0.009,22.5,-0.97
@@ -610,7 +610,7 @@ QUBT,Quantum Computing Inc.,hot,,不明,2.615,0.65,9523703,3642341,0.014,0.015,-
 CFG,Citizens Financial Group,core,Regional Banks,金融,2.605,1.90,31020334,11909733,0.047,0.040,+0.007,64.8,-4.50
 NEXA,Nexa Resources S.A.,hot,,不明,2.605,0.55,992244,380958,0.001,0.002,-0.000,12.2,-5.73
 RUM,RUM Group Inc.,hot,,不明,2.602,0.99,5109479,1963565,0.008,0.008,-0.000,7.9,-8.90
-NVDA,Nvidia,leader,Semiconductors,半導体,2.599,0.80,2611625494,1004941734,3.932,4.063,-0.131,228.9,+5.08
+NVDA,Nvidia,leader,Semiconductors,半導体,2.599,0.80,2611625494,1004941734,3.931,4.063,-0.131,228.9,+5.08
 TTWO,Take-Two Interactive,leader,Interactive Home Entertainment,コミュニケーション・サービス,2.598,0.97,57903217,22291378,0.087,0.092,-0.005,202.3,-4.80
 SNAP,Snap Inc.,hot,,不明,2.597,1.27,22264434,8572123,0.034,0.033,+0.001,5.2,-11.23
 FSLR,First Solar,core,Semiconductors,半導体,2.593,1.07,63415888,24457142,0.095,0.095,+0.000,173.0,-10.71
@@ -658,6 +658,7 @@ COMP,"Compass, Inc.",hot,,不明,2.357,0.92,19342632,8207830,0.029,0.032,-0.003,
 VOD,Vodafone Group Plc,hot,,不明,2.352,1.15,6615785,2812283,0.010,0.010,-0.000,16.6,-5.52
 CBRS,Cerebras Systems Inc.,hot,,不明,2.346,1.02,123718358,52726535,0.186,0.200,-0.013,196.6,+0.22
 INTU,Intuit,leader,Application Software,情報技術,2.345,0.91,113234937,48294708,0.170,0.191,-0.021,269.4,-15.17
+AMR,"Alpha Metallurgical Resources,",hot,,不明,2.333,1.18,6334229,2714832,0.010,0.009,+0.000,175.8,-9.73
 BAC,Bank of America,core,Diversified Banks,金融,2.323,1.04,193079380,83101865,0.291,0.322,-0.031,55.5,-4.72
 BOBS,"Bob's Discount Furniture, Inc.",hot,,不明,2.322,0.63,1463078,630198,0.002,0.003,-0.000,13.9,-5.70
 USB,U.S. Bancorp,core,Diversified Banks,金融,2.320,1.15,40424947,17424722,0.061,0.063,-0.003,58.8,-2.96
@@ -694,7 +695,6 @@ FIG,"Figma, Inc.",hot,,不明,2.126,0.76,26658119,12538519,0.040,0.048,-0.008,20
 SAP,SAP  SE,hot,,不明,2.118,0.79,37594300,17746897,0.057,0.066,-0.010,209.2,-2.12
 SMTC,Semtech Corporation,hot,,不明,2.116,0.65,66568758,31464246,0.100,0.124,-0.023,174.8,+1.02
 SPCX,Space Exploration Technologies,hot,,不明,2.111,0.57,1218272234,577045743,1.834,2.284,-0.450,145.5,-5.52
-AMR,"Alpha Metallurgical Resources,",hot,,不明,2.111,0.94,5730139,2714832,0.009,0.009,-0.001,175.8,-9.73
 GME,GameStop Corporation,hot,,不明,2.105,0.77,28428163,13508164,0.043,0.050,-0.007,24.0,+8.76
 BFLY,"Butterfly Network, Inc.",hot,,不明,2.093,0.21,5393250,2577356,0.008,0.012,-0.004,9.1,+20.33
 UBER,Uber,core,Passenger Ground Transportation,資本財,2.091,0.81,112726801,53902690,0.170,0.206,-0.037,68.2,-4.18
