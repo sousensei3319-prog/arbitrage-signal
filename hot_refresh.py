@@ -37,12 +37,14 @@ JPX33業種を機械付与する(週次でJPX一覧xlsを引くのは重いた�
     ユニバースからは消さない。
 """
 import csv
+import difflib
 import json
 import os
 import re
 import socket
 import ssl
 import sys
+import unicodedata
 import urllib.request
 import urllib.error
 from datetime import datetime, timezone, timedelta
@@ -58,6 +60,8 @@ MONEY_FLOW_CSV = os.path.join(DATA_DIR, "money_flow.csv")
 # universe_refresh.py が書く指数構成銘柄一覧 (code,index_bucket)。話題枠から外す銘柄が
 # 指数構成銘柄なら、ユニバースから消さずに leader/core へ戻すために使う
 INDEX_MEMBERS_CSV = os.path.join(DATA_DIR, "index_members.csv")
+# universe_refresh.py が書く東証上場の普通株の正式名一覧 (code,name)。広告の見分けに使う
+LISTED_NAMES_CSV = os.path.join(DATA_DIR, "listed_names.csv")
 
 FIELDNAMES = ["code", "name", "bucket", "sector", "group"]
 
@@ -79,8 +83,10 @@ CODE_RE = re.compile(r"^[0-9][0-9A-Za-z]{3}$")
 PAIR_RE = re.compile(r"/quote/(\d[0-9A-Za-z]{3})(?:\.T)?/?[^>]*>\s*([^<\s][^<]{0,24})")
 # 旧パターン: 除外したリンクをログに出して、判定が正しいかをランナーログで確認するためだけに使う
 LEGACY_PAIR_RE = re.compile(r"/(\d[0-9A-Za-z]{3})/?[^>]*>\s*([^<\s][^<]{0,24})")
-# 銘柄名として不自然なもの (広告・記事見出し)。東証の正式銘柄名に【】や先頭のNewは現れない
-AD_NAME_RE = re.compile(r"[【】]|^\s*new\b", re.IGNORECASE)
+# 銘柄名として不自然なもの (広告・記事見出し)。東証の正式銘柄名に【】・読点・疑問符/感嘆符・
+# 「提供」や先頭のNewは現れない。2026-10-03 のランナー実行で、銘柄ページ(/quote/5588.T)へ
+# リンクする広告「SaaS過度懸念で売られた今、狙う成長株　提供:フ…」が出来高1位に入ったため追加
+AD_NAME_RE = re.compile(r"[【】、？?！!]|提供|^\s*new\b", re.IGNORECASE)
 
 RANKINGS = [
     ("出来高", "https://finance.yahoo.co.jp/stocks/ranking/volume?market=all&term=daily"),
@@ -111,19 +117,61 @@ def is_ad_name(name):
     return bool(AD_NAME_RE.search(name or ""))
 
 
-def parse_ranking(html, top=RANK_TOP):
+def _norm_name(s):
+    """比較用の正規化: 全角→半角(NFKC)・(株)/株式会社・空白・中黒を除去・小文字化。"""
+    s = unicodedata.normalize("NFKC", s or "")
+    for t in ("(株)", "株式会社", "(有)", "(同)"):
+        s = s.replace(t, "")
+    return re.sub(r"[\s・･.,]", "", s).lower()
+
+
+def names_match(scraped, official):
+    """ランキング上の名前が東証の正式名と同じ会社を指しているか (表記ゆれ・途中切れは許容)。
+    広告文は銘柄ページへリンクしていても正式名とは似ても似つかないので弾ける。"""
+    a, b = _norm_name(scraped), _norm_name(official)
+    if not a or not b:
+        return True   # 判定材料が無いときは通す (ad表記チェックは別途かかる)
+    if a in b or b in a:
+        return True
+    return difflib.SequenceMatcher(None, a, b).ratio() >= 0.5
+
+
+def load_listed_names():
+    """{code: 正式名}。ファイルが無い(月次更新が未実行)場合は空 = 名前照合はスキップ。"""
+    out = {}
+    if os.path.exists(LISTED_NAMES_CSV):
+        with open(LISTED_NAMES_CSV, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                c = (r.get("code") or "").strip()
+                if c:
+                    out[c] = (r.get("name") or "").strip()
+    return out
+
+
+def parse_ranking(html, top=RANK_TOP, listed=None, rejected=None):
     """ランキングHTMLから (code, name) を順位順・重複排除で最大top件返す。
-    個別銘柄ページ(/quote/)へのリンクのみ採用し、ETF等と広告見出し風の名前は除外。
-    ネットワーク非依存なのでローカルでも単体テスト可能。"""
+    個別銘柄ページ(/quote/)へのリンクのみ採用し、ETF等・広告見出し風の名前・東証の正式名と
+    食い違う名前 (listed={code: 正式名} が与えられた時) は除外する。名前は正式名に置き換える。
+    除外した (code, name, 理由) は rejected リストへ追記。ネットワーク非依存で単体テスト可能。"""
+    listed = listed or {}
     out, seen = [], set()
     for code, name in PAIR_RE.findall(html):
         name = name.strip()
         if not CODE_RE.match(code) or code in seen:
             continue
-        if any(x in name for x in EXCLUDE_NAME) or is_ad_name(name):
+        if any(x in name for x in EXCLUDE_NAME):
+            continue
+        reason = None
+        if is_ad_name(name):
+            reason = "広告/記事見出し風の名前"
+        elif code in listed and not names_match(name, listed[code]):
+            reason = f"東証の正式名「{listed[code]}」と一致しない (広告の可能性)"
+        if reason:
+            if rejected is not None and all(r[0] != code for r in rejected):
+                rejected.append((code, name, reason))
             continue
         seen.add(code)
-        out.append((code, name))
+        out.append((code, listed.get(code) or name))
         if len(out) >= top:
             break
     return out
@@ -205,6 +253,8 @@ def main():
     # 1) ランキング取得 (取れたものだけ使う。全滅ならhot枠を維持して終了)
     trending = {}  # code -> {"name","sources":[...]}
     ok_sources = 0
+    listed = load_listed_names()
+    print(f"東証の正式名一覧: {len(listed)}銘柄" + ("" if listed else " (未生成のため名前照合はスキップ)"))
     for label, url in RANKINGS:
         if (datetime.now(timezone.utc) - t0).total_seconds() > FETCH_DEADLINE_MIN * 60:
             print("デッドライン超過、以降のランキング取得を打ち切り")
@@ -214,10 +264,13 @@ def main():
         except (urllib.error.URLError, urllib.error.HTTPError, socket.timeout, ssl.SSLError) as e:
             print(f"  {label}: 取得失敗 {type(e).__name__} (スキップ)")
             continue
-        pairs = parse_ranking(html)
+        rejected = []
+        pairs = parse_ranking(html, listed=listed, rejected=rejected)
+        for c, n, why in rejected:
+            print(f"  {label}: 除外 {c} 「{n}」 — {why}")
         rej = rejected_links(html)
         if rej:
-            print(f"  {label}: 銘柄ページ以外/広告見出しとして除外したリンク(先頭{len(rej)}件): "
+            print(f"  {label}: 銘柄ページ以外へのリンクとして除外(先頭{len(rej)}件): "
                   + " / ".join(f"{c} {n}" for c, n in rej))
         if not pairs:
             # ページは取れたが銘柄を1件も解析できない = HTML構造の変更。成功扱いにすると

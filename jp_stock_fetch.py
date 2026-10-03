@@ -214,10 +214,12 @@ def merge_bars(path, ticker, timestamps, quote, interval):
 
 def load_tickers():
     """取得対象を解決: JP_TICKERS(env) > UNIVERSE_FILE(code列) > DEFAULT_TICKERS。
-    universeのcodeは '7203' でも '7203.T' でも可 (.Tを自動補完)。"""
+    コードは '7203' でも '7203.T' でも可 (どちらの入口でも .T を自動補完)。"""
     env = os.environ.get("JP_TICKERS")
     if env:
-        return [t.strip() for t in env.split(",") if t.strip()]
+        # '7203' のように .T 無しで渡されても補完する (hot-refresh.yml の新規銘柄の初期取得は
+        # universe.csv のコードをそのまま渡すため、補完が無いと全銘柄 404 で失敗していた)
+        return [t if "." in t else t + ".T" for t in (x.strip() for x in env.split(",")) if t]
     if os.path.exists(UNIVERSE_FILE):
         out = []
         with open(UNIVERSE_FILE, newline="", encoding="utf-8") as f:

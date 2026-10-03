@@ -71,8 +71,8 @@ jobs:
         run: python universe_refresh.py
 
       # 再構築したCSVをコミットバック (1ファイルずつadd・push競合は再試行・失敗は赤で通知)
-      - name: Persist universe.csv / index_members.csv
+      - name: Persist universe.csv / index_members.csv / listed_names.csv
         run: |
           bash .github/scripts/commit_back.sh \
             "chore: 監視ユニバース再構築 (TOPIX500+日経225+話題枠) $(date -u +'%Y-%m-%d %H:%M')" \
-            data/jp_stocks/universe.csv data/jp_stocks/index_members.csv
+            data/jp_stocks/universe.csv data/jp_stocks/index_members.csv data/jp_stocks/listed_names.csv

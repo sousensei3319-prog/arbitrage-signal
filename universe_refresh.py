@@ -57,7 +57,8 @@ xlrd が「Excel xlsx file; not supported」で解析失敗 → TOPIX500ソー�
      「取得できた範囲で構築」は廃止 — 前回の正常なユニバースを保持する方が安全。
      定期見直し等で本当に大量入替が起きた月は、workflow_dispatch の max_drop 入力で
      MAX_DROP を一時的に引き上げて再実行する。
-  3. 指数構成銘柄の一覧 index_members.csv (code,index_bucket=leader/core) を
+  3. 指数構成銘柄の一覧 index_members.csv (code,index_bucket=leader/core) と、東証上場の
+     普通株の正式名一覧 listed_names.csv (code,name。hot_refresh.py の広告見分け用) を
      universe.csv と同時に書き出す。hot枠の銘柄が指数構成銘柄でもある場合 (手動シードの
      半導体株や、障害中に話題枠として入ったTOPIX500銘柄) に、hot_refresh.py が圏外除外する
      際「ユニバースから消す」のではなく「leader/coreへ戻す」ために使う (bucket優先順位の
@@ -100,6 +101,9 @@ MIN_NIKKEI225 = int(os.environ.get("MIN_NIKKEI225") or "200")
 MAX_DROP = int(os.environ.get("MAX_DROP") or "100")
 # 指数構成銘柄の一覧 (code,index_bucket)。universe.csv と同じディレクトリに置く
 INDEX_MEMBERS_FILE = os.path.join(os.path.dirname(UNIVERSE_FILE) or ".", "index_members.csv")
+# 東証上場の普通株の正式名一覧 (code,name)。hot_refresh.py がランキング上の「銘柄名」が
+# 正式名と食い違う行 (= 広告・記事見出し) を見分けるために使う
+LISTED_NAMES_FILE = os.path.join(os.path.dirname(UNIVERSE_FILE) or ".", "listed_names.csv")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
@@ -399,6 +403,7 @@ def build_universe(deadline):
         # 指数構成銘柄 → 本来のbucket (hot_refresh.py が話題枠から外す時の戻り先)
         "index_members": {c: ("leader" if c in leader_codes else "core")
                           for c in (leader_codes | set(topix500))},
+        "listed_names": dict(jpx_name),
     }
 
 
@@ -438,6 +443,12 @@ def main():
         w.writerow(["code", "index_bucket"])
         for code, b in sorted(stats["index_members"].items()):
             w.writerow([code, b])
+    if len(stats["listed_names"]) >= 3000:   # 上場普通株は約3,900 (2026-10実測3,892)。欠けた一覧で上書きしない
+        with open(LISTED_NAMES_FILE, "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(["code", "name"])
+            for code, name in sorted(stats["listed_names"].items()):
+                w.writerow([code, name])
 
     bucket_n = {}
     for r in rows:
