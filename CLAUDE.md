@@ -98,8 +98,8 @@ JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付�
 
 | ファイル | 役割 | workflow / 頻度 |
 |---|---|---|
-| `universe_refresh.py` | 監視ユニバースの機械構築: JPX「東証上場銘柄一覧」(data_j.xls, 規模区分Core30+Large70+Mid400=TOPIX500, 2026-09からxlsx形式。先頭バイトで判定し xlsx=標準ライブラリ / 旧xls=xlrd)+日経公式構成銘柄ウエイトCSV(cp932)から `universe.csv` を再構築。bucket優先順位 hot(既存hot枠温存)>leader(日経225)>core(TOPIX500残り)。**安全装置**: TOPIX500<450・日経225<200・既存leader/coreの除外>100 のどれかで書き込まず exit 2(赤)。大量入替の月は dispatch入力 max_drop で上限を上げて再実行。指数構成銘柄一覧 `index_members.csv` も出力(hot_refreshが指数銘柄を消さずleader/coreへ戻すのに使う)。既存銘柄の手書きsectorは温存、新規はJPX33業種区分で機械付与(hot_refreshが追加したsector空の話題株にもここでJPX33業種を付与) | `universe-refresh.yml` 月1回(毎月3日 21:41 UTC) |
-| `hot_refresh.py` | 話題枠(hot)の**週次自動入れ替え**: Yahoo Finance JPの出来高・値上がり率ランキング上位(各RANK_TOP位)からユニバース外の個別株(ETF/投信/REIT除外)を hot に追加し、ABSENT_WEEKS(4)週連続で全ランキング圏外かつ直近集中度<KEEP_SURGE(1.3)の古いhot銘柄を除外。**leader/core(TOPIX500/日経225)は絶対に外さない**、custom_groups掲載の恒久テーマ銘柄(半導体等)は保護。追加/除外の根拠は `hot_changes_log.csv`(履歴)/`hot_changes_latest.json`(ダッシュボード「今週の話題枠入れ替え」欄)/`hot_state.json`(圏外週カウント)に記録。Yahoo JP全滅時は前週hot枠を維持して落ちない設計。上限なし(枠が増えるほど収集が重くなる点だけ注意)。2026-10-03修正: 抽出を `/quote/XXXX.T` リンクに限定(広告記事を1位と誤認していた)・【】/先頭New名の除外と既存誤登録行の即時除外・解析0件は失敗扱い・同週再実行で圏外を二重カウントしない・指数銘柄はユニバースから消さない・所有ファイルだけをコミット(money_flowはコミットしない) | `hot-refresh.yml` 週1回(日曜22:11 UTC=月曜07:11 JST 寄り前) |
+| `universe_refresh.py` | 監視ユニバースの機械構築: JPX「東証上場銘柄一覧」(data_j.xls, 規模区分Core30+Large70+Mid400=TOPIX500, 2026-09からxlsx形式。先頭バイトで判定し xlsx=標準ライブラリ / 旧xls=xlrd)+日経公式構成銘柄ウエイトCSV(cp932)から `universe.csv` を再構築。bucket優先順位 hot(既存hot枠温存)>leader(日経225)>core(TOPIX500残り)。**安全装置**: TOPIX500<450・日経225<200・既存leader/coreの除外>100 のどれかで書き込まず exit 2(赤)。大量入替の月は dispatch入力 max_drop で上限を上げて再実行。指数構成銘柄一覧 `index_members.csv` と上場普通株の正式名一覧 `listed_names.csv` も出力(hot_refreshが指数銘柄を消さずleader/coreへ戻す・広告文を見分けるのに使う)。既存銘柄の手書きsectorは温存、新規はJPX33業種区分で機械付与(hot_refreshが追加したsector空の話題株にもここでJPX33業種を付与) | `universe-refresh.yml` 月1回(毎月3日 21:41 UTC) |
+| `hot_refresh.py` | 話題枠(hot)の**週次自動入れ替え**: Yahoo Finance JPの出来高・値上がり率ランキング上位(各RANK_TOP位)からユニバース外の個別株(ETF/投信/REIT除外)を hot に追加し、ABSENT_WEEKS(4)週連続で全ランキング圏外かつ直近集中度<KEEP_SURGE(1.3)の古いhot銘柄を除外。**leader/core(TOPIX500/日経225)は絶対に外さない**、custom_groups掲載の恒久テーマ銘柄(半導体等)は保護。追加/除外の根拠は `hot_changes_log.csv`(履歴)/`hot_changes_latest.json`(ダッシュボード「今週の話題枠入れ替え」欄)/`hot_state.json`(圏外週カウント)に記録。Yahoo JP全滅時は前週hot枠を維持して落ちない設計。上限なし(枠が増えるほど収集が重くなる点だけ注意)。2026-10-03修正: 抽出を `/quote/XXXX.T` リンクに限定(広告記事を1位と誤認していた)・【】/先頭New名の除外と既存誤登録行の即時除外・解析0件は失敗扱い・同週再実行で圏外を二重カウントしない・指数銘柄はユニバースから消さない・所有ファイルだけをコミット(money_flowはコミットしない)・ランキング上の名前を東証の正式名(`listed_names.csv`)と照合して広告文を除外 | `hot-refresh.yml` 週1回(日曜22:11 UTC=月曜07:11 JST 寄り前) |
 | `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に **upsert(同じ足は最新の取得値で上書き・新しい足は追加)** で反映(2026-10-03に「新規だけ追記」から変更: 1mの現在値ティック(分頭でない出来高0の行)は保存しない、1dは取引日をキーにして同日重複を防ぐ、1wk/1moは末尾の現在値点を入れない)。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector 約500銘柄)。通常巡回はRANGE=1d軽量化(497銘柄実測231秒・429ゼロ)、日またぎ欠損は引け後のRANGE=5d追取りで回収。429検知で適応的バックオフ | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回(日足2y/週足5y/月足max/1分足5d追取り) |
 | `jp_stock_rotate.py` | ストレージ肥大化対策: 1分足ライブファイルを直近ROLLING_DAYS(7)営業日に切り詰め、溢れた分を月次gzipアーカイブ `{code}_T_1m_YYYYMM.csv.gz` へ退避(多重メンバーgzip追記)。アーカイブは後検証用でスクリーナー/ダッシュボードは読まない | `jp-stock-history.yml` の最終ステップ |
 | `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文。497銘柄で1秒未満。`window_stats()`はdashboardの窓統計事前計算からも再利用。業種グループ集計はJPX33業種+独自区分 — `data/jp_stocks/custom_groups.csv`(code,custom_group,basis)の上書きで「半導体」等の公式に無い切り口を切り出せる(手順はSKILL.md (4b)節) | `jp-stock.yml`/`pages.yml` に統合済み |
@@ -153,7 +153,12 @@ JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付�
     (2026-09-28の話題枠入替)。週次/月次/検証ジョブは `.github/scripts/commit_back.sh`(1ファイルずつadd・
     push競合は再試行・失敗は赤)を使い、自分の所有ファイルだけをコミットする
 14. Yahoo JPランキングページ最上部の広告/特集記事リンク(例「【New】キオクシアや…」)は旧正規表現で
-    「出来高1位の銘柄」に見えた。リンク先の種類(/quote/)で判定する
+    「出来高1位の銘柄」に見えた。さらに**銘柄ページ(/quote/5588.T)へリンクする広告文**
+    (「SaaS過度懸念で売られた今、狙う成長株　提供:…」)もある(2026-10-03ランナーで確認)。
+    リンク先(/quote/)・広告表記(【】、？！提供・先頭New)・**東証の正式名との照合**
+    (`listed_names.csv`、universe_refreshが毎月出力)の3段で判定し、採用時は正式名に置き換える
+15. hot-refresh.yml の新規銘柄の初期履歴取得は `.T` 無しのコードを JP_TICKERS に渡していたため
+    **全銘柄404で毎週失敗していた**(`|| true` で緑)。jp_stock_fetch.py 側で `.T` を補完するよう修正
 
 ## ⑥ 米国株資金集中スクリーナー (2026-07-16 実装)
 
