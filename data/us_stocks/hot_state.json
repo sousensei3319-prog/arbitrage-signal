@@ -18,16 +18,18 @@
 "source": "取引高上位3位"
 },
 "PATH": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-07-16",
-"source": "取引高上位4位"
+"source": "取引高上位4位",
+"counted_week": "2026-W40"
 },
 "OPEN": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-07-16",
-"source": "取引高上位6位"
+"source": "取引高上位6位",
+"counted_week": "2026-W40"
 },
 "NOK": {
 "absent": 0,
@@ -36,10 +38,11 @@
 "source": "取引高上位7位"
 },
 "SKHY": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-07-16",
-"source": "取引高上位11位"
+"source": "取引高上位11位",
+"counted_week": "2026-W40"
 },
 "SOFI": {
 "absent": 0,
@@ -54,10 +57,11 @@
 "source": "取引高上位14位"
 },
 "LCID": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-16",
-"source": "取引高上位15位・値上がり率1位"
+"source": "取引高上位15位・値上がり率1位",
+"counted_week": "2026-W40"
 },
 "MARA": {
 "absent": 0,
@@ -72,652 +76,753 @@
 "source": "取引高上位21位"
 },
 "CLSK": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "取引高上位22位"
+"source": "取引高上位22位",
+"counted_week": "2026-W40"
 },
 "IOVA": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-07-16",
-"source": "取引高上位24位"
+"source": "取引高上位24位",
+"counted_week": "2026-W40"
 },
 "BMNR": {
-"absent": 1,
-"last_seen": "2026-W39",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-16",
 "source": "取引高上位25位"
 },
 "SNAP": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-07-16",
-"source": "取引高上位26位"
+"source": "取引高上位26位",
+"counted_week": "2026-W40"
 },
 "HL": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-07-16",
-"source": "取引高上位27位"
+"source": "取引高上位27位",
+"counted_week": "2026-W40"
 },
 "JBLU": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-16",
-"source": "取引高上位30位"
+"source": "取引高上位30位",
+"counted_week": "2026-W40"
 },
 "AEHR": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-07-16",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "MANE": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率6位"
-},
-"MNSO": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率7位"
-},
-"ERAS": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率8位"
-},
-"RH": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率9位"
-},
-"MESO": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率10位"
-},
-"COMP": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率11位"
-},
-"SAH": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率12位"
-},
-"BILL": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率13位"
-},
-"AEO": {
-"absent": 0,
-"last_seen": "2026-W40",
-"added": "2026-07-16",
-"source": "値上がり率14位"
-},
-"CWK": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率15位"
-},
-"MD": {
-"absent": 11,
-"last_seen": "2026-W29",
-"added": "2026-07-16",
-"source": "値上がり率16位"
-},
-"MBX": {
-"absent": 0,
-"last_seen": "2026-W40",
-"added": "2026-07-16",
-"source": "値上がり率17位"
-},
-"HTFL": {
-"absent": 6,
-"last_seen": "2026-W34",
-"added": "2026-07-16",
-"source": "値上がり率18位"
-},
-"ADPT": {
 "absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率19位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
+},
+"MNSO": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
+},
+"ERAS": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
+},
+"RH": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
+},
+"MESO": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
+},
+"COMP": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
+},
+"SAH": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
+},
+"BILL": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
+},
+"AEO": {
+"absent": 1,
+"last_seen": "2026-W40",
+"added": "2026-07-16",
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
+},
+"CWK": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
+},
+"MD": {
+"absent": 12,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
+},
+"MBX": {
+"absent": 1,
+"last_seen": "2026-W40",
+"added": "2026-07-16",
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
+},
+"HTFL": {
+"absent": 7,
+"last_seen": "2026-W34",
+"added": "2026-07-16",
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
+},
+"ADPT": {
+"absent": 13,
+"last_seen": "2026-W29",
+"added": "2026-07-16",
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "FLYW": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "GPI": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "ROAD": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-07-16",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "YMM": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "IMOS": {
-"absent": 11,
-"last_seen": "2026-W29",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-16",
 "source": "値上がり率25位"
 },
 "KRMN": {
-"absent": 11,
-"last_seen": "2026-W29",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-16",
 "source": "値上がり率26位"
 },
 "Z": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率27位"
+"source": "値上がり率27位",
+"counted_week": "2026-W40"
 },
 "RELY": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "ZG": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "IREN": {
-"absent": 1,
-"last_seen": "2026-W39",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-16",
 "source": "取引高上位28位"
 },
 "SMG": {
-"absent": 11,
+"absent": 12,
 "last_seen": "2026-W29",
 "added": "2026-07-16",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "SOUN": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-07-20",
-"source": "取引高上位24位"
+"source": "取引高上位24位",
+"counted_week": "2026-W40"
 },
 "ATAI": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "取引高上位29位"
+"source": "取引高上位29位",
+"counted_week": "2026-W40"
 },
 "SLS": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-07-20",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "ORKA": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "DNTH": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "COAG": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "TRVI": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率6位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
 },
 "BHVN": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "VG": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-07-20",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "AGL": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率13位"
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
 },
 "PTGX": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "FRVO": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "MMED": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "EROC": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-07-20",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "SYRE": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "WU": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "PVLA": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "RAPP": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "LQDA": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-07-20",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "LEU": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率23位"
+"source": "値上がり率23位",
+"counted_week": "2026-W40"
 },
 "GLUE": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "TALO": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "WDS": {
-"absent": 10,
+"absent": 11,
 "last_seen": "2026-W30",
 "added": "2026-07-20",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "OUST": {
-"absent": 6,
-"last_seen": "2026-W34",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-20",
 "source": "値上がり率30位"
 },
 "TMHC": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "取引高上位5位"
+"source": "取引高上位5位",
+"counted_week": "2026-W40"
 },
 "QBTS": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-07-27",
-"source": "取引高上位6位・値上がり率16位"
+"source": "取引高上位6位・値上がり率16位",
+"counted_week": "2026-W40"
 },
 "NSA": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "取引高上位10位"
+"source": "取引高上位10位",
+"counted_week": "2026-W40"
 },
 "RGTI": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-07-27",
-"source": "取引高上位13位・値上がり率2位"
+"source": "取引高上位13位・値上がり率2位",
+"counted_week": "2026-W40"
 },
 "IONQ": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-07-27",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "INFQ": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-07-27",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "MBLY": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "RNG": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率8位"
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
 },
 "LIF": {
-"absent": 9,
-"last_seen": "2026-W31",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-27",
 "source": "値上がり率10位"
 },
 "W": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "STEP": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率12位"
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
 },
 "USAR": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-07-27",
-"source": "値上がり率13位"
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
 },
 "FIGR": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-07-27",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "ENLT": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "HAWK": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "RHI": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "VOD": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "QNT": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "JBS": {
-"absent": 9,
-"last_seen": "2026-W31",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-07-27",
 "source": "値上がり率25位"
 },
 "SAP": {
-"absent": 9,
+"absent": 10,
 "last_seen": "2026-W31",
 "added": "2026-07-27",
-"source": "値上がり率26位"
+"source": "値上がり率26位",
+"counted_week": "2026-W40"
 },
 "FUTU": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-07-27",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "TEAM": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-07-27",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "AMC": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-08-03",
-"source": "取引高上位2位"
+"source": "取引高上位2位",
+"counted_week": "2026-W40"
 },
 "ATKR": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率1位"
+"source": "値上がり率1位",
+"counted_week": "2026-W40"
 },
 "CNH": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-03",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "LIND": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "MMYT": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "NWL": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "CDNA": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率6位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
 },
 "FERG": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "FTAI": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率8位"
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
 },
 "SUPN": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "PSN": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "KWR": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "LMND": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率12位"
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
 },
 "WRBY": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "BLKB": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "BFLY": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "WIX": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-03",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "SNOW": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "FIG": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "AGM": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率23位"
+"source": "値上がり率23位",
+"counted_week": "2026-W40"
 },
 "U": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "HIMS": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率26位"
+"source": "値上がり率26位",
+"counted_week": "2026-W40"
 },
 "BOOT": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率27位"
+"source": "値上がり率27位",
+"counted_week": "2026-W40"
 },
 "ASAN": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-03",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "NEOG": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "WAY": {
-"absent": 8,
+"absent": 9,
 "last_seen": "2026-W32",
 "added": "2026-08-03",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "BTG": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-10",
-"source": "取引高上位7位・値上がり率5位"
+"source": "取引高上位7位・値上がり率5位",
+"counted_week": "2026-W40"
 },
 "DOCS": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "取引高上位8位・値上がり率2位"
+"source": "取引高上位8位・値上がり率2位",
+"counted_week": "2026-W40"
 },
 "CDE": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-08-10",
-"source": "取引高上位13位"
+"source": "取引高上位13位",
+"counted_week": "2026-W40"
 },
 "CIFR": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-10",
-"source": "取引高上位18位"
+"source": "取引高上位18位",
+"counted_week": "2026-W40"
 },
 "RKT": {
 "absent": 0,
@@ -726,634 +831,727 @@
 "source": "取引高上位21位"
 },
 "WULF": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-10",
-"source": "取引高上位22位"
+"source": "取引高上位22位",
+"counted_week": "2026-W40"
 },
 "DV": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-10",
-"source": "取引高上位25位・値上がり率30位"
+"source": "取引高上位25位・値上がり率30位",
+"counted_week": "2026-W40"
 },
 "ABEV": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-10",
-"source": "取引高上位26位"
+"source": "取引高上位26位",
+"counted_week": "2026-W40"
 },
 "DKNG": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "取引高上位27位"
+"source": "取引高上位27位",
+"counted_week": "2026-W40"
 },
 "FIGS": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "TWLO": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "NTRA": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率6位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
 },
 "HALO": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "FIVN": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-10",
-"source": "値上がり率8位"
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
 },
 "AXTI": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-10",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "FLR": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率12位"
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
 },
 "CELH": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "TIC": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "RDW": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-10",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "OKLO": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "ONTO": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "IAG": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "TXG": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "APPN": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "CAI": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "CVSA": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "AUGO": {
-"absent": 7,
+"absent": 8,
 "last_seen": "2026-W33",
 "added": "2026-08-10",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "TEM": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-10",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "RIG": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-08-17",
-"source": "取引高上位11位"
+"source": "取引高上位11位",
+"counted_week": "2026-W40"
 },
 "ACHR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-17",
-"source": "取引高上位14位"
+"source": "取引高上位14位",
+"counted_week": "2026-W40"
 },
 "KEEL": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-17",
-"source": "取引高上位16位"
+"source": "取引高上位16位",
+"counted_week": "2026-W40"
 },
 "SMR": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-08-17",
-"source": "取引高上位22位"
+"source": "取引高上位22位",
+"counted_week": "2026-W40"
 },
 "ITUB": {
-"absent": 6,
-"last_seen": "2026-W34",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-08-17",
 "source": "取引高上位28位"
 },
 "AAOI": {
-"absent": 6,
-"last_seen": "2026-W34",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-08-17",
 "source": "値上がり率2位"
 },
 "RDDT": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "WING": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "MXL": {
-"absent": 1,
-"last_seen": "2026-W39",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-08-17",
 "source": "値上がり率5位"
 },
 "STDN": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-17",
-"source": "値上がり率6位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
 },
 "VERA": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "AVAH": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "ALM": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "LUNR": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-17",
-"source": "値上がり率13位"
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
 },
 "ASTH": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "SIMO": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-08-17",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "LFTO": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率17位"
-},
-"XNDU": {
-"absent": 5,
-"last_seen": "2026-W35",
-"added": "2026-08-17",
-"source": "値上がり率23位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "AMR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-17",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "CGNX": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率27位"
+"source": "値上がり率27位",
+"counted_week": "2026-W40"
 },
 "DIOD": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "OSCR": {
-"absent": 6,
+"absent": 7,
 "last_seen": "2026-W34",
 "added": "2026-08-17",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "WBS": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "取引高上位4位"
+"source": "取引高上位4位",
+"counted_week": "2026-W40"
 },
 "DNN": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "取引高上位18位"
+"source": "取引高上位18位",
+"counted_week": "2026-W40"
 },
 "IQMX": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-24",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "UEC": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "DK": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "VIRT": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "CVI": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "FSLY": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-24",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "QUBT": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率13位"
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
 },
 "NEXA": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "ERO": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "FCFS": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "MP": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "PARR": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "BTDR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-24",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "UUUU": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "BGC": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "SCCO": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "AXGN": {
-"absent": 5,
+"absent": 6,
 "last_seen": "2026-W35",
 "added": "2026-08-24",
-"source": "値上がり率26位"
+"source": "値上がり率26位",
+"counted_week": "2026-W40"
 },
 "PURR": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-08-31",
-"source": "取引高上位12位"
+"source": "取引高上位12位",
+"counted_week": "2026-W40"
 },
 "NIO": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-31",
-"source": "取引高上位20位"
+"source": "取引高上位20位",
+"counted_week": "2026-W40"
 },
 "AUR": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-08-31",
-"source": "取引高上位21位"
+"source": "取引高上位21位",
+"counted_week": "2026-W40"
 },
 "XE": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "ASND": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "CRCL": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "CHA": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "BBAR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "RBLX": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-08-31",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "ELF": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "GGAL": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率12位"
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
 },
 "AGCO": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "BMA": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "SAIC": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "CAR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "XP": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率23位"
+"source": "値上がり率23位",
+"counted_week": "2026-W40"
 },
 "GME": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "LEGN": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "PBR": {
-"absent": 4,
+"absent": 5,
 "last_seen": "2026-W36",
 "added": "2026-08-31",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "PL": {
-"absent": 3,
-"last_seen": "2026-W37",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-09-07",
 "source": "取引高上位26位"
 },
 "BLTE": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率1位"
+"source": "値上がり率1位",
+"counted_week": "2026-W40"
 },
 "COHU": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "CBRS": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "SMTC": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率8位"
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
 },
 "TARS": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "TTMI": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "UCTT": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "DPC": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "TSEM": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "EQPT": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "VAC": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "FORM": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "BOBS": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "BE": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "ACMR": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "ICHR": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率26位"
+"source": "値上がり率26位",
+"counted_week": "2026-W40"
 },
 "BETA": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率27位"
+"source": "値上がり率27位",
+"counted_week": "2026-W40"
 },
 "SITM": {
-"absent": 3,
+"absent": 4,
 "last_seen": "2026-W37",
 "added": "2026-09-07",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "PENG": {
-"absent": 3,
-"last_seen": "2026-W37",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-09-07",
 "source": "値上がり率30位"
 },
 "BZ": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-14",
-"source": "取引高上位8位"
+"source": "取引高上位8位",
+"counted_week": "2026-W40"
 },
 "RUM": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "取引高上位18位・値上がり率1位"
+"source": "取引高上位18位・値上がり率1位",
+"counted_week": "2026-W40"
 },
 "GRAB": {
 "absent": 0,
@@ -1362,184 +1560,213 @@
 "source": "取引高上位19位"
 },
 "SAIL": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "S": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "ZS": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "NTSK": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率6位"
+"source": "値上がり率6位",
+"counted_week": "2026-W40"
 },
 "QLYS": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "RBRK": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率8位"
+"source": "値上がり率8位",
+"counted_week": "2026-W40"
 },
 "TENB": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "OKTA": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "HUBS": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "IOT": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "MNDY": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "NICE": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "BSP": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "VERX": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率23位"
+"source": "値上がり率23位",
+"counted_week": "2026-W40"
 },
 "GWRE": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "BLSH": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "AVPT": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "BWIN": {
-"absent": 2,
+"absent": 3,
 "last_seen": "2026-W38",
 "added": "2026-09-14",
-"source": "値上がり率30位"
+"source": "値上がり率30位",
+"counted_week": "2026-W40"
 },
 "NVO": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "取引高上位7位"
+"source": "取引高上位7位",
+"counted_week": "2026-W40"
 },
 "HLN": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "取引高上位22位"
+"source": "取引高上位22位",
+"counted_week": "2026-W40"
 },
 "GRAL": {
-"absent": 1,
-"last_seen": "2026-W39",
+"absent": 0,
+"last_seen": "2026-W40",
 "added": "2026-09-21",
 "source": "値上がり率1位"
 },
 "VNET": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "DOCN": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率7位"
+"source": "値上がり率7位",
+"counted_week": "2026-W40"
 },
 "RMBS": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率9位"
+"source": "値上がり率9位",
+"counted_week": "2026-W40"
 },
 "XXI": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "AMRX": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "FLY": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率18位"
+"source": "値上がり率18位",
+"counted_week": "2026-W40"
 },
 "NN": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "HHH": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-21",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "P": {
-"absent": 1,
+"absent": 2,
 "last_seen": "2026-W39",
 "added": "2026-09-21",
-"source": "値上がり率29位"
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
 },
 "AGNC": {
 "absent": 0,
@@ -1548,10 +1775,11 @@
 "source": "取引高上位13位"
 },
 "KOD": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "取引高上位14位・値上がり率1位"
+"source": "取引高上位14位・値上がり率1位",
+"counted_week": "2026-W40"
 },
 "STLA": {
 "absent": 0,
@@ -1560,147 +1788,291 @@
 "source": "取引高上位26位"
 },
 "BB": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "取引高上位29位・値上がり率7位"
+"source": "取引高上位29位・値上がり率7位",
+"counted_week": "2026-W40"
 },
 "MAAS": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率2位"
+"source": "値上がり率2位",
+"counted_week": "2026-W40"
 },
 "ABCL": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率3位"
+"source": "値上がり率3位",
+"counted_week": "2026-W40"
 },
 "CAAP": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率4位"
+"source": "値上がり率4位",
+"counted_week": "2026-W40"
 },
 "VSXY": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率5位"
+"source": "値上がり率5位",
+"counted_week": "2026-W40"
 },
 "BVC": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率10位"
+"source": "値上がり率10位",
+"counted_week": "2026-W40"
 },
 "PLBL": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率11位"
+"source": "値上がり率11位",
+"counted_week": "2026-W40"
 },
 "VOYG": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率12位"
+"source": "値上がり率12位",
+"counted_week": "2026-W40"
 },
 "PBLS": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率13位"
+"source": "値上がり率13位",
+"counted_week": "2026-W40"
 },
 "DFTX": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率14位"
+"source": "値上がり率14位",
+"counted_week": "2026-W40"
 },
 "NAMS": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率15位"
+"source": "値上がり率15位",
+"counted_week": "2026-W40"
 },
 "ABVX": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率16位"
+"source": "値上がり率16位",
+"counted_week": "2026-W40"
 },
 "GAP": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率17位"
+"source": "値上がり率17位",
+"counted_week": "2026-W40"
 },
 "ALVO": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率19位"
+"source": "値上がり率19位",
+"counted_week": "2026-W40"
 },
 "NKTR": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率20位"
+"source": "値上がり率20位",
+"counted_week": "2026-W40"
 },
 "GIL": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率21位"
+"source": "値上がり率21位",
+"counted_week": "2026-W40"
 },
 "BURL": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率22位"
+"source": "値上がり率22位",
+"counted_week": "2026-W40"
 },
 "TFX": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率23位"
+"source": "値上がり率23位",
+"counted_week": "2026-W40"
 },
 "ADMA": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率24位"
+"source": "値上がり率24位",
+"counted_week": "2026-W40"
 },
 "IDYA": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率25位"
+"source": "値上がり率25位",
+"counted_week": "2026-W40"
 },
 "PTCT": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率26位"
+"source": "値上がり率26位",
+"counted_week": "2026-W40"
 },
 "IONS": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率27位"
+"source": "値上がり率27位",
+"counted_week": "2026-W40"
 },
 "NTES": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
-"source": "値上がり率28位"
+"source": "値上がり率28位",
+"counted_week": "2026-W40"
 },
 "PS": {
-"absent": 0,
+"absent": 1,
 "last_seen": "2026-W40",
 "added": "2026-09-28",
+"source": "値上がり率29位",
+"counted_week": "2026-W40"
+},
+"RIVN": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "取引高上位10位"
+},
+"BBD": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "取引高上位14位"
+},
+"VALE": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "取引高上位17位"
+},
+"SYNA": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率3位"
+},
+"VSH": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率5位"
+},
+"IBRX": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率6位"
+},
+"MTRN": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率7位"
+},
+"RXO": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率8位"
+},
+"INIO": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率9位"
+},
+"PPC": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率10位"
+},
+"ALGM": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率11位"
+},
+"ACLS": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率14位"
+},
+"FPS": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率15位"
+},
+"AADX": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率17位"
+},
+"VECO": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率19位"
+},
+"TGB": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率21位"
+},
+"CAMT": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率23位"
+},
+"SEDG": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率26位"
+},
+"GPGI": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
+"source": "値上がり率28位"
+},
+"STM": {
+"absent": 0,
+"last_seen": "2026-W40",
+"added": "2026-10-03",
 "source": "値上がり率29位"
 }
 }

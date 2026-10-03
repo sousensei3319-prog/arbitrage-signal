@@ -8,8 +8,12 @@ name: JP Stock Universe Refresh (TOPIX500+日経225+話題枠)
 #   - フィーチャーブランチでの検証は push トリガーで代用 (本体/workflow変更時に1回走る)
 #   - このサンドボックス(Claude Code)からはJPX/Nikkei公式サイトにproxy403で到達不可の
 #     ため、実データ疎通の検証はこのランナー上の実行が初 (jp-stock.ymlと同じ制約)
-#   - JPX東証上場銘柄一覧(data_j.xls)は旧BIFF形式のためopenpyxlではなくxlrdが必要
-#     (jp_supply_demand.pyと同じ設計。未導入でもcore層が空になるだけでクラッシュしない)
+#   - JPX東証上場銘柄一覧(data_j)は2026-09に旧xls(BIFF)→xlsxへ形式変更された。
+#     xlsxは標準ライブラリで、旧xlsはxlrdで読む (形式は先頭バイトで自動判定)
+#   - 【安全装置】ソース件数の不足・大量除外を検知したら universe.csv を書き換えず
+#     exit 2 (赤) で止まる。定期見直しで本当に大量入替の月は workflow_dispatch の
+#     max_drop 入力 (例 300) で上限を一時的に引き上げて再実行する
+#   - hot-refresh.yml と同じ concurrency group で直列化 (どちらも universe.csv を書くため)
 
 on:
   schedule:
@@ -17,6 +21,11 @@ on:
     # :00/:15/:30 はGitHub負荷ピークでドロップされやすいため :41 にオフセット。
     - cron: '41 21 3 * *'
   workflow_dispatch:
+    inputs:
+      max_drop:
+        description: '既存leader/coreから一度に外してよい最大件数 (空=既定100。定期見直しで大量入替の月だけ引き上げる)'
+        required: false
+        default: ''
   # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
   push:
     paths:
@@ -26,9 +35,9 @@ on:
 permissions:
   contents: write
 
-# 同時実行するとCSVコミットバックが競合するため直列化
+# universe.csv を書く月次更新(本workflow)と週次話題枠(hot-refresh.yml)を同じgroupで直列化
 concurrency:
-  group: universe-refresh-${{ github.ref }}
+  group: jp-universe-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -42,29 +51,28 @@ jobs:
         with:
           python-version: '3.12'
 
-      # JPX東証上場銘柄一覧(data_j.xls, 旧BIFF形式)の解析にxlrdが必要
-      # (未導入でもuniverse_refresh.py側でImportErrorを捕捉しTOPIX500ソースのみスキップする設計)
+      # 旧xls(BIFF)形式に戻った場合の解析用 (xlsxは標準ライブラリで読むので不要)
       - name: Install xlrd (旧xls形式の解析用)
         run: pip install xlrd
+
+      # 直前に走った別ジョブ(月次ユニバース更新⇔週次話題枠)のpushを取り込んでから計算する。
+      # checkoutはトリガー時点のコミットなので、待機中に他ジョブが更新したuniverse.csvを
+      # 古いまま上書きしないよう最新へ揃える (同じconcurrency groupで直列化済み)。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
 
       - name: Refresh universe (TOPIX500 + 日経225 + hot)
         env:
           FETCH_DEADLINE_MIN: '5'
+          MAX_DROP: ${{ inputs.max_drop }}
         run: python universe_refresh.py
 
-      # 再構築したCSVをコミットバック (GH Actionsはステートレスなので永続化が必要)
-      - name: Persist universe.csv
+      # 再構築したCSVをコミットバック (1ファイルずつadd・push競合は再試行・失敗は赤で通知)
+      - name: Persist universe.csv / index_members.csv / listed_names.csv
         run: |
-          git config user.name "jp-stock-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- data/jp_stocks/universe.csv 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: 監視ユニバース再構築 (TOPIX500+日経225+話題枠) $(date -u +'%Y-%m-%d %H:%M')"
-          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
-          # (競合したまま放置するとpushが「Everything up-to-date」となり
-          #  データ喪失がsuccessに見える。2026-07-09に並走runで実際に発生)
-            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
-            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
-          else
-            echo "変更なし (構成銘柄に変化なし)"
-          fi
+          bash .github/scripts/commit_back.sh \
+            "chore: 監視ユニバース再構築 (TOPIX500+日経225+話題枠) $(date -u +'%Y-%m-%d %H:%M')" \
+            data/jp_stocks/universe.csv data/jp_stocks/index_members.csv data/jp_stocks/listed_names.csv
