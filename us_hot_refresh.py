@@ -314,18 +314,29 @@ def main():
     hot_now = [r for r in surviving if r["bucket"] == "hot"]
     # 同じ週の再実行 (手動dispatch等) で「今週の入れ替え」欄が空で上書きされないよう、
     # 同週の既存サマリーがあれば追加/除外を合算する
+    # (同じ週に「追加→除外」された銘柄は差し引きゼロなので両方から外す。新規銘柄の初期取得も行わない)
     latest_added, latest_removed = added, removed
     try:
         prev = json.load(open(HOT_LATEST, encoding="utf-8"))
         if prev.get("week") == week:
             a_codes, r_codes = {a["code"] for a in added}, {x["code"] for x in removed}
-            latest_added = [a for a in prev.get("added", []) if a.get("code") not in a_codes] + added
-            latest_removed = [x for x in prev.get("removed", []) if x.get("code") not in r_codes] + removed
+            prev_a = [a for a in prev.get("added", []) if a.get("code") not in a_codes]
+            prev_r = [x for x in prev.get("removed", []) if x.get("code") not in r_codes]
+            undone = {a.get("code") for a in prev_a} & r_codes      # 今週追加→今回除外
+            redone = {x.get("code") for x in prev_r} & a_codes      # 今週除外→今回再追加
+            latest_added = [a for a in prev_a + added if a.get("code") not in undone | redone]
+            latest_removed = [x for x in prev_r + removed if x.get("code") not in undone | redone]
     except (OSError, ValueError):
         pass
     json.dump({"week": week, "date": today, "added": latest_added, "removed": latest_removed,
                "hot_total": len(hot_now)},
               open(HOT_LATEST, "w", encoding="utf-8"), ensure_ascii=False)
+    # 今回の実行で追加した銘柄だけを workflow に渡す (初期履歴の取得とコミット対象用)。
+    # 週の合算(latest)を使うと、同じ週の再実行で既に収集中の銘柄を取り直し、収集ジョブと衝突する
+    out = os.environ.get("HOT_ADDED_OUT")
+    if out:
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(",".join(a["code"] for a in added))
 
     print(f"\n=== 話題枠 週次入れ替え {week} ({today}) ===")
     print(f"取得ランキング: {ok_sources}/{len(SOURCES)} / hot枠: {len(hot_now)}銘柄")

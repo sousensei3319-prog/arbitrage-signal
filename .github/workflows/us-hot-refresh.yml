@@ -59,6 +59,7 @@ jobs:
           ABSENT_WEEKS: '4'
           KEEP_SURGE: '1.3'
           FETCH_DEADLINE_MIN: '5'
+          HOT_ADDED_OUT: ${{ runner.temp }}/hot_added.txt
         run: python us_hot_refresh.py
 
       # 新規追加した話題株の履歴(日足2y/週足5y/月足max/1分足5d)を即取得する。
@@ -69,7 +70,8 @@ jobs:
           SLEEP_SEC: '0.4'
           FETCH_DEADLINE_MIN: '8'
         run: |
-          NEW=$(python3 -c "import json;print(','.join(a['code'] for a in json.load(open('data/us_stocks/hot_changes_latest.json')).get('added',[])))" 2>/dev/null || true)
+          # 今回の実行で追加した銘柄だけ (同じ週の再実行で取り直さない)
+          NEW=$(cat "$RUNNER_TEMP/hot_added.txt" 2>/dev/null || true)
           if [ -z "$NEW" ]; then echo "新規追加なし・初期取得スキップ"; exit 0; fi
           echo "新規話題株の初期履歴を取得: $NEW"
           US_TICKERS="$NEW" INTERVAL=1d  RANGE=2y  python us_stock_fetch.py || true
@@ -87,7 +89,7 @@ jobs:
           COMMIT_BOT_NAME: us-stock-bot
         run: |
           FILES="data/us_stocks/universe.csv data/us_stocks/hot_state.json data/us_stocks/hot_changes_log.csv data/us_stocks/hot_changes_latest.json"
-          NEW=$(python3 -c "import json;print(' '.join(a['code'] for a in json.load(open('data/us_stocks/hot_changes_latest.json')).get('added',[])))" 2>/dev/null || true)
+          NEW=$( [ -f "$RUNNER_TEMP/hot_added.txt" ] && tr ',' ' ' < "$RUNNER_TEMP/hot_added.txt" || true)
           for c in $NEW; do
             for iv in 1d 1wk 1mo 1m; do FILES="$FILES data/us_stocks/${c}_${iv}.csv"; done
           done
