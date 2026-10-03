@@ -37,6 +37,12 @@ GICSセクターを機械付与する。
 
 依存なし(標準ライブラリのみ)。実データ検証は GitHub Actions ランナー上でのみ可能
 (サンドボックスからは Yahoo へ proxy403 で到達不可)。
+
+2026-10-03 修正 (JP版 hot_refresh.py と同じ再発防止):
+  - 応答は取れたが銘柄を1件も解析できない場合はそのランキングを失敗扱いにする。
+  - 圏外週カウントは同じ週に何度実行しても1回だけ数える (counted_week)。
+  - 指数構成銘柄(index_members.csv)は話題枠から外しても leader/core 層へ戻すだけで、
+    ユニバースからは消さない。同週再実行でも「今週の入れ替え」欄を空で上書きしない。
 """
 import csv
 import json
@@ -57,6 +63,9 @@ HOT_STATE = os.path.join(DATA_DIR, "hot_state.json")
 HOT_LOG = os.path.join(DATA_DIR, "hot_changes_log.csv")
 HOT_LATEST = os.path.join(DATA_DIR, "hot_changes_latest.json")
 MONEY_FLOW_CSV = os.path.join(DATA_DIR, "money_flow.csv")
+# us_universe_refresh.py が書く指数構成銘柄一覧 (code,index_bucket)。話題枠から外す銘柄が
+# 指数構成銘柄なら、ユニバースから消さずに leader/core へ戻すために使う
+INDEX_MEMBERS_CSV = os.path.join(DATA_DIR, "index_members.csv")
 
 FIELDNAMES = ["code", "name", "bucket", "sector", "group"]
 
@@ -150,6 +159,18 @@ def load_protected():
     return protected
 
 
+def load_index_members():
+    """{code: "leader"/"core"}。ファイルが無い(月次更新が未実行)場合は空 = 従来どおり削除。"""
+    out = {}
+    if os.path.exists(INDEX_MEMBERS_CSV):
+        with open(INDEX_MEMBERS_CSV, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                c, b = (r.get("code") or "").strip(), (r.get("index_bucket") or "").strip()
+                if c and b in ("leader", "core"):
+                    out[c] = b
+    return out
+
+
 def load_surge():
     """money_flow.csv から {code: surge_ratio} を読む(除外判定の集中度チェック用)。"""
     surge = {}
@@ -191,6 +212,11 @@ def main():
                 ssl.SSLError, ValueError, OSError) as e:
             print(f"  {label}: 取得失敗 {type(e).__name__} (スキップ)")
             continue
+        if not pairs:
+            # 応答は取れたがEQUITYを1件も解析できない = 応答形式の変更。成功扱いにすると
+            # 全hot銘柄が「圏外」と数えられ数週後に一斉除外されるため失敗扱いにする。
+            print(f"  {label}: ⚠️ 銘柄を1件も解析できなかった (応答形式変更の可能性) — このランキングは失敗扱い")
+            continue
         ok_sources += 1
         for rank, (code, name) in enumerate(pairs, 1):
             t = trending.setdefault(code, {"name": name, "sources": []})
@@ -203,6 +229,7 @@ def main():
 
     rows = load_universe_rows()
     protected = load_protected()
+    index_members = load_index_members()
     surge = load_surge()
     state = load_state()
 
@@ -232,6 +259,7 @@ def main():
 
     # 3) 圏外カウント更新 & 除外判定 (hot枠のみ・保護銘柄と集中中は残す)
     trend_codes = set(trending)
+    added_codes = {a["code"] for a in added}
     surviving = []
     for r in rows:
         if r["bucket"] != "hot":
@@ -241,15 +269,22 @@ def main():
         st = state.setdefault(code, {"absent": 0, "last_seen": week})
         if code in trend_codes:
             st["absent"] = 0; st["last_seen"] = week
-        elif code not in {a["code"] for a in added}:
+        elif code not in added_codes and st.get("counted_week") != week:
+            # 同じ週に再実行(手動dispatch・push失敗後の再実行等)しても二重に数えない
             st["absent"] = st.get("absent", 0) + 1
+            st["counted_week"] = week
 
         s = surge.get(code, 0.0)
         if code in protected:
             surviving.append(r); kept.append((code, "恒久テーマ銘柄(保護)")); continue
         if st.get("absent", 0) >= ABSENT_WEEKS and s < KEEP_SURGE:
-            removed.append({"code": code, "name": r["name"],
-                            "reason": f"{st['absent']}週連続でランキング圏外・直近の集中度{s:.2f}x(<{KEEP_SURGE})のため除外"})
+            reason = f"{st['absent']}週連続でランキング圏外・直近の集中度{s:.2f}x(<{KEEP_SURGE})のため除外"
+            if code in index_members:
+                # 指数構成銘柄はユニバースから消さず、本来の層(leader/core)へ戻して監視を継続
+                r["bucket"] = index_members[code]
+                surviving.append(r)
+                reason += f" (指数構成銘柄のため {index_members[code]} 層として監視は継続)"
+            removed.append({"code": code, "name": r["name"], "reason": reason})
             state.pop(code, None)
         else:
             surviving.append(r)
@@ -277,7 +312,18 @@ def main():
             w.writerow([today, week, "remove", rm["code"], rm["name"], rm["reason"]])
 
     hot_now = [r for r in surviving if r["bucket"] == "hot"]
-    json.dump({"week": week, "date": today, "added": added, "removed": removed,
+    # 同じ週の再実行 (手動dispatch等) で「今週の入れ替え」欄が空で上書きされないよう、
+    # 同週の既存サマリーがあれば追加/除外を合算する
+    latest_added, latest_removed = added, removed
+    try:
+        prev = json.load(open(HOT_LATEST, encoding="utf-8"))
+        if prev.get("week") == week:
+            a_codes, r_codes = {a["code"] for a in added}, {x["code"] for x in removed}
+            latest_added = [a for a in prev.get("added", []) if a.get("code") not in a_codes] + added
+            latest_removed = [x for x in prev.get("removed", []) if x.get("code") not in r_codes] + removed
+    except (OSError, ValueError):
+        pass
+    json.dump({"week": week, "date": today, "added": latest_added, "removed": latest_removed,
                "hot_total": len(hot_now)},
               open(HOT_LATEST, "w", encoding="utf-8"), ensure_ascii=False)
 

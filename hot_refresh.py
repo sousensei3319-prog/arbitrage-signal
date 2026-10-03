@@ -25,6 +25,16 @@ JPX33業種を機械付与する(週次でJPX一覧xlsを引くのは重いた�
 
 依存なし(標準ライブラリのみ)。実データ検証は GitHub Actions ランナー上でのみ可能
 (サンドボックスからは Yahoo JP へ proxy403 で到達不可)。
+
+2026-10-03 修正 (誤検出・取りこぼしの再発防止):
+  - 銘柄の抽出を個別銘柄ページ(/quote/XXXX.T)へのリンクに限定。旧パターンはランキング
+    最上部の広告/特集記事リンクを「出来高1位・値上がり率1位の銘柄」と誤認していた
+    (2608・2609)。【】や先頭Newを含む名前も除外し、既にhot枠に入っている該当行は即時除外。
+  - ページは取れたが銘柄を1件も解析できない場合はそのランキングを失敗扱いにする
+    (成功扱いだと全hot銘柄が「圏外」と数えられ、HTML構造変更の数週後に一斉除外される)。
+  - 圏外週カウントは同じ週に何度実行しても1回だけ数える (counted_week)。
+  - 指数構成銘柄(index_members.csv)は話題枠から外しても leader/core 層へ戻すだけで、
+    ユニバースからは消さない。
 """
 import csv
 import json
@@ -45,6 +55,9 @@ HOT_STATE = os.path.join(DATA_DIR, "hot_state.json")
 HOT_LOG = os.path.join(DATA_DIR, "hot_changes_log.csv")
 HOT_LATEST = os.path.join(DATA_DIR, "hot_changes_latest.json")
 MONEY_FLOW_CSV = os.path.join(DATA_DIR, "money_flow.csv")
+# universe_refresh.py が書く指数構成銘柄一覧 (code,index_bucket)。話題枠から外す銘柄が
+# 指数構成銘柄なら、ユニバースから消さずに leader/core へ戻すために使う
+INDEX_MEMBERS_CSV = os.path.join(DATA_DIR, "index_members.csv")
 
 FIELDNAMES = ["code", "name", "bucket", "sector", "group"]
 
@@ -58,8 +71,16 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/125.0 Safari/537.36")
 CODE_RE = re.compile(r"^[0-9][0-9A-Za-z]{3}$")
 
-# 証券コード直後にリンクテキスト(銘柄名)が続くYahoo JPランキングのパターン
-PAIR_RE = re.compile(r"/(\d[0-9A-Za-z]{3})/?[^>]*>\s*([^<\s][^<]{0,24})")
+# Yahoo JPの個別銘柄ページへのリンク (/quote/7203.T) 直後にリンクテキスト(銘柄名)が続くパターン。
+# 【2026-10-03 修正】旧パターンは「/ + 英数4文字」で終わる任意のリンクを拾っていたため、
+# ランキング最上部の広告・特集記事リンク (例: /…/2609 「【New】キオクシアや太陽誘電の売買は
+# どう見極める」) を出来高1位・値上がり率1位の「銘柄」と誤認し、hot枠に追加していた
+# (2026-08-10 の 2608、2026-09-21 の 2609)。個別銘柄ページ(/quote/)へのリンクだけに限定する。
+PAIR_RE = re.compile(r"/quote/(\d[0-9A-Za-z]{3})(?:\.T)?/?[^>]*>\s*([^<\s][^<]{0,24})")
+# 旧パターン: 除外したリンクをログに出して、判定が正しいかをランナーログで確認するためだけに使う
+LEGACY_PAIR_RE = re.compile(r"/(\d[0-9A-Za-z]{3})/?[^>]*>\s*([^<\s][^<]{0,24})")
+# 銘柄名として不自然なもの (広告・記事見出し)。東証の正式銘柄名に【】や先頭のNewは現れない
+AD_NAME_RE = re.compile(r"[【】]|^\s*new\b", re.IGNORECASE)
 
 RANKINGS = [
     ("出来高", "https://finance.yahoo.co.jp/stocks/ranking/volume?market=all&term=daily"),
@@ -86,21 +107,39 @@ def fetch(url, timeout=25):
         return raw.decode(enc, errors="replace")
 
 
+def is_ad_name(name):
+    return bool(AD_NAME_RE.search(name or ""))
+
+
 def parse_ranking(html, top=RANK_TOP):
     """ランキングHTMLから (code, name) を順位順・重複排除で最大top件返す。
-    ETF等はnameで除外。ネットワーク非依存なのでローカルでも単体テスト可能。"""
+    個別銘柄ページ(/quote/)へのリンクのみ採用し、ETF等と広告見出し風の名前は除外。
+    ネットワーク非依存なのでローカルでも単体テスト可能。"""
     out, seen = [], set()
     for code, name in PAIR_RE.findall(html):
         name = name.strip()
         if not CODE_RE.match(code) or code in seen:
             continue
-        if any(x in name for x in EXCLUDE_NAME):
+        if any(x in name for x in EXCLUDE_NAME) or is_ad_name(name):
             continue
         seen.add(code)
         out.append((code, name))
         if len(out) >= top:
             break
     return out
+
+
+def rejected_links(html):
+    """旧パターンなら銘柄として拾っていたが、今回は除外したリンク (code, name) の先頭10件。
+    = 個別銘柄ページ(/quote/)以外へのリンク、または広告見出し風の名前。ランナーログ確認用。"""
+    quote_ok = {c for c, n in PAIR_RE.findall(html) if not is_ad_name(n.strip())}
+    out, seen = [], set()
+    for code, name in LEGACY_PAIR_RE.findall(html):
+        if code in quote_ok or code in seen or not CODE_RE.match(code):
+            continue
+        seen.add(code)
+        out.append((code, name.strip()))
+    return out[:10]
 
 
 def load_universe_rows():
@@ -121,6 +160,18 @@ def load_protected():
                 if c:
                     protected.add(c)
     return protected
+
+
+def load_index_members():
+    """{code: "leader"/"core"}。ファイルが無い(月次更新が未実行)場合は空 = 従来どおり削除。"""
+    out = {}
+    if os.path.exists(INDEX_MEMBERS_CSV):
+        with open(INDEX_MEMBERS_CSV, encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                c, b = (r.get("code") or "").strip(), (r.get("index_bucket") or "").strip()
+                if c and b in ("leader", "core"):
+                    out[c] = b
+    return out
 
 
 def load_surge():
@@ -159,15 +210,26 @@ def main():
             print("デッドライン超過、以降のランキング取得を打ち切り")
             break
         try:
-            pairs = parse_ranking(fetch(url))
+            html = fetch(url)
         except (urllib.error.URLError, urllib.error.HTTPError, socket.timeout, ssl.SSLError) as e:
             print(f"  {label}: 取得失敗 {type(e).__name__} (スキップ)")
+            continue
+        pairs = parse_ranking(html)
+        rej = rejected_links(html)
+        if rej:
+            print(f"  {label}: 銘柄ページ以外/広告見出しとして除外したリンク(先頭{len(rej)}件): "
+                  + " / ".join(f"{c} {n}" for c, n in rej))
+        if not pairs:
+            # ページは取れたが銘柄を1件も解析できない = HTML構造の変更。成功扱いにすると
+            # 全hot銘柄が「圏外」と数えられ、数週後に一斉除外されてしまうため失敗扱いにする。
+            print(f"  {label}: ⚠️ 銘柄を1件も解析できなかった (HTML構造変更の可能性) — このランキングは失敗扱い")
             continue
         ok_sources += 1
         for rank, (code, name) in enumerate(pairs, 1):
             t = trending.setdefault(code, {"name": name, "sources": []})
             t["sources"].append(f"{label}{rank}位")
-        print(f"  {label}: {len(pairs)}銘柄取得")
+        print(f"  {label}: {len(pairs)}銘柄取得 (上位: "
+              + "・".join(f"{c} {n}" for c, n in pairs[:3]) + ")")
 
     if ok_sources == 0:
         print("全ランキング取得失敗。hot枠を変更せず終了(前週維持)。")
@@ -175,6 +237,7 @@ def main():
 
     rows = load_universe_rows()
     protected = load_protected()
+    index_members = load_index_members()
     surge = load_surge()
     state = load_state()
 
@@ -205,24 +268,38 @@ def main():
 
     # 3) 圏外カウント更新 & 除外判定 (hot枠のみ・保護銘柄と集中中は残す)
     trend_codes = set(trending)
+    added_codes = {a["code"] for a in added}
     surviving = []
     for r in rows:
         if r["bucket"] != "hot":
             surviving.append(r)
             continue
         code = r["code"]
+        # 過去に広告・記事リンクを誤検出して入った行 (例: 2609「【New】…」) は即時除外
+        if is_ad_name(r["name"]):
+            removed.append({"code": code, "name": r["name"],
+                            "reason": "ランキング上の広告/記事リンクを銘柄と誤認して追加された行のため除外"})
+            state.pop(code, None)
+            continue
         st = state.setdefault(code, {"absent": 0, "last_seen": week})
         if code in trend_codes:
             st["absent"] = 0; st["last_seen"] = week
-        elif code not in {a["code"] for a in added}:
+        elif code not in added_codes and st.get("counted_week") != week:
+            # 同じ週に再実行(手動dispatch・push失敗後の再実行等)しても二重に数えない
             st["absent"] = st.get("absent", 0) + 1
+            st["counted_week"] = week
 
         s = surge.get(code, 0.0)
         if code in protected:
             surviving.append(r); kept.append((code, "恒久テーマ銘柄(保護)")); continue
         if st.get("absent", 0) >= ABSENT_WEEKS and s < KEEP_SURGE:
-            removed.append({"code": code, "name": r["name"],
-                            "reason": f"{st['absent']}週連続でランキング圏外・直近の集中度{s:.2f}x(<{KEEP_SURGE})のため除外"})
+            reason = f"{st['absent']}週連続でランキング圏外・直近の集中度{s:.2f}x(<{KEEP_SURGE})のため除外"
+            if code in index_members:
+                # 指数構成銘柄はユニバースから消さず、本来の層(leader/core)へ戻して監視を継続
+                r["bucket"] = index_members[code]
+                surviving.append(r)
+                reason += f" (指数構成銘柄のため {index_members[code]} 層として監視は継続)"
+            removed.append({"code": code, "name": r["name"], "reason": reason})
             state.pop(code, None)
         else:
             surviving.append(r)
@@ -250,7 +327,18 @@ def main():
             w.writerow([today, week, "remove", rm["code"], rm["name"], rm["reason"]])
 
     hot_now = [r for r in surviving if r["bucket"] == "hot"]
-    json.dump({"week": week, "date": today, "added": added, "removed": removed,
+    # 同じ週の再実行 (手動dispatch等) で「今週の入れ替え」欄が空で上書きされないよう、
+    # 同週の既存サマリーがあれば追加/除外を合算する
+    latest_added, latest_removed = added, removed
+    try:
+        prev = json.load(open(HOT_LATEST, encoding="utf-8"))
+        if prev.get("week") == week:
+            a_codes, r_codes = {a["code"] for a in added}, {x["code"] for x in removed}
+            latest_added = [a for a in prev.get("added", []) if a.get("code") not in a_codes] + added
+            latest_removed = [x for x in prev.get("removed", []) if x.get("code") not in r_codes] + removed
+    except (OSError, ValueError):
+        pass
+    json.dump({"week": week, "date": today, "added": latest_added, "removed": latest_removed,
                "hot_total": len(hot_now)},
               open(HOT_LATEST, "w", encoding="utf-8"), ensure_ascii=False)
 
