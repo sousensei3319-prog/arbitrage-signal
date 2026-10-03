@@ -49,7 +49,6 @@ INTC,Intel,leader,Semiconductors,情報技術
 INTU,Intuit,leader,Application Software,情報技術
 ISRG,Intuitive Surgical,leader,Health Care Equipment,ヘルスケア
 KDP,Keurig Dr Pepper,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品
-KHC,Kraft Heinz,leader,Packaged Foods & Meats,生活必需品
 KLAC,KLA Corporation,leader,Semiconductor Materials & Equipment,情報技術
 LIN,Linde plc,leader,Industrial Gases,素材
 LITE,Lumentum,leader,Communications Equipment,情報技術
@@ -146,7 +145,6 @@ BEN,Franklin Resources,core,Asset Management & Custody Banks,金融
 BF-B,Brown–Forman,core,Distillers & Vintners,生活必需品
 BG,Bunge Global,core,Agricultural Products & Services,生活必需品
 BIIB,Biogen,core,Biotechnology,ヘルスケア
-BLDR,Builders FirstSource,core,Building Products,資本財
 BLK,BlackRock,core,Asset Management & Custody Banks,金融
 BMY,Bristol Myers Squibb,core,Pharmaceuticals,ヘルスケア
 BNY,BNY Mellon,core,Asset Management & Custody Banks,金融
@@ -303,6 +301,7 @@ IBM,IBM,core,IT Consulting & Other Services,情報技術
 ICE,Intercontinental Exchange,core,Financial Exchanges & Data,金融
 IEX,IDEX Corporation,core,Industrial Machinery & Supplies & Components,資本財
 IFF,International Flavors & Fragrances,core,Specialty Chemicals,素材
+ILMN,"Illumina, Inc.",core,Life Sciences Tools & Services,ヘルスケア
 INCY,Incyte,core,Biotechnology,ヘルスケア
 INVH,Invitation Homes,core,Single-Family Residential REITs,不動産
 IP,International Paper,core,Paper & Plastic Packaging Products & Materials,素材
@@ -321,6 +320,7 @@ JNJ,Johnson & Johnson,core,Pharmaceuticals,ヘルスケア
 JPM,JPMorgan Chase,core,Diversified Banks,金融
 KEY,KeyCorp,core,Regional Banks,金融
 KEYS,Keysight Technologies,core,Electronic Equipment & Instruments,情報技術
+KHC,Kraft Heinz,core,Packaged Foods & Meats,生活必需品
 KIM,Kimco Realty,core,Retail REITs,不動産
 KKR,KKR & Co.,core,Asset Management & Custody Banks,金融
 KMB,Kimberly-Clark,core,Household Products,生活必需品
@@ -448,7 +448,6 @@ SYF,Synchrony Financial,core,Consumer Finance,金融
 SYK,Stryker Corporation,core,Health Care Equipment,ヘルスケア
 SYY,Sysco,core,Food Distributors,生活必需品
 T,AT&T,core,Integrated Telecommunication Services,コミュニケーション・サービス
-TAP,Molson Coors Beverage Company,core,Brewers,生活必需品
 TDG,TransDigm Group,core,Aerospace & Defense,資本財
 TDY,Teledyne Technologies,core,Electronic Equipment & Instruments,情報技術
 TECH,Bio-Techne,core,Life Sciences Tools & Services,ヘルスケア
@@ -467,7 +466,6 @@ TRV,Travelers Companies (The),core,Property & Casualty Insurance,金融
 TSCO,Tractor Supply,core,Other Specialty Retail,一般消費財
 TSN,Tyson Foods,core,Packaged Foods & Meats,生活必需品
 TT,Trane Technologies,core,Building Products,資本財
-TTD,Trade Desk (The),core,Advertising,コミュニケーション・サービス
 TXT,Textron,core,Aerospace & Defense,資本財
 TYL,Tyler Technologies,core,Application Software,情報技術
 UAL,United Airlines Holdings,core,Passenger Airlines,資本財
@@ -548,7 +546,7 @@ AXGN,"AxoGen, Inc.",hot,,
 AXTI,AXT Inc,hot,,
 BB,BlackBerry Limited,hot,,
 BBAR,Banco BBVA Argentina S.A.,hot,,
-BE,Bloom Energy Corporation,hot,,
+BE,Bloom Energy Corporation,hot,,資本財
 BETA,"Beta Technologies, Inc.",hot,,
 BFLY,"Butterfly Network, Inc.",hot,,
 BGC,"BGC Group, Inc.",hot,,
@@ -697,7 +695,7 @@ OPEN,Opendoor Technologies Inc,hot,,
 ORKA,"Oruka Therapeutics, Inc.",hot,,
 OSCR,"Oscar Health, Inc.",hot,,
 OUST,"Ouster, Inc.",hot,,
-P,"Everpure, Inc.",hot,,
+P,"Everpure, Inc.",hot,,情報技術
 PARR,"Par Pacific Holdings, Inc. Comm",hot,,
 PATH,"UiPath, Inc.",hot,,
 PBLS,"Parabilis Medicines, Inc.",hot,,
