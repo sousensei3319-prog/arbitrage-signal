@@ -31,6 +31,7 @@
 | ④ | スマートマネー追跡 (下記詳細) | `smart_money/` ほか | 複数 |
 | ⑤ | 日本株資金集中スクリーナー (下記詳細) | `jp_stock_fetch.py`+`jp_money_flow.py`+`dashboard/` | 複数 |
 | ⑥ | 米国株資金集中スクリーナー (⑤の米国版・下記詳細) | `us_*.py`+`dashboard/build_us_dashboard.py` | 複数 |
+| ⑦ | 検証基盤: 仮想の約定記録 / 戦略Cの答え合わせ (下記詳細) | `ledger.py` / `strategy_c_check.py` | history workflow内 / 手動 |
 
 ## ④ スマートマネー追跡 (2026-07-03 実装, PR #3)
 
@@ -97,9 +98,9 @@ JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付�
 
 | ファイル | 役割 | workflow / 頻度 |
 |---|---|---|
-| `universe_refresh.py` | 監視ユニバースの機械構築: JPX「東証上場銘柄一覧」(data_j.xls, 規模区分Core30+Large70+Mid400=TOPIX500, 旧BIFF形式でxlrd必須)+日経公式構成銘柄ウエイトCSV(cp932)から `universe.csv` を再構築。bucket優先順位 hot(既存hot枠温存)>leader(日経225)>core(TOPIX500残り)。既存銘柄の手書きsectorは温存、新規はJPX33業種区分で機械付与(hot_refreshが追加したsector空の話題株にもここでJPX33業種を付与) | `universe-refresh.yml` 月1回(毎月3日 21:41 UTC) |
-| `hot_refresh.py` | 話題枠(hot)の**週次自動入れ替え**: Yahoo Finance JPの出来高・値上がり率ランキング上位(各RANK_TOP位)からユニバース外の個別株(ETF/投信/REIT除外)を hot に追加し、ABSENT_WEEKS(4)週連続で全ランキング圏外かつ直近集中度<KEEP_SURGE(1.3)の古いhot銘柄を除外。**leader/core(TOPIX500/日経225)は絶対に外さない**、custom_groups掲載の恒久テーマ銘柄(半導体等)は保護。追加/除外の根拠は `hot_changes_log.csv`(履歴)/`hot_changes_latest.json`(ダッシュボード「今週の話題枠入れ替え」欄)/`hot_state.json`(圏外週カウント)に記録。Yahoo JP全滅時は前週hot枠を維持して落ちない設計。上限なし(枠が増えるほど収集が重くなる点だけ注意) | `hot-refresh.yml` 週1回(日曜22:11 UTC=月曜07:11 JST 寄り前) |
-| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に重複排除で差分追記。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector 約500銘柄)。通常巡回はRANGE=1d軽量化(497銘柄実測231秒・429ゼロ)、日またぎ欠損は引け後のRANGE=5d追取りで回収。429検知で適応的バックオフ | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回(日足2y/週足5y/月足max/1分足5d追取り) |
+| `universe_refresh.py` | 監視ユニバースの機械構築: JPX「東証上場銘柄一覧」(data_j.xls, 規模区分Core30+Large70+Mid400=TOPIX500, 2026-09からxlsx形式。先頭バイトで判定し xlsx=標準ライブラリ / 旧xls=xlrd)+日経公式構成銘柄ウエイトCSV(cp932)から `universe.csv` を再構築。bucket優先順位 hot(既存hot枠温存)>leader(日経225)>core(TOPIX500残り)。**安全装置**: TOPIX500<450・日経225<200・既存leader/coreの除外>100 のどれかで書き込まず exit 2(赤)。大量入替の月は dispatch入力 max_drop で上限を上げて再実行。指数構成銘柄一覧 `index_members.csv` も出力(hot_refreshが指数銘柄を消さずleader/coreへ戻すのに使う)。既存銘柄の手書きsectorは温存、新規はJPX33業種区分で機械付与(hot_refreshが追加したsector空の話題株にもここでJPX33業種を付与) | `universe-refresh.yml` 月1回(毎月3日 21:41 UTC) |
+| `hot_refresh.py` | 話題枠(hot)の**週次自動入れ替え**: Yahoo Finance JPの出来高・値上がり率ランキング上位(各RANK_TOP位)からユニバース外の個別株(ETF/投信/REIT除外)を hot に追加し、ABSENT_WEEKS(4)週連続で全ランキング圏外かつ直近集中度<KEEP_SURGE(1.3)の古いhot銘柄を除外。**leader/core(TOPIX500/日経225)は絶対に外さない**、custom_groups掲載の恒久テーマ銘柄(半導体等)は保護。追加/除外の根拠は `hot_changes_log.csv`(履歴)/`hot_changes_latest.json`(ダッシュボード「今週の話題枠入れ替え」欄)/`hot_state.json`(圏外週カウント)に記録。Yahoo JP全滅時は前週hot枠を維持して落ちない設計。上限なし(枠が増えるほど収集が重くなる点だけ注意)。2026-10-03修正: 抽出を `/quote/XXXX.T` リンクに限定(広告記事を1位と誤認していた)・【】/先頭New名の除外と既存誤登録行の即時除外・解析0件は失敗扱い・同週再実行で圏外を二重カウントしない・指数銘柄はユニバースから消さない・所有ファイルだけをコミット(money_flowはコミットしない) | `hot-refresh.yml` 週1回(日曜22:11 UTC=月曜07:11 JST 寄り前) |
+| `jp_stock_fetch.py` | Yahoo Finance非公式チャートAPI(v8/finance/chart, query1→query2フォールバック)から1分足を取得し `data/jp_stocks/{code}_T_1m.csv` に **upsert(同じ足は最新の取得値で上書き・新しい足は追加)** で反映(2026-10-03に「新規だけ追記」から変更: 1mの現在値ティック(分頭でない出来高0の行)は保存しない、1dは取引日をキーにして同日重複を防ぐ、1wk/1moは末尾の現在値点を入れない)。取得対象は `data/jp_stocks/universe.csv`(code,name,bucket,sector 約500銘柄)。通常巡回はRANGE=1d軽量化(497銘柄実測231秒・429ゼロ)、日またぎ欠損は引け後のRANGE=5d追取りで回収。429検知で適応的バックオフ | `jp-stock.yml` 東証立会時間の平日30分間隔(毎時23分・53分) / `jp-stock-history.yml` 平日引け後1回(日足2y/週足5y/月足max/1分足5d追取り) |
 | `jp_stock_rotate.py` | ストレージ肥大化対策: 1分足ライブファイルを直近ROLLING_DAYS(7)営業日に切り詰め、溢れた分を月次gzipアーカイブ `{code}_T_1m_YYYYMM.csv.gz` へ退避(多重メンバーgzip追記)。アーカイブは後検証用でスクリーナー/ダッシュボードは読まない | `jp-stock-history.yml` の最終ステップ |
 | `jp_money_flow.py` | 売買代金(終値×出来高)の異常集中スクリーナー。直近窓vs履歴中央値でsurge/z/share_deltaを算出し `data/jp_stocks/money_flow.{csv,json}` を出力。json内commentaryは事実ベースの自動分析文。497銘柄で1秒未満。`window_stats()`はdashboardの窓統計事前計算からも再利用。業種グループ集計はJPX33業種+独自区分 — `data/jp_stocks/custom_groups.csv`(code,custom_group,basis)の上書きで「半導体」等の公式に無い切り口を切り出せる(手順はSKILL.md (4b)節) | `jp-stock.yml`/`pages.yml` に統合済み |
 | `dashboard/template.html` + `dashboard/help_template.html` + `dashboard/build_dashboard.py` | **遅延読み込み型**ダッシュボード: `site/index.html`(自動分析コメント・急騰アラート・集計窓1分〜月足のランキング統計をPython側で事前計算して埋め込み・検索可能セレクタ・空売り残バッジ・初期選択銘柄のチャートのみ同梱)+銘柄別チャートJSON `site/data/{code}.json` を生成。銘柄選択時にfetchで遅延取得(同一オリジン)。使い方ガイド `site/help.html` も同時生成(help_template.htmlに銘柄数/最新時刻を差し込む静的ページ、ヘッダーとフッターからリンク) | `pages.yml` の1ステップ |
@@ -140,6 +141,19 @@ JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付�
 10. templateとbuilderでファイル名規則を合わせる: 銘柄別JSONは `7203.T`→`7203_T.json`。
     またtemplateには `<meta charset="utf-8">` が必須 (ローカルhttp.server検証で
     charset無しだと文字化けする。Pagesはヘッダーで補うため顕在化しない)
+11. JPXは data_j を2026-09に旧xls→xlsxへ予告なく変更し、月次更新が解析失敗→「取れた範囲で
+    構築」でcore 271銘柄を落とした(runは緑)。外部ソースの形式は拡張子でなく先頭バイトで判定し、
+    件数が不自然なら**書き込まずに赤で止める(fail-closed)**。この種の更新処理で「取れた範囲で続行」はしない
+12. Yahoo chart APIの実態 (2026-10-03 実データで確認): 日米とも約15分遅延で、進行中の1分は
+    「分頭でない時刻・出来高0」の現在値ティックとして末尾に付く(未確定の1分足が返るのは取得の1〜2%)。
+    日足は当日分を引け時刻の仮タイムスタンプで返し翌日以降は寄り時刻で返す(→取引日キーで扱う)。
+    米国の日足は当日分が翌日の取得まで出てこない。週足/月足の末尾には日足相当の点が付く
+13. コミットバックの競合: 5分ごとの収集(cron-job.orgから24時間dispatch)と週次/月次ジョブが
+    同じファイルを触ると rebase が衝突し、旧方式は「push failed (race) - next run」で**緑のまま結果が消えた**
+    (2026-09-28の話題枠入替)。週次/月次/検証ジョブは `.github/scripts/commit_back.sh`(1ファイルずつadd・
+    push競合は再試行・失敗は赤)を使い、自分の所有ファイルだけをコミットする
+14. Yahoo JPランキングページ最上部の広告/特集記事リンク(例「【New】キオクシアや…」)は旧正規表現で
+    「出来高1位の銘柄」に見えた。リンク先の種類(/quote/)で判定する
 
 ## ⑥ 米国株資金集中スクリーナー (2026-07-16 実装)
 
@@ -177,3 +191,20 @@ JPX公式の空売り残高報告(大口0.5%以上・日次)を需給の裏付�
   動かない」のは正常 (前日引けデータを表示)
 - 障害切り分け・手動実行・閾値調整は `.claude/skills/jp-stock-ops/SKILL.md` の手順が
   `jp`→`us` の読み替えでそのまま使える
+
+## ⑦ 検証基盤 (2026-10-03 実装)
+
+ML実現性検証(2026-10)で「今のデータでは後知恵バイアス(後から話題になった銘柄がユニバースに
+入っている)と標本不足で、シグナルの良し悪しを判定できない」と分かったため、判定時点の記録を
+毎日残す仕組みと、RULES.md 戦略Cの答え合わせを用意した。どちらも発注しない・APIキー不要。
+
+| ファイル | 役割 | 実行 |
+|---|---|---|
+| `ledger.py` | 仮想の約定記録。引け後にユニバース全銘柄の判定(日次の売買代金集中度 surge_1d=当日÷直前20日中央値、flag=candidate(≥2.0倍)/near(≥1.5倍)、引け時点のmoney_flow値)を `data/{jp,us}_stocks/ledger/ledger_YYYY-MM.csv` に記録し、後日 ret_1/5/20(翌営業日の寄りで買いh日後の引け)と同日平均との差 ex_h を自動記入。同じ日は再実行しても増えない(最初の記録が正)。取りこぼした日は3営業日まで backfilled=1 付きで補完。集計は `ledger_summary.json`(backfilledは除外) | `jp-stock-history.yml`/`us-stock-history.yml` の最終ステップ(失敗しても収集データの保存は継続) |
+| `strategy_c_check.py` | 戦略Cの答え合わせ。FGI(alternative.me)+BTC/ETH日足(OKX、Coinbaseで照合)で 固定積立/恐怖で倍額/RULES.md戦略C(≤30買い・≥70で25%利確)/一括 を全期間+3区間で比較。**合否基準はスクリプト冒頭に結果を見る前に固定**。結果は `data/strategy_c/result.json` | `strategy-c-check.yml` 手動のみ |
+
+- 米国は日足の当日分が翌日にしか届かないため、ledgerの判定日は米国だけ1営業日遅れて記録される
+  (特徴量は判定日までのデータだけで計算するので先読みは無い)。money_flowは5分ごとに上書きされる
+  ので、引け後の値を `ledger/mf_pending.json` に日付別に保存してから使う
+- 数か月たまるまで成績は判断しない (1日分の候補はほぼ同じ地合いを共有するため、件数より日数が効く)
+
