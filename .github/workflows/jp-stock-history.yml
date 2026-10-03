@@ -20,6 +20,7 @@ on:
     paths:
       - 'jp_stock_fetch.py'
       - 'jp_stock_rotate.py'
+      - 'ledger.py'
       - '.github/workflows/jp-stock-history.yml'
 
 permissions:
@@ -60,6 +61,12 @@ jobs:
       - name: Rotate 1m live files to monthly archive
         env: { ROLLING_DAYS: '7' }
         run: python jp_stock_rotate.py
+
+      # 仮想の約定記録 (ledger.py): その日のユニバース全銘柄の判定(日次の資金集中度・候補フラグ・
+      # 引け時点のスクリーナー値)を記録し、過去の記録に +1/+5/+20営業日後の値動きを書き足す。
+      # 日足が確定した引け後のこのジョブで実行する。失敗しても収集データの保存は止めない。
+      - name: Virtual ledger (判定の記録 + 答え合わせ)
+        run: python ledger.py jp || echo "ledger skipped (収集データの保存は継続)"
 
       - name: Persist collected data
         run: |
