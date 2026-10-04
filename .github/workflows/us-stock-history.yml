@@ -21,6 +21,7 @@ on:
       - 'us_stock_fetch.py'
       - 'us_stock_rotate.py'
       - 'ledger.py'
+      - '.github/scripts/freshness_check.py'
       - '.github/workflows/us-stock-history.yml'
 
 permissions:
@@ -33,7 +34,8 @@ concurrency:
 jobs:
   history:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # 各取得stepの締切(10+10+10+16分)+台帳+保存が収まる長さ (620〜810銘柄化で重くなったため35→60)
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -62,24 +64,70 @@ jobs:
         env: { ROLLING_DAYS: '7' }
         run: python us_stock_rotate.py
 
+      # 仮想台帳の答え合わせ待ちなのにユニバースから外れた銘柄 (話題枠の除外など) の日足だけ取り続ける。
+      # 取らないと、外れた銘柄の +20日 が永久に空欄のまま集計から消える (生き残った銘柄だけが残る偏り)
+      - name: Keep daily bars for ledger rows outside the universe
+        env: { INTERVAL: '1d', RANGE: '3mo', SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '3' }
+        run: |
+          P=$(python ledger.py us --pending-codes 2>/dev/null || true)
+          if [ -n "$P" ]; then
+            echo "ユニバース外の答え合わせ待ち: $P"
+            US_TICKERS="$P" python us_stock_fetch.py || true
+          else
+            echo "対象なし"
+          fi
+
       # 仮想の約定記録 (ledger.py): その日のユニバース全銘柄の判定(日次の資金集中度・候補フラグ・
-      # 引け時点のスクリーナー値)を記録し、過去の記録に +1/+5/+20営業日後の値動きを書き足す。
-      # 日足が確定した引け後のこのジョブで実行する。失敗しても収集データの保存は止めない。
+      # 引け時点のスクリーナー値)を記録し、過去の記録に答え合わせ(+1/+5/+20営業日)を書き足す。
+      # 失敗しても収集データの保存は止めない (continue-on-error) が、最後に赤にして知らせる
       - name: Virtual ledger (判定の記録 + 答え合わせ)
-        run: python ledger.py us || echo "ledger skipped (収集データの保存は継続)"
+        id: ledger
+        continue-on-error: true
+        run: python ledger.py us
 
       - name: Persist collected data
         run: |
           git config user.name "us-stock-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- data/us_stocks 2>/dev/null || true
+          # 仮想台帳は次の step で別に (再試行付きで) 保存する
+          git reset -q -- data/us_stocks/ledger 2>/dev/null || true
           if ! git diff --cached --quiet; then
             git commit -m "chore: US stock history (d/w/m/1m backfill/rotate) $(date -u +'%Y-%m-%d %H:%M')"
           # rebase競合時はabortして「push failed (race)」を正しく踏ませる
           # (競合したまま放置するとpushが「Everything up-to-date」となり
-          #  データ喪失がsuccessに見える。JP版と同じ既知の落とし穴)
-            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
+          #  データ喪失がsuccessに見える。2026-07-09に並走runで実際に発生)
+          # 収集データは次回の取得で自然回復するので、ここは従来どおり1回だけ試す
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
             git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
           else
             echo "新規バーなし"
           fi
+
+      # 仮想台帳は「次回で自然回復」しない (取りこぼした日は補完扱いで集計から外れる) ため、
+      # 最新のブランチに自分のファイルだけを載せ直し、再試行付きで保存する。失敗は赤
+      # (2026-10-03 のブランチ検証で、収集データの衝突に巻き込まれて台帳が保存されなかったため分離)
+      - name: Persist virtual ledger
+        if: steps.ledger.outcome == 'success'
+        env: { COMMIT_BOT_NAME: 'us-stock-bot' }
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q FETCH_HEAD
+          bash .github/scripts/commit_back.sh "chore: 仮想台帳 US $(date -u +'%Y-%m-%d %H:%M')" data/us_stocks/ledger
+
+      - name: Ledger failure is red
+        if: steps.ledger.outcome == 'failure'
+        run: |
+          echo "::error::仮想台帳 (ledger.py) が失敗しました。収集データは保存済み。3営業日以内に直れば翌回に補完されます (補完分は集計から除外)"
+          exit 1
+
+      # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (予定実行の時だけ。マージ直後の並走で誤報しないため)
+      - name: Freshness check
+        if: ${{ always() && github.event_name == 'schedule' }}
+        run: python .github/scripts/freshness_check.py us
+
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 米国株の履歴収集・仮想台帳・鮮度点検のいずれか
+        run: python .github/scripts/notify_failure.py

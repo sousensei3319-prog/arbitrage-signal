@@ -224,8 +224,9 @@ def main():
         print(f"  {label}: {len(pairs)}銘柄取得")
 
     if ok_sources == 0:
-        print("全ランキング取得失敗。hot枠を変更せず終了(前週維持)。")
-        return
+        # 何も書き換えずに赤で終える (前週の hot枠はそのまま残る。従来は緑で気づけなかった)
+        print("::error::全ランキングの取得/解析に失敗。hot枠を変更せず終了 (前週維持)。応答形式の変更を疑う")
+        sys.exit(2)
 
     rows = load_universe_rows()
     protected = load_protected()

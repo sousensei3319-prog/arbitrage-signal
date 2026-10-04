@@ -153,10 +153,10 @@ def fetched_rows(ticker, timestamps, quote, interval):
         c = closes[i] if i < len(closes) else None
         if None in (o, h, l, c):
             continue  # 寄り付き前後などの欠測バーはスキップ
-        v = vols[i] if i < len(vols) and vols[i] is not None else 0
+        v = vols[i] if i < len(vols) else None   # None = 出来高の欠測 (merge_barsで既存の足を残す)
         et = datetime.fromtimestamp(ts, tz=ET).strftime("%Y-%m-%d %H:%M:%S")
         # 文字列化は旧append方式(csv.writerにfloat/intを渡す=str())と同じ表記にする
-        out.append((bar_key(ts, interval), [et, str(ts), ticker, str(o), str(h), str(l), str(c), str(v)]))
+        out.append((bar_key(ts, interval), [et, str(ts), ticker, str(o), str(h), str(l), str(c), "" if v is None else str(v)]))
     return out
 
 
@@ -194,6 +194,11 @@ def merge_bars(path, ticker, timestamps, quote, interval):
     n_new = n_upd = 0
     for k, row in fetched_rows(ticker, timestamps, quote, interval):
         old = existing.get(k)
+        if row[7] == "":
+            # 出来高が欠測の応答 (一時的な不完全データ) で、既にある完全な足を上書きしない
+            if old is not None:
+                continue
+            row = row[:7] + ["0"]
         if old is None:
             n_new += 1
         elif old != row:

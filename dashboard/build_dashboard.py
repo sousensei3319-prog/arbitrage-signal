@@ -157,8 +157,9 @@ def load_supply_demand():
 
 
 def _stat_rows_intraday(t, c, v):
-    """window_stats向け: 出来高0を除いた(epoch,close,vol,turnover)。jp_money_flow.load_barsと同じ規則。"""
-    return sorted(((tt, cc, vv, cc * vv) for tt, cc, vv in zip(t, c, v) if vv > 0), key=lambda r: r[0])
+    """window_stats向け: 出来高0を除いた(epoch,close,vol,turnover)。jp_money_flow.load_barsと同じ規則 (異常足の除外を含む)。"""
+    rows = sorted(((tt, cc, vv, cc * vv) for tt, cc, vv in zip(t, c, v) if vv > 0), key=lambda r: r[0])
+    return jmf.drop_volume_glitches(rows)   # 「累計出来高入り」異常足を窓統計から除く (チャートの生データは残す)
 
 
 def _stat_rows_daily(d):

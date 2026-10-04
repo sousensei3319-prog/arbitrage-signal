@@ -36,7 +36,8 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    # 入れ替え(5分)+初期取得(3分×4回)+保存が収まる長さ (締切の合計がtimeoutを超え、保存前に強制終了しうる状態だった)
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -68,7 +69,7 @@ jobs:
       - name: Fetch initial history for newly added stocks
         env:
           SLEEP_SEC: '0.4'
-          FETCH_DEADLINE_MIN: '8'
+          FETCH_DEADLINE_MIN: '3'   # 新規は数十銘柄で通常は数秒。4回分の締切がjobのtimeoutに収まる値
         run: |
           # 今回の実行で追加した銘柄だけ (同じ週の再実行で取り直さない)
           NEW=$(cat "$RUNNER_TEMP/hot_added.txt" 2>/dev/null || true)
@@ -94,3 +95,10 @@ jobs:
             for iv in 1d 1wk 1mo 1m; do FILES="$FILES data/us_stocks/${c}_${iv}.csv"; done
           done
           bash .github/scripts/commit_back.sh "chore: 米国株 話題枠 週次入れ替え+新規銘柄の初期履歴 $(date -u +'%Y-%m-%d')" $FILES
+
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 米国株の話題枠の週次入れ替え (前週の話題枠のまま)
+        run: python .github/scripts/notify_failure.py

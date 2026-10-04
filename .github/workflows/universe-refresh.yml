@@ -76,3 +76,10 @@ jobs:
           bash .github/scripts/commit_back.sh \
             "chore: 監視ユニバース再構築 (TOPIX500+日経225+話題枠) $(date -u +'%Y-%m-%d %H:%M')" \
             data/jp_stocks/universe.csv data/jp_stocks/index_members.csv data/jp_stocks/listed_names.csv
+
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 日本株の監視銘柄リストの月次更新 (前月のリストのまま)
+        run: python .github/scripts/notify_failure.py

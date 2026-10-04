@@ -22,7 +22,8 @@ RULES.md の戦略C「FGI(恐怖と欲望指数)≤30で現物を分割買い(DC
                        無いため検証対象外
     S0 一括購入(参考): S1と同じ総額を初日に一括で買って持ち続ける
   評価: 投資倍率 MOIC = 最終評価額 ÷ 投入総額、内部収益率 IRR (お金の出し入れの時期を考慮した
-        年率)、最大の含み損率 (評価額÷投入額 の最大下落率)。期間: 全期間と3区間
+        年率)、最大の含み損率 (評価額÷その時点までの投入額 の最低値 − 1)。参考に投資倍率のピークからの
+        最大下落率も出す (2026-10-04 訂正: 当初は後者を「最大含み損」と表示していた)。期間: 全期間と3区間
         (2018-02〜2020年 / 2021〜2023年 / 2024年〜) — 各区間はゼロから始め直す。
   合否:
     判定1 (S2を採用するか): BTCで S2 の MOIC が S1 を「全期間」かつ「3区間中2区間以上」で上回る
@@ -208,7 +209,7 @@ def simulate(prices, fgi, start, end, strat, fee, lump_total=None):
     coins = cash = invested = 0.0
     flows, curve = [], []
     n_buy = n_sell = 0
-    peak_moic, max_under = 0.0, 0.0
+    peak_moic, max_under, min_moic = 0.0, 0.0, None
     if strat == "S0":
         amt = lump_total
         coins = amt * (1 - fee) / prices[mondays[0]]
@@ -240,6 +241,7 @@ def simulate(prices, fgi, start, end, strat, fee, lump_total=None):
         if invested > 0:
             moic = value / invested
             curve.append((d.isoformat(), round(moic, 4)))
+            min_moic = moic if min_moic is None else min(min_moic, moic)
             peak_moic = max(peak_moic, moic)
             if peak_moic > 0:
                 max_under = min(max_under, moic / peak_moic - 1)
@@ -249,6 +251,7 @@ def simulate(prices, fgi, start, end, strat, fee, lump_total=None):
     return {"invested": round(invested, 2), "final_value": round(final, 2),
             "moic": round(final / invested, 4) if invested else None,
             "irr": round(irr, 4) if irr is not None else None,
+            "max_unrealized_loss": round(min(0.0, (min_moic or 1.0) - 1), 4),
             "max_drawdown_of_moic": round(max_under, 4),
             "n_buy_weeks": n_buy, "n_sell_weeks": n_sell, "end": last.isoformat(),
             "avg_cost": round(invested / coins, 2) if strat != "S3" and coins > 0 else None,
@@ -295,13 +298,82 @@ def verdicts(btc, eth):
                  "条件付き採用 (BTCは基準を満たすがETHでは不成立)" if pass_b else
                  "不採用 → 固定積立のみ (事前合意どおり)")}
     f3, n3 = wins(btc, "S3", "S1", "irr")
-    dd_ok = (btc["全期間"]["S3"] or {}).get("max_drawdown_of_moic", -9) >= \
-        (btc["全期間"]["S1"] or {}).get("max_drawdown_of_moic", 0)
+    dd_ok = (btc["全期間"]["S3"] or {}).get("max_unrealized_loss", -9) >= \
+        (btc["全期間"]["S1"] or {}).get("max_unrealized_loss", 0)
     v["判定2_RULES戦略C(S3)"] = {
         "BTC_全期間でIRR勝ち": f3, "BTC_IRR勝ち区間数": n3, "最大含み損がS1より悪くない": dd_ok,
         "結論": "採用 (RULES.mdの戦略Cは固定積立より良い)" if (f3 and n3 >= 2 and dd_ok)
                 else "不採用 → 固定積立の方が良い (または同等以下)"}
     return v
+
+
+def budget_matched(prices, fgi, start, end, fee):
+    """[事前登録外・2026-10-04 の反証で追加] 同じ予算での比較。
+    S2 は恐怖の週に倍額を買うため、その分の現金を普段から用意しておく必要がある。そこで毎週
+    「S2の平均投入額」を入金するとして、S1B=毎週その全額を買う / S2R=毎週$100買い、残りは
+    現金で待機し恐怖の週に$100上乗せ (待機資金が足りなければ見送り) を比べる。"""
+    days = sorted(d for d in prices if start <= d <= end and d in fgi)
+    mondays = [d for d in days if d.weekday() == 0]
+    if not mondays:
+        return None
+    n_fear = sum(1 for d in mondays if fgi[d] <= FEAR)
+    weekly = WEEKLY * (1 + n_fear / len(mondays))
+    out = {"weekly_deposit": round(weekly, 2)}
+    for mode in ("S1B", "S2R"):
+        coins = cash = 0.0
+        missed = 0
+        for d in mondays:
+            if mode == "S1B":
+                buy = weekly
+            else:
+                cash += weekly - WEEKLY
+                buy = WEEKLY
+                if fgi[d] <= FEAR:
+                    if cash >= WEEKLY:
+                        cash -= WEEKLY
+                        buy += WEEKLY
+                    else:
+                        missed += 1
+            coins += buy * (1 - fee) / prices[d]
+        final = coins * prices[mondays[-1]] + cash
+        out[mode] = {"moic": round(final / (weekly * len(mondays)), 4)}
+        if mode == "S2R":
+            out[mode]["missed_double_weeks"] = missed
+    return out
+
+
+def placebo_pass_rate(prices, n=200, seed=1):
+    """[事前登録外・2026-10-04 の反証で追加] 判定1の基準の「甘さ」の確認。
+    BTCの日次騰落率を並べ替えて「予測力が無い」価格の道筋を n 本作り、FGIの代わりに
+    「30日前より安い週は倍額」というルールで判定1と同じ基準 (全期間で勝ち かつ 3区間中2以上で勝ち)
+    を満たす割合を数える。高ければ、基準を満たしてもFGIの予測力の証拠にはならない。"""
+    import random
+    ds = sorted(prices)
+    rets = [prices[b] / prices[a] for a, b in zip(ds, ds[1:])]
+    rng = random.Random(seed)
+    passed = 0
+    for _ in range(n):
+        rng.shuffle(rets)
+        p, v = {}, prices[ds[0]]
+        for d, r in zip(ds, [1.0] + rets):
+            v *= r
+            p[d] = v
+
+        def moic(s, e, double):
+            coins = inv = 0.0
+            for d in (x for x in ds if s <= x <= e and x.weekday() == 0):
+                prev = p.get(d - timedelta(days=30))
+                buy = WEEKLY * (2 if double and prev is not None and p[d] < prev else 1)
+                inv += buy
+                coins += buy / p[d]
+            return coins * p[max(x for x in ds if x <= e)] / inv if inv else 0
+
+        last = ds[-1]
+        periods = [(START, last)] + [(s, e or last) for _, s, e in PERIODS]
+        wins = [moic(s, e, True) > moic(s, e, False) for s, e in periods]
+        if wins[0] and sum(wins[1:]) >= 2:
+            passed += 1
+    return round(passed / n, 3)
 
 
 def event_study(prices, fgi, thr, horizon=90, gap_days=30):
@@ -383,6 +455,15 @@ def main():
     result["verdicts"] = verdicts(result["results"]["BTC"], result["results"].get("ETH"))
     result["verdicts_fee_alt"] = verdicts(result["results_fee_alt"]["BTC"], result["results_fee_alt"].get("ETH"))
     result["event_study"] = {f"BTC_FGI<{t}": event_study(assets["BTC"], fgi, t) for t in (10, 20, 25, 30)}
+    # 事前登録外の追加検証 (判定は変えない。反証で判明した「基準の甘さ」「予算の違い」を数字で残す)
+    last_day = max(d for d in assets["BTC"] if d in fgi)
+    result["post_hoc"] = {
+        "note": "事前登録外の追加検証 (2026-10-04 の反証で追加)。上の判定(事前基準)は変えずに併記する",
+        "budget_matched": {a: {lab: budget_matched(prices, fgi, s, e or last_day, FEE)
+                               for lab, s, e in [("全期間", START, None)] + PERIODS}
+                           for a, prices in assets.items() if len(prices) >= 1500},
+        "placebo_pass_rate_btc": placebo_pass_rate(assets["BTC"]),
+    }
     # グラフ用: 週次の価格とFGI
     mondays = sorted(d for d in assets["BTC"] if d in fgi and d.weekday() == 0 and d >= START)
     result["weekly"] = [{"date": d.isoformat(), "btc": round(assets["BTC"][d], 2), "fgi": fgi[d]} for d in mondays]
@@ -397,6 +478,10 @@ def main():
         print(f"  {label}: {line}")
     for k, v in result["verdicts"].items():
         print(f"  {k}: {v['結論']}")
+    bm = result["post_hoc"]["budget_matched"]["BTC"]["全期間"]
+    print(f"  [追加検証] 同じ予算 (毎週${bm['weekly_deposit']:.2f}): 毎週全額 {bm['S1B']['moic']:.2f}倍 / "
+          f"恐怖で倍額(待機資金あり) {bm['S2R']['moic']:.2f}倍")
+    print(f"  [追加検証] 予測力の無い価格でも判定1の基準を満たす割合: {result['post_hoc']['placebo_pass_rate_btc']:.0%}")
     es = result["event_study"]["BTC_FGI<10"]
     if es["episodes"]:
         print(f"  FGI<10 → 90日後: 日単位 平均{es['days']['mean']:+.1%} (n={es['days']['n']}) / "

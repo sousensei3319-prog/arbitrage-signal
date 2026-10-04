@@ -75,3 +75,10 @@ jobs:
           bash .github/scripts/commit_back.sh \
             "chore: 米国株 監視ユニバース再構築 (S&P500+Nasdaq-100+話題枠) $(date -u +'%Y-%m-%d %H:%M')" \
             data/us_stocks/universe.csv data/us_stocks/custom_groups.csv data/us_stocks/index_members.csv
+
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 米国株の監視銘柄リストの月次更新 (前月のリストのまま)
+        run: python .github/scripts/notify_failure.py

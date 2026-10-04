@@ -119,7 +119,7 @@ def load_1d(sym, cutoff_date, t1m, c1m, v1m):
 
 
 def _stat_rows_intraday(t, c, v):
-    """window_stats向け: 出来高0を除いた(epoch,close,vol,turnover)。us_money_flow.load_barsと同じ規則。"""
+    """window_stats向け: 出来高0を除いた(epoch,close,vol,turnover)。us_money_flow.load_barsと同じ規則 (異常足は build() で全銘柄が揃ってから除く)。"""
     return sorted(((tt, cc, vv, cc * vv) for tt, cc, vv in zip(t, c, v) if vv > 0), key=lambda r: r[0])
 
 
@@ -227,6 +227,11 @@ def build(uni):
             "last": c[-1] if c else None, "pct": round(pct, 2),
             "t": t, "close": c, "vol": v, "d": d,
         }
+
+    # 複数銘柄で同時に起きた「累計出来高入り」異常足を窓統計から除く (us_money_flow と同じ規則。チャートの生データは残す)
+    cleaned = umf.apply_glitch_drop({s: r["intraday"] for s, r in per_ticker_rows.items()})
+    for s in per_ticker_rows:
+        per_ticker_rows[s]["intraday"] = cleaned[s]
 
     if not per_ticker_rows:
         raise SystemExit("1分足データが無い。先に収集を実行すること。")

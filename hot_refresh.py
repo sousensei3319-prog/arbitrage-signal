@@ -93,10 +93,12 @@ RANKINGS = [
     ("値上がり率", "https://finance.yahoo.co.jp/stocks/ranking/up?market=all&term=daily"),
 ]
 
-# ETF/ETN/REIT/指数連動商品を名前で除外 (話題「個別株」だけを拾う)
+# ETF/ETN/REIT/指数連動商品を名前で除外 (話題「個別株」だけを拾う)。
+# 東証の普通株一覧 (listed_names.csv) にあるコードには当てない: 部分一致のため
+# 「ダブル・スコープ」「ブルボン」「旭コンクリート工業」等の本物の個別株17銘柄を永久に弾いていた
 EXCLUDE_NAME = ("ＥＴＦ", "ETF", "ＥＴＮ", "ETN", "投信", "上場", "ベア", "ブル",
                 "レバレッジ", "インバース", "日経平均", "ＴＯＰＩＸ", "リート",
-                "ＲＥＩＴ", "REIT", "指数", "連動")
+                "ＲＥＩＴ", "REIT", "指数", "連動", "投資法人")
 
 
 def _now_week():
@@ -111,6 +113,9 @@ def fetch(url, timeout=25):
         raw = r.read()
         enc = r.headers.get_content_charset() or "utf-8"
         return raw.decode(enc, errors="replace")
+
+
+COMPANY_RE = re.compile(r"\(株\)|（株）|株式会社")
 
 
 def is_ad_name(name):
@@ -136,6 +141,13 @@ def names_match(scraped, official):
     return difflib.SequenceMatcher(None, a, b).ratio() >= 0.5
 
 
+def is_official_name(code, name, listed):
+    """東証の正式名そのもの (全角半角・(株)の有無などの表記ゆれのみ) なら True。
+    正式名に読点等を含む銘柄 (例: 9720「ホテル、ニューグランド」) を広告表記チェックで誤って弾かないため。"""
+    official = (listed or {}).get(code)
+    return bool(official) and _norm_name(name) == _norm_name(official)
+
+
 def load_listed_names():
     """{code: 正式名}。ファイルが無い(月次更新が未実行)場合は空 = 名前照合はスキップ。"""
     out = {}
@@ -159,12 +171,17 @@ def parse_ranking(html, top=RANK_TOP, listed=None, rejected=None):
         name = name.strip()
         if not CODE_RE.match(code) or code in seen:
             continue
-        if any(x in name for x in EXCLUDE_NAME):
+        if code not in listed and any(x in name for x in EXCLUDE_NAME):
             continue
+        official = is_official_name(code, name, listed)
         reason = None
-        if is_ad_name(name):
+        if not official and is_ad_name(name):
             reason = "広告/記事見出し風の名前"
-        elif code in listed and not names_match(name, listed[code]):
+        elif listed and code not in listed and not COMPANY_RE.search(name):
+            # 正式名一覧に無いコード (月次更新後の新規上場など) は名前照合ができないので、
+            # 社名の形をしているものだけ採用する (広告文には (株)/株式会社 が付かない)
+            reason = "東証の普通株一覧に無く、社名の形 ((株)/株式会社) でもない (広告の可能性)"
+        elif code in listed and not official and not names_match(name, listed[code]):
             reason = f"東証の正式名「{listed[code]}」と一致しない (広告の可能性)"
         if reason:
             if rejected is not None and all(r[0] != code for r in rejected):
@@ -285,8 +302,10 @@ def main():
               + "・".join(f"{c} {n}" for c, n in pairs[:3]) + ")")
 
     if ok_sources == 0:
-        print("全ランキング取得失敗。hot枠を変更せず終了(前週維持)。")
-        return
+        # 何も書き換えずに赤で終える (前週の hot枠はそのまま残る)。従来は緑で終わり、Yahooの
+        # ページ構成が変わって全滅しても気づけなかった
+        print("::error::全ランキングの取得/解析に失敗。hot枠を変更せず終了 (前週維持)。ページ構成の変更を疑う")
+        sys.exit(2)
 
     rows = load_universe_rows()
     protected = load_protected()
@@ -329,7 +348,8 @@ def main():
             continue
         code = r["code"]
         # 過去に広告・記事リンクを誤検出して入った行 (例: 2609「【New】…」) は即時除外
-        if is_ad_name(r["name"]):
+        # (正式名に読点等を含む本物の銘柄は除外しない)
+        if is_ad_name(r["name"]) and not is_official_name(code, r["name"], listed):
             removed.append({"code": code, "name": r["name"],
                             "reason": "ランキング上の広告/記事リンクを銘柄と誤認して追加された行のため除外"})
             state.pop(code, None)
