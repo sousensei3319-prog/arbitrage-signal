@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-03T14:28:05+00:00",
+ "generated_at": "2026-10-04T02:24:22+00:00",
  "params": {
   "weekly_usd": 100.0,
   "fee": 0.001,
@@ -28,17 +28,17 @@
  },
  "data": {
   "fgi": {
-   "n_days": 3163,
+   "n_days": 3164,
    "first": "2018-02-01",
-   "last": "2026-10-03"
+   "last": "2026-10-04"
   },
   "BTC": {
    "source": "OKX BTC-USDT",
-   "n_days": 3187,
+   "n_days": 3188,
    "first": "2018-01-11",
-   "last": "2026-10-02",
+   "last": "2026-10-03",
    "okx_vs_coinbase": {
-    "n_days": 3187,
+    "n_days": 3188,
     "median_abs_diff_pct": 0.051,
     "p99_abs_diff_pct": 2.255,
     "max_abs_diff_pct": 5.535
@@ -47,11 +47,11 @@
   },
   "ETH": {
    "source": "OKX ETH-USDT",
-   "n_days": 3187,
+   "n_days": 3188,
    "first": "2018-01-11",
-   "last": "2026-10-02",
+   "last": "2026-10-03",
    "okx_vs_coinbase": {
-    "n_days": 3187,
+    "n_days": 3188,
     "median_abs_diff_pct": 0.053,
     "p99_abs_diff_pct": 2.321,
     "max_abs_diff_pct": 6.253
@@ -67,6 +67,7 @@
      "final_value": 231108.12,
      "moic": 5.1243,
      "irr": 0.3663,
+     "max_unrealized_loss": -0.4965,
      "max_drawdown_of_moic": -0.8033,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -1884,6 +1885,7 @@
      "final_value": 320997.36,
      "moic": 5.3145,
      "irr": 0.3716,
+     "max_unrealized_loss": -0.4758,
      "max_drawdown_of_moic": -0.815,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -3701,6 +3703,7 @@
      "final_value": 23566.85,
      "moic": 1.5403,
      "irr": 0.0967,
+     "max_unrealized_loss": -0.4377,
      "max_drawdown_of_moic": -0.658,
      "n_buy_weeks": 153,
      "n_sell_weeks": 98,
@@ -5518,6 +5521,7 @@
      "final_value": 540576.58,
      "moic": 11.9862,
      "irr": 0.3326,
+     "max_unrealized_loss": -0.5072,
      "max_drawdown_of_moic": -0.7663,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -7337,6 +7341,7 @@
      "final_value": 55953.51,
      "moic": 3.7055,
      "irr": 1.1607,
+     "max_unrealized_loss": -0.4965,
      "max_drawdown_of_moic": -0.6331,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -7348,6 +7353,7 @@
      "final_value": 77135.0,
      "moic": 3.8957,
      "irr": 1.1473,
+     "max_unrealized_loss": -0.4758,
      "max_drawdown_of_moic": -0.6315,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -7359,6 +7365,7 @@
      "final_value": 8186.64,
      "moic": 1.7418,
      "irr": 0.3365,
+     "max_unrealized_loss": -0.4377,
      "max_drawdown_of_moic": -0.658,
      "n_buy_weeks": 47,
      "n_sell_weeks": 21,
@@ -7370,6 +7377,7 @@
      "final_value": 58685.97,
      "moic": 3.8865,
      "irr": 0.598,
+     "max_unrealized_loss": -0.5072,
      "max_drawdown_of_moic": -0.7002,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -7383,6 +7391,7 @@
      "final_value": 22290.65,
      "moic": 1.4289,
      "irr": 0.2551,
+     "max_unrealized_loss": -0.533,
      "max_drawdown_of_moic": -0.6935,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -7394,6 +7403,7 @@
      "final_value": 32379.36,
      "moic": 1.4921,
      "irr": 0.2797,
+     "max_unrealized_loss": -0.5019,
      "max_drawdown_of_moic": -0.6871,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -7405,6 +7415,7 @@
      "final_value": 9591.7,
      "moic": 1.5724,
      "irr": 0.2976,
+     "max_unrealized_loss": -0.2219,
      "max_drawdown_of_moic": -0.4615,
      "n_buy_weeks": 61,
      "n_sell_weeks": 16,
@@ -7416,6 +7427,7 @@
      "final_value": 21220.2,
      "moic": 1.3603,
      "irr": 0.1091,
+     "max_unrealized_loss": -0.5072,
      "max_drawdown_of_moic": -0.7663,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -7429,6 +7441,7 @@
      "final_value": 15824.04,
      "moic": 1.0989,
      "irr": 0.0701,
+     "max_unrealized_loss": -0.2128,
      "max_drawdown_of_moic": -0.537,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -7440,6 +7453,7 @@
      "final_value": 21053.27,
      "moic": 1.1139,
      "irr": 0.0896,
+     "max_unrealized_loss": -0.2047,
      "max_drawdown_of_moic": -0.5363,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -7451,6 +7465,7 @@
      "final_value": 5157.79,
      "moic": 1.1462,
      "irr": 0.1828,
+     "max_unrealized_loss": -0.0999,
      "max_drawdown_of_moic": -0.3432,
      "n_buy_weeks": 45,
      "n_sell_weeks": 28,
@@ -7462,6 +7477,7 @@
      "final_value": 27184.57,
      "moic": 1.8878,
      "irr": 0.2607,
+     "max_unrealized_loss": -0.1054,
      "max_drawdown_of_moic": -0.5167,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -7477,6 +7493,7 @@
      "final_value": 220126.48,
      "moic": 4.8809,
      "irr": 0.3553,
+     "max_unrealized_loss": -0.7066,
      "max_drawdown_of_moic": -0.8265,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -9294,6 +9311,7 @@
      "final_value": 302255.57,
      "moic": 5.0042,
      "irr": 0.3582,
+     "max_unrealized_loss": -0.6826,
      "max_drawdown_of_moic": -0.8296,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -11111,6 +11129,7 @@
      "final_value": 22381.35,
      "moic": 1.4628,
      "irr": 0.0854,
+     "max_unrealized_loss": -0.6387,
      "max_drawdown_of_moic": -0.7566,
      "n_buy_weeks": 153,
      "n_sell_weeks": 98,
@@ -12928,6 +12947,7 @@
      "final_value": 172760.24,
      "moic": 3.8306,
      "irr": 0.168,
+     "max_unrealized_loss": -0.8719,
      "max_drawdown_of_moic": -0.9045,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14747,6 +14767,7 @@
      "final_value": 49868.42,
      "moic": 3.3025,
      "irr": 1.0352,
+     "max_unrealized_loss": -0.7066,
      "max_drawdown_of_moic": -0.7552,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -14758,6 +14779,7 @@
      "final_value": 68245.84,
      "moic": 3.4468,
      "irr": 1.0188,
+     "max_unrealized_loss": -0.6826,
      "max_drawdown_of_moic": -0.7517,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -14769,6 +14791,7 @@
      "final_value": 8534.68,
      "moic": 1.8159,
      "irr": 0.3648,
+     "max_unrealized_loss": -0.6387,
      "max_drawdown_of_moic": -0.7566,
      "n_buy_weeks": 47,
      "n_sell_weeks": 21,
@@ -14780,6 +14803,7 @@
      "final_value": 15714.11,
      "moic": 1.0407,
      "irr": 0.0139,
+     "max_unrealized_loss": -0.8719,
      "max_drawdown_of_moic": -0.9045,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14793,6 +14817,7 @@
      "final_value": 18509.23,
      "moic": 1.1865,
      "irr": 0.1184,
+     "max_unrealized_loss": -0.5274,
      "max_drawdown_of_moic": -0.7946,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -14804,6 +14829,7 @@
      "final_value": 26197.83,
      "moic": 1.2073,
      "irr": 0.1263,
+     "max_unrealized_loss": -0.528,
      "max_drawdown_of_moic": -0.7915,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -14815,6 +14841,7 @@
      "final_value": 7935.57,
      "moic": 1.3009,
      "irr": 0.1649,
+     "max_unrealized_loss": -0.2307,
      "max_drawdown_of_moic": -0.5056,
      "n_buy_weeks": 61,
      "n_sell_weeks": 16,
@@ -14826,6 +14853,7 @@
      "final_value": 33987.29,
      "moic": 2.1787,
      "irr": 0.2995,
+     "max_unrealized_loss": -0.001,
      "max_drawdown_of_moic": -0.772,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14839,6 +14867,7 @@
      "final_value": 14650.51,
      "moic": 1.0174,
      "irr": 0.0126,
+     "max_unrealized_loss": -0.4517,
      "max_drawdown_of_moic": -0.6388,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -14850,6 +14879,7 @@
      "final_value": 20030.71,
      "moic": 1.0598,
      "irr": 0.0478,
+     "max_unrealized_loss": -0.438,
      "max_drawdown_of_moic": -0.6321,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -14861,6 +14891,7 @@
      "final_value": 5325.38,
      "moic": 1.1834,
      "irr": 0.2279,
+     "max_unrealized_loss": -0.1935,
      "max_drawdown_of_moic": -0.3743,
      "n_buy_weeks": 45,
      "n_sell_weeks": 28,
@@ -14872,6 +14903,7 @@
      "final_value": 16445.84,
      "moic": 1.1421,
      "irr": 0.0496,
+     "max_unrealized_loss": -0.3404,
      "max_drawdown_of_moic": -0.6556,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14889,6 +14921,7 @@
      "final_value": 224399.28,
      "moic": 4.9756,
      "irr": 0.3596,
+     "max_unrealized_loss": -0.5111,
      "max_drawdown_of_moic": -0.8033,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -14900,6 +14933,7 @@
      "final_value": 311679.12,
      "moic": 5.1603,
      "irr": 0.3651,
+     "max_unrealized_loss": -0.491,
      "max_drawdown_of_moic": -0.815,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -14911,6 +14945,7 @@
      "final_value": 22255.62,
      "moic": 1.4546,
      "irr": 0.0842,
+     "max_unrealized_loss": -0.454,
      "max_drawdown_of_moic": -0.658,
      "n_buy_weeks": 153,
      "n_sell_weeks": 98,
@@ -14922,6 +14957,7 @@
      "final_value": 524884.17,
      "moic": 11.6382,
      "irr": 0.3281,
+     "max_unrealized_loss": -0.5215,
      "max_drawdown_of_moic": -0.7663,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14935,6 +14971,7 @@
      "final_value": 54329.24,
      "moic": 3.598,
      "irr": 1.1281,
+     "max_unrealized_loss": -0.5111,
      "max_drawdown_of_moic": -0.6331,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -14946,6 +14983,7 @@
      "final_value": 74895.84,
      "moic": 3.7826,
      "irr": 1.1158,
+     "max_unrealized_loss": -0.491,
      "max_drawdown_of_moic": -0.6315,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -14957,6 +14995,7 @@
      "final_value": 7721.54,
      "moic": 1.6429,
      "irr": 0.2974,
+     "max_unrealized_loss": -0.454,
      "max_drawdown_of_moic": -0.658,
      "n_buy_weeks": 47,
      "n_sell_weeks": 21,
@@ -14968,6 +15007,7 @@
      "final_value": 56982.37,
      "moic": 3.7737,
      "irr": 0.5819,
+     "max_unrealized_loss": -0.5215,
      "max_drawdown_of_moic": -0.7002,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -14981,6 +15021,7 @@
      "final_value": 21643.57,
      "moic": 1.3874,
      "irr": 0.2329,
+     "max_unrealized_loss": -0.5465,
      "max_drawdown_of_moic": -0.6935,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -14992,6 +15033,7 @@
      "final_value": 31439.42,
      "moic": 1.4488,
      "irr": 0.2576,
+     "max_unrealized_loss": -0.5164,
      "max_drawdown_of_moic": -0.6871,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -15003,6 +15045,7 @@
      "final_value": 9100.79,
      "moic": 1.4919,
      "irr": 0.2596,
+     "max_unrealized_loss": -0.2535,
      "max_drawdown_of_moic": -0.4537,
      "n_buy_weeks": 61,
      "n_sell_weeks": 16,
@@ -15014,6 +15057,7 @@
      "final_value": 20604.2,
      "moic": 1.3208,
      "irr": 0.0981,
+     "max_unrealized_loss": -0.5215,
      "max_drawdown_of_moic": -0.7663,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15027,6 +15071,7 @@
      "final_value": 15364.68,
      "moic": 1.067,
      "irr": 0.0479,
+     "max_unrealized_loss": -0.2356,
      "max_drawdown_of_moic": -0.537,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -15038,6 +15083,7 @@
      "final_value": 20442.11,
      "moic": 1.0816,
      "irr": 0.0647,
+     "max_unrealized_loss": -0.2278,
      "max_drawdown_of_moic": -0.5363,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -15049,6 +15095,7 @@
      "final_value": 4899.83,
      "moic": 1.0889,
      "irr": 0.1122,
+     "max_unrealized_loss": -0.1337,
      "max_drawdown_of_moic": -0.3307,
      "n_buy_weeks": 45,
      "n_sell_weeks": 28,
@@ -15060,6 +15107,7 @@
      "final_value": 26395.43,
      "moic": 1.833,
      "irr": 0.2473,
+     "max_unrealized_loss": -0.1313,
      "max_drawdown_of_moic": -0.5167,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15075,6 +15123,7 @@
      "final_value": 213736.42,
      "moic": 4.7392,
      "irr": 0.3487,
+     "max_unrealized_loss": -0.7151,
      "max_drawdown_of_moic": -0.8265,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -15086,6 +15135,7 @@
      "final_value": 293481.38,
      "moic": 4.859,
      "irr": 0.3516,
+     "max_unrealized_loss": -0.6918,
      "max_drawdown_of_moic": -0.8296,
      "n_buy_weeks": 451,
      "n_sell_weeks": 0,
@@ -15097,6 +15147,7 @@
      "final_value": 21140.64,
      "moic": 1.3817,
      "irr": 0.0728,
+     "max_unrealized_loss": -0.6492,
      "max_drawdown_of_moic": -0.7566,
      "n_buy_weeks": 153,
      "n_sell_weeks": 98,
@@ -15108,6 +15159,7 @@
      "final_value": 167745.18,
      "moic": 3.7194,
      "irr": 0.164,
+     "max_unrealized_loss": -0.8756,
      "max_drawdown_of_moic": -0.9045,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15121,6 +15173,7 @@
      "final_value": 48420.79,
      "moic": 3.2067,
      "irr": 1.004,
+     "max_unrealized_loss": -0.7151,
      "max_drawdown_of_moic": -0.7552,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -15132,6 +15185,7 @@
      "final_value": 66264.73,
      "moic": 3.3467,
      "irr": 0.9887,
+     "max_unrealized_loss": -0.6918,
      "max_drawdown_of_moic": -0.7517,
      "n_buy_weeks": 151,
      "n_sell_weeks": 0,
@@ -15143,6 +15197,7 @@
      "final_value": 8049.95,
      "moic": 1.7128,
      "irr": 0.3251,
+     "max_unrealized_loss": -0.6492,
      "max_drawdown_of_moic": -0.7566,
      "n_buy_weeks": 47,
      "n_sell_weeks": 21,
@@ -15154,6 +15209,7 @@
      "final_value": 15257.94,
      "moic": 1.0105,
      "irr": 0.0036,
+     "max_unrealized_loss": -0.8756,
      "max_drawdown_of_moic": -0.9045,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15167,6 +15223,7 @@
      "final_value": 17971.92,
      "moic": 1.152,
      "irr": 0.0975,
+     "max_unrealized_loss": -0.5411,
      "max_drawdown_of_moic": -0.7946,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -15178,6 +15235,7 @@
      "final_value": 25437.33,
      "moic": 1.1722,
      "irr": 0.1059,
+     "max_unrealized_loss": -0.5418,
      "max_drawdown_of_moic": -0.7915,
      "n_buy_weeks": 156,
      "n_sell_weeks": 0,
@@ -15189,6 +15247,7 @@
      "final_value": 7525.12,
      "moic": 1.2336,
      "irr": 0.1299,
+     "max_unrealized_loss": -0.2546,
      "max_drawdown_of_moic": -0.503,
      "n_buy_weeks": 61,
      "n_sell_weeks": 16,
@@ -15200,6 +15259,7 @@
      "final_value": 33000.68,
      "moic": 2.1154,
      "irr": 0.2867,
+     "max_unrealized_loss": -0.03,
      "max_drawdown_of_moic": -0.772,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15213,6 +15273,7 @@
      "final_value": 14225.22,
      "moic": 0.9879,
      "irr": -0.0089,
+     "max_unrealized_loss": -0.4676,
      "max_drawdown_of_moic": -0.6388,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -15224,6 +15285,7 @@
      "final_value": 19449.24,
      "moic": 1.0291,
      "irr": 0.0234,
+     "max_unrealized_loss": -0.4543,
      "max_drawdown_of_moic": -0.6321,
      "n_buy_weeks": 144,
      "n_sell_weeks": 0,
@@ -15235,6 +15297,7 @@
      "final_value": 5060.53,
      "moic": 1.1246,
      "irr": 0.1563,
+     "max_unrealized_loss": -0.224,
      "max_drawdown_of_moic": -0.3622,
      "n_buy_weeks": 45,
      "n_sell_weeks": 28,
@@ -15246,6 +15309,7 @@
      "final_value": 15968.43,
      "moic": 1.1089,
      "irr": 0.0384,
+     "max_unrealized_loss": -0.3595,
      "max_drawdown_of_moic": -0.6556,
      "n_buy_weeks": 1,
      "n_sell_weeks": 0,
@@ -15343,7 +15407,7 @@
     }
    ],
    "base_all_days": {
-    "n": 3072,
+    "n": 3073,
     "mean": 0.1389,
     "median": 0.03,
     "min": -0.5854,
@@ -15463,7 +15527,7 @@
     }
    ],
    "base_all_days": {
-    "n": 3072,
+    "n": 3073,
     "mean": 0.1389,
     "median": 0.03,
     "min": -0.5854,
@@ -15475,12 +15539,12 @@
    "threshold": 25,
    "horizon_days": 90,
    "days": {
-    "n": 673,
-    "mean": 0.0236,
-    "median": -0.0416,
+    "n": 674,
+    "mean": 0.0241,
+    "median": -0.0407,
     "min": -0.5049,
     "max": 1.082,
-    "share_negative": 0.55
+    "share_negative": 0.549
    },
    "episodes": {
     "n": 14,
@@ -15563,7 +15627,7 @@
     }
    ],
    "base_all_days": {
-    "n": 3072,
+    "n": 3073,
     "mean": 0.1389,
     "median": 0.03,
     "min": -0.5854,
@@ -15575,12 +15639,12 @@
    "threshold": 30,
    "horizon_days": 90,
    "days": {
-    "n": 971,
-    "mean": 0.0323,
-    "median": -0.038,
+    "n": 972,
+    "mean": 0.0327,
+    "median": -0.0375,
     "min": -0.5301,
     "max": 1.082,
-    "share_negative": 0.543
+    "share_negative": 0.542
    },
    "episodes": {
     "n": 11,
@@ -15648,7 +15712,7 @@
     }
    ],
    "base_all_days": {
-    "n": 3072,
+    "n": 3073,
     "mean": 0.1389,
     "median": 0.03,
     "min": -0.5854,
@@ -15656,6 +15720,96 @@
     "share_negative": 0.463
    }
   }
+ },
+ "post_hoc": {
+  "note": "事前登録外の追加検証 (2026-10-04 の反証で追加)。上の判定(事前基準)は変えずに併記する",
+  "budget_matched": {
+   "BTC": {
+    "全期間": {
+     "weekly_deposit": 133.92,
+     "S1B": {
+      "moic": 5.1243
+     },
+     "S2R": {
+      "moic": 4.9354,
+      "missed_double_weeks": 21
+     }
+    },
+    "2018-02〜2020": {
+     "weekly_deposit": 131.13,
+     "S1B": {
+      "moic": 3.7055
+     },
+     "S2R": {
+      "moic": 3.6009,
+      "missed_double_weeks": 14
+     }
+    },
+    "2021〜2023": {
+     "weekly_deposit": 139.1,
+     "S1B": {
+      "moic": 1.4289
+     },
+     "S2R": {
+      "moic": 1.3985,
+      "missed_double_weeks": 20
+     }
+    },
+    "2024〜": {
+     "weekly_deposit": 131.25,
+     "S1B": {
+      "moic": 1.0989
+     },
+     "S2R": {
+      "moic": 1.1092,
+      "missed_double_weeks": 3
+     }
+    }
+   },
+   "ETH": {
+    "全期間": {
+     "weekly_deposit": 133.92,
+     "S1B": {
+      "moic": 4.8809
+     },
+     "S2R": {
+      "moic": 4.6941,
+      "missed_double_weeks": 21
+     }
+    },
+    "2018-02〜2020": {
+     "weekly_deposit": 131.13,
+     "S1B": {
+      "moic": 3.3025
+     },
+     "S2R": {
+      "moic": 3.2484,
+      "missed_double_weeks": 14
+     }
+    },
+    "2021〜2023": {
+     "weekly_deposit": 139.1,
+     "S1B": {
+      "moic": 1.1865
+     },
+     "S2R": {
+      "moic": 1.1586,
+      "missed_double_weeks": 20
+     }
+    },
+    "2024〜": {
+     "weekly_deposit": 131.25,
+     "S1B": {
+      "moic": 1.0174
+     },
+     "S2R": {
+      "moic": 1.053,
+      "missed_double_weeks": 3
+     }
+    }
+   }
+  },
+  "placebo_pass_rate_btc": 0.875
  },
  "weekly": [
   {
