@@ -8,7 +8,11 @@ name: JP Hot Bucket Refresh (話題枠の週次自動入れ替え)
 #   - フィーチャーブランチ検証は push トリガーで代用 (実データ検証はランナー上が初)
 #   - サンドボックスからは Yahoo JP へ proxy403 で到達不可のため、本体の疎通確認は
 #     このランナー上の実行が唯一の手段
-#   - 週次のため schedule 遅延(数時間)は許容範囲
+#   - 週次のため schedule 遅延(数時間)は許容範囲。ただし遅延で場中にずれ込むと5分ごとの
+#     収集ジョブとコミットが衝突しやすい (2026-09-28 は money_flow の衝突で入れ替え結果が
+#     丸ごと消え、runは緑のままだった)。対策: 本ジョブが所有するファイルだけをコミットし
+#     (money_flowは収集ジョブの持ち物なのでコミットしない)、push競合は再試行、失敗は赤で通知
+#   - universe-refresh.yml と同じ concurrency group で直列化 (どちらも universe.csv を書くため)
 
 on:
   schedule:
@@ -23,20 +27,30 @@ on:
 permissions:
   contents: write
 
-# 収集/他のコミットバックと競合しないよう直列化
+# universe.csv を書く週次話題枠(本workflow)と月次更新(universe-refresh.yml)を同じgroupで直列化
 concurrency:
-  group: hot-refresh-${{ github.ref }}
+  group: jp-universe-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    # 入れ替え(5分)+初期取得(3分×4回)+保存が収まる長さ (締切の合計がtimeoutを超え、保存前に強制終了しうる状態だった)
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
+
+      # 直前に走った別ジョブ(月次ユニバース更新⇔週次話題枠)のpushを取り込んでから計算する。
+      # checkoutはトリガー時点のコミットなので、待機中に他ジョブが更新したuniverse.csvを
+      # 古いまま上書きしないよう最新へ揃える (同じconcurrency groupで直列化済み)。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
 
       # 依存なし (標準ライブラリのみ)
       - name: Refresh hot bucket from trending rankings
@@ -45,6 +59,7 @@ jobs:
           ABSENT_WEEKS: '4'
           KEEP_SURGE: '1.3'
           FETCH_DEADLINE_MIN: '5'
+          HOT_ADDED_OUT: ${{ runner.temp }}/hot_added.txt
         run: python hot_refresh.py
 
       # 新規追加した話題株の履歴(日足2y/週足5y/月足max/1分足5d)を即取得する。
@@ -53,9 +68,10 @@ jobs:
       - name: Fetch initial history for newly added stocks
         env:
           SLEEP_SEC: '0.4'
-          FETCH_DEADLINE_MIN: '8'
+          FETCH_DEADLINE_MIN: '3'   # 新規は数十銘柄で通常は数秒。4回分の締切がjobのtimeoutに収まる値
         run: |
-          NEW=$(python3 -c "import json;print(','.join(a['code'] for a in json.load(open('data/jp_stocks/hot_changes_latest.json')).get('added',[])))" 2>/dev/null || true)
+          # 今回の実行で追加した銘柄だけ (同じ週の再実行で取り直さない)
+          NEW=$(cat "$RUNNER_TEMP/hot_added.txt" 2>/dev/null || true)
           if [ -z "$NEW" ]; then echo "新規追加なし・初期取得スキップ"; exit 0; fi
           echo "新規話題株の初期履歴を取得: $NEW"
           JP_TICKERS="$NEW" INTERVAL=1d  RANGE=2y  python jp_stock_fetch.py || true
@@ -63,24 +79,24 @@ jobs:
           JP_TICKERS="$NEW" INTERVAL=1mo RANGE=max python jp_stock_fetch.py || true
           JP_TICKERS="$NEW" INTERVAL=1m  RANGE=5d  python jp_stock_fetch.py || true
 
-      # 新規銘柄込みで資金集中スクリーナーを再計算 (ダッシュボードに即反映させる)
-      - name: Screen money flow (include new stocks)
-        env:
-          WINDOW_MIN: '30'
-        run: python jp_money_flow.py
+      # (旧 "Screen money flow" ステップは削除: money_flow は5分ごとの収集ジョブが更新し、
+      #  Pages公開時にも pages.yml が再計算するため、ここでコミットする必要が無い。
+      #  ここでコミットすると収集ジョブと衝突して入れ替え結果ごと消える原因になっていた)
 
-      # universe.csv・状態/ログ・新規銘柄の履歴CSV・money_flow をまとめてコミットバック
-      # (data/jp_stocks ディレクトリ指定は未存在でもabortしない)
+      # 本ジョブの持ち物だけを1ファイルずつコミットバック:
+      # universe.csv・状態/ログ/最新サマリー・新規銘柄の履歴CSV
       - name: Persist hot bucket changes
         run: |
-          git config user.name "jp-stock-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- data/jp_stocks 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: 話題枠 週次入れ替え+新規銘柄の初期履歴 $(date -u +'%Y-%m-%d')"
-          # rebase競合時はabortして push failed を正しく踏ませる (データ喪失をsuccessに見せない)
-            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
-            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
-          else
-            echo "話題枠に変更なし"
-          fi
+          FILES="data/jp_stocks/universe.csv data/jp_stocks/hot_state.json data/jp_stocks/hot_changes_log.csv data/jp_stocks/hot_changes_latest.json"
+          NEW=$( [ -f "$RUNNER_TEMP/hot_added.txt" ] && tr ',' ' ' < "$RUNNER_TEMP/hot_added.txt" || true)
+          for c in $NEW; do
+            for iv in 1d 1wk 1mo 1m; do FILES="$FILES data/jp_stocks/${c}_T_${iv}.csv"; done
+          done
+          bash .github/scripts/commit_back.sh "chore: 話題枠 週次入れ替え+新規銘柄の初期履歴 $(date -u +'%Y-%m-%d')" $FILES
+
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 日本株の話題枠の週次入れ替え (前週の話題枠のまま)
+        run: python .github/scripts/notify_failure.py

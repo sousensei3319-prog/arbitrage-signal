@@ -10,6 +10,9 @@ name: US Universe Refresh (S&P500+Nasdaq-100+話題枠)
 #   - フィーチャーブランチでの検証は push トリガーで代用
 #   - このサンドボックス(Claude Code)からはWikipediaにproxy403で到達不可のため、
 #     実データ疎通の検証はこのランナー上の実行が初 (JP版と同じ制約)
+#   - 【安全装置】ソース件数の不足・大量除外を検知したら universe.csv/custom_groups.csv を
+#     書き換えず exit 2 (赤) で止まる。本当に大量入替の月は workflow_dispatch の max_drop で再実行
+#   - us-hot-refresh.yml と同じ concurrency group で直列化 (どちらも universe.csv を書くため)
 
 on:
   schedule:
@@ -17,6 +20,11 @@ on:
     # :00/:15/:30 はGitHub負荷ピークでドロップされやすいため :41 にオフセット。
     - cron: '41 20 4 * *'
   workflow_dispatch:
+    inputs:
+      max_drop:
+        description: '既存leader/coreから一度に外してよい最大件数 (空=既定100。大量入替の月だけ引き上げる)'
+        required: false
+        default: ''
   # フィーチャーブランチ上での動作検証用 (本体/workflow変更時に1回走る)
   push:
     paths:
@@ -26,9 +34,9 @@ on:
 permissions:
   contents: write
 
-# 同時実行するとCSVコミットバックが競合するため直列化
+# universe.csv を書く月次更新(本workflow)と週次話題枠(us-hot-refresh.yml)を同じgroupで直列化
 concurrency:
-  group: us-universe-refresh-${{ github.ref }}
+  group: us-universe-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -42,39 +50,35 @@ jobs:
         with:
           python-version: '3.12'
 
+      # 直前に走った別ジョブ(米国 月次ユニバース更新⇔週次話題枠)のpushを取り込んでから計算する。
+      # checkoutはトリガー時点のコミットなので、待機中に他ジョブが更新したuniverse.csvを
+      # 古いまま上書きしないよう最新へ揃える (同じconcurrency groupで直列化済み)。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
+
       # 依存なし (標準ライブラリのみ、html.parserでWikipediaテーブルを解析) — pip installは不要
       - name: Refresh universe (S&P500 + Nasdaq-100 + hot)
         env:
           FETCH_DEADLINE_MIN: '5'
+          MAX_DROP: ${{ inputs.max_drop }}
         run: python us_universe_refresh.py
 
-      # 再構築したCSV(universe.csv + custom_groups.csv)をコミットバック
-      # (GH Actionsはステートレスなので永続化が必要。1ファイルずつadd)
-      - name: Persist universe.csv
+      # 再構築したCSV(universe.csv + custom_groups.csv + index_members.csv)をコミットバック
+      # (1ファイルずつadd・push競合は再試行・失敗は赤で通知)
+      - name: Persist universe.csv / custom_groups.csv / index_members.csv
+        env:
+          COMMIT_BOT_NAME: us-stock-bot
         run: |
-          git config user.name "us-stock-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- data/us_stocks/universe.csv 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: 米国株 監視ユニバース再構築 (S&P500+Nasdaq-100+話題枠) $(date -u +'%Y-%m-%d %H:%M')"
-          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
-            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
-            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
-          else
-            echo "変更なし (universe.csvは構成銘柄に変化なし)"
-          fi
+          bash .github/scripts/commit_back.sh \
+            "chore: 米国株 監視ユニバース再構築 (S&P500+Nasdaq-100+話題枠) $(date -u +'%Y-%m-%d %H:%M')" \
+            data/us_stocks/universe.csv data/us_stocks/custom_groups.csv data/us_stocks/index_members.csv
 
-      # custom_groups.csv(半導体、機械生成)は別ファイルとして1ファイルずつadd
-      # (CLAUDE.md規約: git addは1ファイルずつ、複数まとめると未存在ファイルで全体abort実績あり)
-      - name: Persist custom_groups.csv
-        run: |
-          git config user.name "us-stock-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -- data/us_stocks/custom_groups.csv 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: 米国株 custom_groups.csv(半導体)再生成 $(date -u +'%Y-%m-%d %H:%M')"
-            git pull --rebase origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
-            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
-          else
-            echo "変更なし (custom_groups.csvに変化なし)"
-          fi
+      - name: Notify failure (Discord)
+        if: failure() && github.ref == 'refs/heads/main'
+        env:
+          WEBHOOK_URL: ${{ secrets.SMART_MONEY_WEBHOOK_URL || secrets.DISCORD_WEBHOOK_URL }}
+          NOTIFY_WHAT: 米国株の監視銘柄リストの月次更新 (前月のリストのまま)
+        run: python .github/scripts/notify_failure.py

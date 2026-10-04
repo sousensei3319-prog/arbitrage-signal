@@ -32,8 +32,12 @@ custom_groups.csv (data/us_stocks/custom_groups.csv, code/custom_group/basis) �
 機械管理 — 実行のたびに最新のSub-Industryから全件作り直す (手で追記しても次回実行で
 上書きされる)。
 
-全候補ソースが機械取得不可な場合は、取得できた範囲で構築し不足分をログに正直に出す
-(例: S&P500取得失敗→leader+hotのみで構築を続行し、その旨を明示)。
+【安全装置 (2026-10-03 追加・fail-closed)】JP版 universe_refresh.py で、ソース取得/形式変更の
+失敗時に「取得できた範囲で構築」して既存core 271銘柄を落とした実害 (2026-09-03) が出たため、
+米国版も同じ安全装置を入れる: S&P500 < MIN_SP500 / Nasdaq-100 < MIN_NASDAQ100 / 既存leader・core
+からの除外 > MAX_DROP のいずれかなら universe.csv・custom_groups.csv を一切書き換えず exit 2
+(runが赤くなり通知が届く)。併せて指数構成銘柄一覧 index_members.csv (code,index_bucket) を
+書き出す (us_hot_refresh.py が話題枠から外す指数銘柄を leader/core に戻すために使う)。
 
 このサンドボックス(Claude Code)からはWikipediaへproxy403で到達不可なため、
 実URL・実テーブル構造の検証はGitHub Actionsランナー上でのみ可能 (JP版と同じ制約)。
@@ -41,6 +45,9 @@ custom_groups.csv (data/us_stocks/custom_groups.csv, code/custom_group/basis) �
 設定 (環境変数、pushイベントでinputsが空文字になるケースに備えて `or` で既定値):
   UNIVERSE_FILE        既存/出力先ユニバースCSV (既定 data/us_stocks/universe.csv)
   FETCH_DEADLINE_MIN   全体デッドライン分・ハング防止 (既定 5)
+  MIN_SP500            S&P500ソースの最低件数 (既定 450)
+  MIN_NASDAQ100        Nasdaq-100ソースの最低件数 (既定 90)
+  MAX_DROP             既存leader/coreから一度に外してよい最大件数 (既定 100)
 
 実行: python us_universe_refresh.py
 """
@@ -66,6 +73,10 @@ socket.setdefaulttimeout(35)
 UNIVERSE_FILE = os.environ.get("UNIVERSE_FILE") or "data/us_stocks/universe.csv"
 DEADLINE_MIN = float(os.environ.get("FETCH_DEADLINE_MIN") or "5")
 CUSTOM_GROUPS_CSV = os.path.join(os.path.dirname(UNIVERSE_FILE) or ".", "custom_groups.csv")
+INDEX_MEMBERS_FILE = os.path.join(os.path.dirname(UNIVERSE_FILE) or ".", "index_members.csv")
+MIN_SP500 = int(os.environ.get("MIN_SP500") or "450")
+MIN_NASDAQ100 = int(os.environ.get("MIN_NASDAQ100") or "90")
+MAX_DROP = int(os.environ.get("MAX_DROP") or "100")
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
@@ -218,9 +229,9 @@ def fetch_sp500():
                 group_map[code] = SECTOR_JA.get(sector, sector)
             if i_name is not None and i_name < len(row) and row[i_name].strip():
                 name_map[code] = row[i_name].strip()
-        if len(codes) < 400:
+        if len(codes) < MIN_SP500:
             print(f"⚠️ S&P500一覧の解析結果が{len(codes)}銘柄と少なすぎる"
-                  "(テーブル構造が変わった可能性)。念のためこのまま使用するが要確認。")
+                  "(テーブル構造が変わった可能性)。main()の件数ガードで書き込みを中止する。")
         return codes, sub_map, group_map, name_map
     except Exception as e:
         print(f"S&P500一覧の解析失敗: {type(e).__name__}: {e}。coreソースをスキップ。")
@@ -266,9 +277,9 @@ def fetch_nasdaq100():
             codes.add(code)
             if i_name is not None and i_name < len(row) and row[i_name].strip():
                 name_map[code] = row[i_name].strip()
-        if len(codes) < 80:
+        if len(codes) < MIN_NASDAQ100:
             print(f"⚠️ Nasdaq-100一覧の解析結果が{len(codes)}銘柄と少なすぎる"
-                  "(テーブル構造が変わった可能性)。念のためこのまま使用するが要確認。")
+                  "(テーブル構造が変わった可能性)。main()の件数ガードで書き込みを中止する。")
         return codes, {}, {}, name_map
     except Exception as e:
         print(f"Nasdaq-100一覧の解析失敗: {type(e).__name__}: {e}。leaderソースをスキップ。")
@@ -307,9 +318,9 @@ def build_universe(deadline):
         nq_codes, nq_sub, nq_group, nq_name = fetch_nasdaq100()
 
     if not sp500_codes:
-        print("⚠️ S&P500ソースが空 (取得/解析失敗)。core層はhot/leaderのみになる — PM判断が必要。")
+        print("⚠️ S&P500ソースが空 (取得/解析失敗)。")
     if not nq_codes:
-        print("⚠️ Nasdaq-100ソースが空 (取得/解析失敗)。leader層は既存hotのみになる — PM判断が必要。")
+        print("⚠️ Nasdaq-100ソースが空 (取得/解析失敗)。")
 
     leader_codes = nq_codes
     all_codes = hot_codes | leader_codes | sp500_codes
@@ -348,6 +359,9 @@ def build_universe(deadline):
     return rows, sub_map, {
         "sp500_n": len(sp500_codes), "leader_n": len(leader_codes), "hot_n": len(hot_codes),
         "dropped_n": len(dropped),
+        # 指数構成銘柄 → 本来のbucket (us_hot_refresh.py が話題枠から外す時の戻り先)
+        "index_members": {c: ("leader" if c in leader_codes else "core")
+                          for c in (leader_codes | sp500_codes)},
     }
 
 
@@ -374,12 +388,32 @@ def write_custom_groups(rows, sub_map):
     return len(entries)
 
 
+def guard_problems(stats):
+    """書き込みを中止すべき異常のリスト (空なら正常)。fail-closed の判定本体。"""
+    problems = []
+    if stats["sp500_n"] < MIN_SP500:
+        problems.append(f"S&P500ソースが{stats['sp500_n']}銘柄 (下限{MIN_SP500}未満 — 取得/形式変更の失敗)")
+    if stats["leader_n"] < MIN_NASDAQ100:
+        problems.append(f"Nasdaq-100ソースが{stats['leader_n']}銘柄 (下限{MIN_NASDAQ100}未満 — 取得/形式変更の失敗)")
+    if stats["dropped_n"] > MAX_DROP:
+        problems.append(f"既存leader/coreから{stats['dropped_n']}銘柄を一度に除外しようとした "
+                        f"(上限{MAX_DROP}超 — 本当に大量入替なら max_drop を引き上げて再実行)")
+    return problems
+
+
 def main():
     deadline = time.time() + DEADLINE_MIN * 60
     rows, sub_map, stats = build_universe(deadline)
     if not rows:
         print("ユニバースが空になったため書き込みを中止する (既存ファイルを保持)。")
         sys.exit(1)
+    problems = guard_problems(stats)
+    if problems:
+        print("❌ 安全装置: 以下の異常のため universe.csv / custom_groups.csv を書き換えずに終了する"
+              " (前回の正常な内容を保持):")
+        for p in problems:
+            print(f"   - {p}")
+        sys.exit(2)
 
     os.makedirs(os.path.dirname(UNIVERSE_FILE) or ".", exist_ok=True)
     with open(UNIVERSE_FILE, "w", newline="", encoding="utf-8") as f:
@@ -388,6 +422,11 @@ def main():
         w.writerows(rows)
 
     n_custom = write_custom_groups(rows, sub_map)
+    with open(INDEX_MEMBERS_FILE, "w", newline="", encoding="utf-8") as f:
+        w = csv.writer(f)
+        w.writerow(["code", "index_bucket"])
+        for code, b in sorted(stats["index_members"].items()):
+            w.writerow([code, b])
 
     bucket_n = {}
     for r in rows:

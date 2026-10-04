@@ -58,6 +58,27 @@ JSON_OUT      = os.environ.get("MONEY_FLOW_JSON") or os.path.join(DATA_DIR, "mon
 
 BUCKET_LABEL = {"leader": "ナスダック100", "core": "S&P500主力", "hot": "話題・噂"}
 
+
+# Yahoo 1分足の「累計出来高入り」異常足の除外 (2026-10-04 追加)。
+# 1分の出来高がその日それまでの累計の0.9倍以上なのに値動きがほぼ0 (0.5%未満) の足は、
+# 実在しない出来高 (その日の累計が1本に入った値) と判断して集計から除く。根拠 (保存済みの実データ):
+#   - 2026-07〜09 に日本株で2,062件・米国株で1,767件 (それぞれ85%・95%が8月)。複数銘柄で同じ時刻に起き (日本株の47%が±1分以内に5銘柄以上)、
+#     起きた日は1分足の合計が公式の日出来高を超える (77%の日。普段は3%) = 二重計上
+#   - この足1本で直近30分の集中度が中央値1.0倍→8.2倍に跳ね、85%が2倍超の偽の点灯になっていた
+# 寄り直後 (累計が小さい)・後場寄り/引けの板寄せ (本物の大きな約定) は判定しない。
+# 米国では1本の巨大な約定 (ブロック取引) も同じ形になるため、下の「複数銘柄で同時」の条件を
+# 満たした足だけを除く。チャート用の生データは消さない。
+VOLUME_GLITCH_RATIO = float(os.environ.get("VOLUME_GLITCH_RATIO") or "0.9")
+VOLUME_GLITCH_MAX_MOVE = 0.005
+VOLUME_GLITCH_MIN_BARS = 20   # その日それまでに出来高のある足が20本以上ある時だけ判定 (薄商い銘柄の通常の約定を誤って除かない)
+# 米国だけの条件: ±1分以内に VOLUME_GLITCH_MIN_STOCKS 銘柄以上で同時に起きた時だけ除く。
+# 米国のブロック取引は取引所外でも約定が1分足に載る (実データ 2026-09-24〜10-02: 単独の該当足51本は
+# その日の1分足合計が公式の日出来高を超えず (0.56〜0.91) = 本物の大口)。日本はToSTNeT等の立会外が
+# 1分足に載らないため、単独でも「1分にその日の累計」はまず実在しない → jp_money_flow は単独でも除く
+VOLUME_GLITCH_MIN_STOCKS = int(os.environ.get("VOLUME_GLITCH_MIN_STOCKS") or "3")
+GLITCH_FROM_HM, GLITCH_UNTIL_HM = "10:00", "15:50"   # 判定する時間帯 (ET。寄りの板寄せ直後と引けのクロスは対象外)
+GLITCH_SKIP_HM = ()
+
 # 米国には JPX 空売り残高報告に相当する日次の公的個別開示が無い (下記_commentary末尾参照)。
 # SUPPLY_CSVは将来的に何らかの需給データソースが用意された場合の受け皿として関数だけ残す
 # (ファイル不存在なら load_short_positions() は空dictを返し、以下のロジックは素通りする)。
@@ -153,8 +174,60 @@ def load_universe():
     return meta
 
 
-def load_bars(sym):
-    """(epoch, close, volume, turnover) のリストを返す。出来高0のバーは除外。"""
+def glitch_candidates(rows, tz=None, from_hm=None, until_hm=None, skip_hm=None):
+    """(epoch, close, volume, turnover) の昇順リストから「累計出来高入り」の疑いがある足の epoch 集合を返す
+    (jp_money_flow.drop_volume_glitches と同じ1銘柄の規則・時刻はET)。疑い足は累計に入れない。"""
+    tz = tz or ET
+    from_hm, until_hm = from_hm or GLITCH_FROM_HM, until_hm or GLITCH_UNTIL_HM
+    skip_hm = GLITCH_SKIP_HM if skip_hm is None else skip_hm
+    out, day, cum, n, prev_c = set(), None, 0.0, 0, None
+    for row in rows:
+        e, c, v = row[0], row[1], row[2]
+        dt = datetime.fromtimestamp(e, tz)
+        d, hm = dt.strftime("%Y-%m-%d"), dt.strftime("%H:%M")
+        if d != day:
+            day, cum, n, prev_c = d, 0.0, 0, None
+        if (from_hm <= hm < until_hm and hm not in skip_hm and n >= VOLUME_GLITCH_MIN_BARS and prev_c
+                and v >= VOLUME_GLITCH_RATIO * cum and abs(c / prev_c - 1) < VOLUME_GLITCH_MAX_MOVE):
+            out.add(e)
+            prev_c = c
+            continue
+        cum += v
+        n += 1
+        prev_c = c
+    return out
+
+
+def glitch_drop_map(rows_by_sym):
+    """{sym: rows} → {sym: {epoch, ...}}: 疑い足のうち、±1分以内に VOLUME_GLITCH_MIN_STOCKS 銘柄以上で
+    同時に起きたものだけ (= Yahoo側の一斉異常。単独の大口約定は残す)。"""
+    cands = {s: glitch_candidates(r) for s, r in rows_by_sym.items()}
+    by_min = {}
+    for s, eps in cands.items():
+        for e in eps:
+            by_min.setdefault(e // 60, set()).add(s)
+    out = {}
+    for s, eps in cands.items():
+        hit = {e for e in eps
+               if len(set().union(*(by_min.get(e // 60 + k, set()) for k in (-1, 0, 1)))) >= VOLUME_GLITCH_MIN_STOCKS}
+        if hit:
+            out[s] = hit
+    return out
+
+
+def apply_glitch_drop(rows_by_sym, stats=None):
+    """{sym: rows} から glitch_drop_map の足を除いた {sym: rows} を返す (除外本数は stats["dropped"])。"""
+    drop = glitch_drop_map(rows_by_sym)
+    if stats is not None:
+        stats["dropped"] = stats.get("dropped", 0) + sum(len(v) for v in drop.values())
+    return {s: ([r for r in rows if r[0] not in drop[s]] if s in drop else rows) for s, rows in rows_by_sym.items()}
+
+
+_GLITCH_DROP = None   # analyze() が全銘柄で確定した除外足 {sym: {epoch}} (load_bars が共通で使う)
+
+
+def _raw_bars(sym):
+    """(epoch, close, volume, turnover) のリスト (出来高0は除外・異常足の除外前)。"""
     path = os.path.join(DATA_DIR, f"{sym.replace('.', '_')}_{INTERVAL}.csv")
     if not os.path.exists(path):
         return []
@@ -171,6 +244,19 @@ def load_bars(sym):
             rows.append((int(r["epoch"]), c, v, c * v))
     rows.sort(key=lambda x: x[0])
     return rows
+
+
+def load_bars(sym, stats=None):
+    """(epoch, close, volume, turnover) のリストを返す。出来高0のバーと、複数銘柄で同時に起きた
+    「累計出来高入り」異常足は除外。除外足は analyze() が全銘柄を見て確定した _GLITCH_DROP を使う
+    (未確定なら除外しない = 単独呼び出しでは生データのまま)。"""
+    rows = _raw_bars(sym)
+    if INTERVAL != "1m" or not _GLITCH_DROP or sym not in _GLITCH_DROP:
+        return rows
+    drop = _GLITCH_DROP[sym]
+    if stats is not None:
+        stats["dropped"] = stats.get("dropped", 0) + len(drop)
+    return [r for r in rows if r[0] not in drop]
 
 
 def window_blocks(rows, win_sec):
@@ -224,8 +310,12 @@ def analyze():
     win_sec = WINDOW_MIN * 60
     recs = []
     latest_ts = 0
+    glitch = {}
+    global _GLITCH_DROP
+    if INTERVAL == "1m":
+        _GLITCH_DROP = glitch_drop_map({sym: _raw_bars(sym) for sym in meta})
     for sym, (name, bucket, sector, group) in meta.items():
-        rows = load_bars(sym)
+        rows = load_bars(sym, stats=glitch)
         if len(rows) < 5:
             continue
         latest_ts = max(latest_ts, rows[-1][0])
@@ -300,6 +390,8 @@ def analyze():
     commentary = _commentary(recs_by_surge, buckets, latest_ts, groups)
     _dump_json(recs_by_surge, buckets, latest_ts, commentary, groups)
     _print_report(recs_by_surge, buckets, latest_ts)
+    if glitch.get("dropped"):
+        print(f"(「累計出来高入り」の異常な1分足 {glitch['dropped']}本を集計から除外)")
     print("\n--- 自動分析コメント ---")
     for line in commentary:
         print("  " + line)

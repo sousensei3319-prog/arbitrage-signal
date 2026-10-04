@@ -1,0 +1,47 @@
+name: Strategy C Check (戦略Cの答え合わせ・手動)
+
+# RULES.md 戦略C (FGI≤30で分割買い・FGI≥70で段階利確) と「恐怖で倍額」積立を、固定積立と
+# 公開データだけで比べる検証 (strategy_c_check.py)。発注しない・APIキー不要。
+# 比較方法と合否の基準はスクリプト冒頭に「結果を見る前に」固定してある。
+# 注意:
+#   - 定期実行はしない (手動 workflow_dispatch のみ。結果は data/strategy_c/result.json)
+#   - フィーチャーブランチ検証は push トリガーで代用 (本体/workflow変更時に1回走る)
+#   - サンドボックス(Claude Code)からは alternative.me / OKX / Coinbase に到達不可のため、
+#     実データでの実行はこのランナー上のみ。Bybit(403)/Binance(451)はActionsから使えないので不使用
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'strategy_c_check.py'
+      - '.github/workflows/strategy-c-check.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: strategy-c-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # 依存なし (標準ライブラリのみ)
+      - name: Run strategy C check (FGI + BTC/ETH daily)
+        env:
+          FETCH_DEADLINE_MIN: '8'
+        run: python strategy_c_check.py
+
+      # 結果と検証に使った生データを1ファイルずつコミット (push競合は再試行・失敗は赤)
+      - name: Persist results
+        run: |
+          bash .github/scripts/commit_back.sh "chore: 戦略Cの答え合わせ結果 $(date -u +'%Y-%m-%d %H:%M')" \
+            data/strategy_c/result.json data/strategy_c/fgi.csv \
+            data/strategy_c/btc_usd.csv data/strategy_c/eth_usd.csv
