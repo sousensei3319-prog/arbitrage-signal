@@ -1,0 +1,97 @@
+{
+ "generated_at": "2026-10-04T22:30:31+00:00",
+ "flag_surge": 2.0,
+ "near_surge": 1.5,
+ "prereg": {
+  "registered": "2026-10-04",
+  "primary": "日本・flag=candidate・backfilled=0・分割疑いなし の ex_5 (同日の記録銘柄の中央値との差)。判定日ごとに平均 → 日次系列の平均。標準誤差は Newey-West (ラグ4)",
+  "evaluate_at": "ex_5 が確定した判定日が120日たまった時点で1回だけ",
+  "success": "平均 ≥ +0.5% かつ t ≥ 2.0",
+  "secondary": "hot枠のみ / near / mf_* を使った判定 / ex_1・ex_20 / exb_* / 米国 は探索扱い (結論に使わない)",
+  "no_peeking": "評価日までは有意かどうかで判断しない (件数・欠測の健全性の確認のみ)"
+ },
+ "groups": {
+  "candidate": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  },
+  "near": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  },
+  "other": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  }
+ },
+ "note": "入口=記録時刻より後の最初の寄り。ex=同日の記録銘柄の中央値との差。評価日前の数字は参考 (判断に使わない)",
+ "first_date": "2026-09-29",
+ "last_date": "2026-10-02",
+ "n_days": 4
+}
