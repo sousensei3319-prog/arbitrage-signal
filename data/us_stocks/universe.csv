@@ -49,6 +49,7 @@ INTC,Intel,leader,Semiconductors,情報技術
 INTU,Intuit,leader,Application Software,情報技術
 ISRG,Intuitive Surgical,leader,Health Care Equipment,ヘルスケア
 KDP,Keurig Dr Pepper,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品
+KHC,Kraft Heinz,leader,Packaged Foods & Meats,生活必需品
 KLAC,KLA Corporation,leader,Semiconductor Materials & Equipment,情報技術
 LIN,Linde plc,leader,Industrial Gases,素材
 LITE,Lumentum,leader,Communications Equipment,情報技術
@@ -145,6 +146,7 @@ BEN,Franklin Resources,core,Asset Management & Custody Banks,金融
 BF-B,Brown–Forman,core,Distillers & Vintners,生活必需品
 BG,Bunge Global,core,Agricultural Products & Services,生活必需品
 BIIB,Biogen,core,Biotechnology,ヘルスケア
+BLDR,Builders FirstSource,core,Building Products,資本財
 BLK,BlackRock,core,Asset Management & Custody Banks,金融
 BMY,Bristol Myers Squibb,core,Pharmaceuticals,ヘルスケア
 BNY,BNY Mellon,core,Asset Management & Custody Banks,金融
@@ -301,7 +303,6 @@ IBM,IBM,core,IT Consulting & Other Services,情報技術
 ICE,Intercontinental Exchange,core,Financial Exchanges & Data,金融
 IEX,IDEX Corporation,core,Industrial Machinery & Supplies & Components,資本財
 IFF,International Flavors & Fragrances,core,Specialty Chemicals,素材
-ILMN,"Illumina, Inc.",core,Life Sciences Tools & Services,ヘルスケア
 INCY,Incyte,core,Biotechnology,ヘルスケア
 INVH,Invitation Homes,core,Single-Family Residential REITs,不動産
 IP,International Paper,core,Paper & Plastic Packaging Products & Materials,素材
@@ -320,7 +321,6 @@ JNJ,Johnson & Johnson,core,Pharmaceuticals,ヘルスケア
 JPM,JPMorgan Chase,core,Diversified Banks,金融
 KEY,KeyCorp,core,Regional Banks,金融
 KEYS,Keysight Technologies,core,Electronic Equipment & Instruments,情報技術
-KHC,Kraft Heinz,core,Packaged Foods & Meats,生活必需品
 KIM,Kimco Realty,core,Retail REITs,不動産
 KKR,KKR & Co.,core,Asset Management & Custody Banks,金融
 KMB,Kimberly-Clark,core,Household Products,生活必需品
@@ -448,6 +448,7 @@ SYF,Synchrony Financial,core,Consumer Finance,金融
 SYK,Stryker Corporation,core,Health Care Equipment,ヘルスケア
 SYY,Sysco,core,Food Distributors,生活必需品
 T,AT&T,core,Integrated Telecommunication Services,コミュニケーション・サービス
+TAP,Molson Coors Beverage Company,core,Brewers,生活必需品
 TDG,TransDigm Group,core,Aerospace & Defense,資本財
 TDY,Teledyne Technologies,core,Electronic Equipment & Instruments,情報技術
 TECH,Bio-Techne,core,Life Sciences Tools & Services,ヘルスケア
@@ -466,6 +467,7 @@ TRV,Travelers Companies (The),core,Property & Casualty Insurance,金融
 TSCO,Tractor Supply,core,Other Specialty Retail,一般消費財
 TSN,Tyson Foods,core,Packaged Foods & Meats,生活必需品
 TT,Trane Technologies,core,Building Products,資本財
+TTD,Trade Desk (The),core,Advertising,コミュニケーション・サービス
 TXT,Textron,core,Aerospace & Defense,資本財
 TYL,Tyler Technologies,core,Application Software,情報技術
 UAL,United Airlines Holdings,core,Passenger Airlines,資本財
@@ -512,14 +514,12 @@ YUM,Yum! Brands,core,Restaurants,一般消費財
 ZBH,Zimmer Biomet,core,Health Care Equipment,ヘルスケア
 ZBRA,Zebra Technologies,core,Electronic Equipment & Instruments,情報技術
 ZTS,Zoetis,core,Pharmaceuticals,ヘルスケア
-AADX,"Applied Aerospace & Defense, In",hot,,
 AAL,"American Airlines Group, Inc.",hot,,
 AAOI,"Applied Optoelectronics, Inc.",hot,,
 ABCL,AbCellera Biologics Inc.,hot,,
 ABEV,Ambev S.A.,hot,,
 ABVX,Abivax SA,hot,,
 ACHR,Archer Aviation Inc.,hot,,
-ACLS,"Axcelis Technologies, Inc.",hot,,
 ACMR,"ACM Research, Inc.",hot,,
 ADMA,ADMA Biologics Inc,hot,,
 ADPT,Adaptive Biotechnologies Corpor,hot,,
@@ -529,7 +529,6 @@ AGCO,AGCO Corporation,hot,,
 AGL,"agilon health, inc.",hot,,
 AGM,Federal Agricultural Mortgage C,hot,,
 AGNC,AGNC Investment Corp.,hot,,
-ALGM,"Allegro MicroSystems, Inc.",hot,,
 ALM,Almonty Industries Inc.,hot,,
 ALVO,Alvotech,hot,,
 AMC,"AMC Entertainment Holdings, Inc",hot,,
@@ -549,8 +548,7 @@ AXGN,"AxoGen, Inc.",hot,,
 AXTI,AXT Inc,hot,,
 BB,BlackBerry Limited,hot,,
 BBAR,Banco BBVA Argentina S.A.,hot,,
-BBD,Banco Bradesco Sa,hot,,
-BE,Bloom Energy Corporation,hot,,資本財
+BE,Bloom Energy Corporation,hot,,
 BETA,"Beta Technologies, Inc.",hot,,
 BFLY,"Butterfly Network, Inc.",hot,,
 BGC,"BGC Group, Inc.",hot,,
@@ -572,7 +570,6 @@ BWIN,"The Baldwin Insurance Group, In",hot,,
 BZ,KANZHUN LIMITED - American Depo,hot,,
 CAAP,Corporacion America Airports SA,hot,,
 CAI,"Caris Life Sciences, Inc.",hot,,
-CAMT,Camtek Ltd.,hot,,
 CAR,"Avis Budget Group, Inc.",hot,,
 CBRS,Cerebras Systems Inc.,hot,,
 CDE,"Coeur Mining, Inc.",hot,,
@@ -616,7 +613,6 @@ FLR,Fluor Corporation,hot,,
 FLY,Firefly Aerospace Inc.,hot,,
 FLYW,Flywire Corporation - Voting,hot,,
 FORM,"FormFactor, Inc.",hot,,
-FPS,"Forgent Power Solutions, Inc.",hot,,
 FRVO,Fervo Energy Company,hot,,
 FSLY,"Fastly, Inc.",hot,,
 FTAI,FTAI Aviation Ltd.,hot,,
@@ -626,7 +622,6 @@ GGAL,Grupo Financiero Galicia S.A.,hot,,
 GIL,"Gildan Activewear, Inc.",hot,,
 GLUE,"Monte Rosa Therapeutics, Inc.",hot,,
 GME,GameStop Corporation,hot,,
-GPGI,"GPGI, Inc.",hot,,
 GPI,"Group 1 Automotive, Inc.",hot,,
 GRAB,Grab Holdings Limited,hot,,
 GRAL,"GRAIL, Inc.",hot,,
@@ -640,12 +635,10 @@ HLN,Haleon plc,hot,,
 HTFL,"Heartflow, Inc.",hot,,
 HUBS,"HubSpot, Inc.",hot,,
 IAG,Iamgold Corporation,hot,,
-IBRX,"ImmunityBio, Inc.",hot,,
 ICHR,Ichor Holdings,hot,,
 IDYA,"IDEAYA Biosciences, Inc.",hot,,
 IMOS,ChipMOS TECHNOLOGIES INC.,hot,,
 INFQ,"Infleqtion, Inc.",hot,,
-INIO,INNIO N.V.,hot,,
 IONQ,"IonQ, Inc.",hot,,
 IONS,"Ionis Pharmaceuticals, Inc.",hot,,
 IOT,Samsara Inc.,hot,,
@@ -680,7 +673,6 @@ MMYT,MakeMyTrip Limited,hot,,
 MNDY,monday.com Ltd.,hot,,
 MNSO,MINISO Group Holding Limited,hot,,
 MP,MP Materials Corp.,hot,,
-MTRN,Materion Corporation,hot,,
 MXL,"MaxLinear, Inc",hot,,
 NAMS,NewAmsterdam Pharma Company N.V,hot,,
 NEOG,Neogen Corporation,hot,,
@@ -705,7 +697,7 @@ OPEN,Opendoor Technologies Inc,hot,,
 ORKA,"Oruka Therapeutics, Inc.",hot,,
 OSCR,"Oscar Health, Inc.",hot,,
 OUST,"Ouster, Inc.",hot,,
-P,"Everpure, Inc.",hot,,情報技術
+P,"Everpure, Inc.",hot,,
 PARR,"Par Pacific Holdings, Inc. Comm",hot,,
 PATH,"UiPath, Inc.",hot,,
 PBLS,"Parabilis Medicines, Inc.",hot,,
@@ -714,7 +706,6 @@ PENG,"Penguin Solutions, Inc.",hot,,
 PL,Planet Labs PBC,hot,,
 PLBL,Polibeli Group Ltd,hot,,
 PLUG,"Plug Power, Inc.",hot,,
-PPC,Pilgrim's Pride Corporation,hot,,
 PS,Pershing Square Inc.,hot,,
 PSN,Parsons Corporation,hot,,
 PTCT,"PTC Therapeutics, Inc.",hot,,
@@ -735,20 +726,17 @@ RGTI,"Rigetti Computing, Inc.",hot,,
 RH,RH,hot,,
 RHI,Robert Half Inc.,hot,,
 RIG,Transocean Ltd (Switzerland),hot,,
-RIVN,"Rivian Automotive, Inc.",hot,,
 RKT,"Rocket Companies, Inc.",hot,,
 RMBS,"Rambus, Inc.",hot,,
 RNG,"Ringcentral, Inc.",hot,,
 ROAD,"Construction Partners, Inc.",hot,,
 RUM,RUM Group Inc.,hot,,
-RXO,"RXO, Inc.",hot,,
 S,"SentinelOne, Inc.",hot,,
 SAH,"Sonic Automotive, Inc.",hot,,
 SAIC,Science Applications Internatio,hot,,
 SAIL,"SailPoint, Inc.",hot,,
 SAP,SAP  SE,hot,,
 SCCO,Southern Copper Corporation,hot,,
-SEDG,"SolarEdge Technologies, Inc.",hot,,
 SIMO,Silicon Motion Technology Corpo,hot,,
 SITM,SiTime Corporation,hot,,
 SKHY,SK hynix Inc. - American Depos,hot,,
@@ -764,9 +752,7 @@ SPCX,Space Exploration Technologies,hot,,
 STDN,"Standard Nuclear, Inc.",hot,,
 STEP,StepStone Group Inc.,hot,,
 STLA,Stellantis N.V.,hot,,
-STM,STMicroelectronics N.V.,hot,,
 SUPN,"Supernus Pharmaceuticals, Inc.",hot,,
-SYNA,Synaptics Incorporated,hot,,
 SYRE,"Spyre Therapeutics, Inc.",hot,,
 TALO,"Talos Energy, Inc.",hot,,
 TARS,"Tarsus Pharmaceuticals, Inc.",hot,,
@@ -774,7 +760,6 @@ TEAM,Atlassian Corporation,hot,,
 TEM,"Tempus AI, Inc.",hot,,
 TENB,"Tenable Holdings, Inc.",hot,,
 TFX,Teleflex Incorporated,hot,,
-TGB,Trekor Metals Limited,hot,,
 TIC,"TIC Solutions, Inc.",hot,,
 TMHC,Taylor Morrison Home Corporatio,hot,,
 TRVI,"Trevi Therapeutics, Inc.",hot,,
@@ -788,8 +773,6 @@ UEC,Uranium Energy Corp.,hot,,
 USAR,"USA Rare Earth, Inc.",hot,,
 UUUU,Energy Fuels Inc,hot,,
 VAC,Marriott Vacations Worldwide Co,hot,,
-VALE,VALE S.A.,hot,,
-VECO,Veeco Instruments Inc.,hot,,
 VERA,"Vera Therapeutics, Inc.",hot,,
 VERX,"Vertex, Inc.",hot,,
 VG,"Venture Global, Inc.",hot,,
@@ -797,7 +780,6 @@ VIRT,"Virtu Financial, Inc.",hot,,
 VNET,"VNET Group, Inc.",hot,,
 VOD,Vodafone Group Plc,hot,,
 VOYG,"Voyager Technologies, Inc.",hot,,
-VSH,"Vishay Intertechnology, Inc.",hot,,
 VSXY,Victorias Secret & Co.,hot,,
 W,Wayfair Inc.,hot,,
 WAY,Waystar Holding Corp.,hot,,
@@ -809,6 +791,7 @@ WRBY,Warby Parker Inc.,hot,,
 WU,Western Union Company (The),hot,,
 WULF,TeraWulf Inc.,hot,,
 XE,"X-Energy, Inc.",hot,,
+XNDU,Xanadu Quantum Technologies Lim,hot,,
 XP,XP Inc.,hot,,
 XXI,"Twenty One Capital, Inc.",hot,,
 YMM,Full Truck Alliance Co. Ltd.,hot,,
