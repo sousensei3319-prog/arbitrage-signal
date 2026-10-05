@@ -43,6 +43,12 @@ GICSセクターを機械付与する。
   - 圏外週カウントは同じ週に何度実行しても1回だけ数える (counted_week)。
   - 指数構成銘柄(index_members.csv)は話題枠から外しても leader/core 層へ戻すだけで、
     ユニバースからは消さない。同週再実行でも「今週の入れ替え」欄を空で上書きしない。
+
+2026-10-05 追加 (GitHub の予定実行を「予備」にする。JP版と同じ):
+  - SKIP_IF_DONE_THIS_WEEK=1 の時、今週 (ET) の入れ替えが済んでいれば何もせず終了する。workflow は
+    GitHub の予定実行 (schedule) と main への push の時だけ 1 を渡す。予定実行は数時間遅れて
+    場中に動くことがあり、場中のランキングで当日の値上がり株まで追加してしまうため。
+    決まった時刻の起動 (cron-job.org → workflow_dispatch) と手動実行は今まで通り毎回動く。
 """
 import csv
 import json
@@ -74,6 +80,8 @@ RANK_TOP = int(os.environ.get("RANK_TOP") or "30")        # 各ランキング�
 ABSENT_WEEKS = int(os.environ.get("ABSENT_WEEKS") or "4")  # 連続圏外で除外する週数
 KEEP_SURGE = float(os.environ.get("KEEP_SURGE") or "1.3")  # これ以上の集中度なら残す
 FETCH_DEADLINE_MIN = float(os.environ.get("FETCH_DEADLINE_MIN") or "5")
+# 1 の時、今週の入れ替えが済んでいれば何もしない (予定実行・main への push を予備にする)
+SKIP_IF_DONE_THIS_WEEK = (os.environ.get("SKIP_IF_DONE_THIS_WEEK") or "") == "1"
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/125.0 Safari/537.36")
@@ -198,6 +206,15 @@ def main():
     t0 = datetime.now(timezone.utc)
     socket.setdefaulttimeout(35)
     week, today = _now_week()
+    if SKIP_IF_DONE_THIS_WEEK:
+        try:
+            done = json.load(open(HOT_LATEST, encoding="utf-8"))
+        except (OSError, ValueError):
+            done = {}
+        if done.get("week") == week:
+            print(f"今週 ({week}) の入れ替えは {done.get('date')} に実行済み。予備の自動実行のため何もしない"
+                  " (手動・cron-job.org からの起動は毎回動く)")
+            return
 
     # 1) ランキング取得 (取れたものだけ使う。全滅ならhot枠を維持して終了)
     trending = {}  # code -> {"name","sources":[...]}
