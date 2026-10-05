@@ -162,6 +162,14 @@ workflow_dispatch API を直接叩いて場中30分ごとの実行を保証す�
   対処: ユーザーがPATを再発行し cron-job.org のジョブ設定を更新する
 - **PATをリポジトリにコミットするのは厳禁**(public repoのため。Discord Webhookと
   同じ扱い — secret scanningの対象になる前に絶対に入れない)
+- **同じPATを使う cron-job.org のジョブ (2026-10-05〜 5本)**: 日本株1分足収集 (jp-stock.yml・5分ごと) /
+  日本株 話題枠 (hot-refresh.yml・月曜07:11 JST) / 米国株 話題枠 (us-hot-refresh.yml・月曜20:11 JST) /
+  日本株 銘柄リスト (universe-refresh.yml・毎月4日06:41 JST) / 米国株 銘柄リスト (us-universe-refresh.yml・
+  毎月5日05:41 JST)。本文はすべて `{"ref":"main"}` 固定 (古いブランチを指定させない)。PATを再発行したら
+  **5本すべてのヘッダーを貼り替えて試験実行し 204 を確認**する (1本でも忘れると 401 で黙って止まり、
+  話題枠は遅れて動く予定実行に戻る)。PATの権限は「Only select repositories: arbitrage-signal」+
+  「Actions: Read and write」(+自動で付く Metadata: Read-only) だけ。漏れた疑いがあれば先に Revoke し、
+  Actions で無効化された workflow や予定外の時刻の起動が無いか確認する
 - GitHub側の schedule トリガーは**保険として残置**。外部cronと二重発火しても
   concurrency直列化 + 同じ足のupsert(上書き)で無害(データは重複しない)
 - 実測 (2026-10-03): jp-stock.yml の workflow_dispatch は**5分ごと・24時間・土日も**届いている
@@ -396,11 +404,12 @@ workflowのenvのみで調整する(コード変更不要)。
     衝突 → 「push failed (race) - next run」で結果が捨てられる (2026-10-05 に1回おきに発生・緑のまま)。
     データは次の run が当日分を取り直すので消えないが、更新間隔が倍 (約12分) になる。銘柄数を増やす時や
     起動間隔を縮める時は、Actions の run 一覧で「所要時間 < 起動間隔」か、コミット間隔が倍になっていないかを見る
-21. **週次の話題枠入れ替えは決まった時刻に起動し、GitHub の予定実行は予備** (2026-10-05〜): 予定実行は
-    数時間遅れることがあり (2026-10-05 は月曜 09:51 JST)、場中のランキングで当日の値上がり株まで追加していた。
-    hot-refresh.yml / us-hot-refresh.yml は schedule と main への push の時だけ SKIP_IF_DONE_THIS_WEEK=1 を渡し、
-    今週の入れ替えが済んでいれば何もしない。cron-job.org からの workflow_dispatch と手動実行は毎回動く。
-    cron-job.org が止まっても予定実行が (遅れて) 代わりに動き、火曜以降も先週のままなら鮮度点検が赤にする
+21. **週次の話題枠入れ替えは週の最初の1回だけ** (2026-10-05〜): GitHub の予定実行は数時間遅れることがあり
+    (2026-10-05 は月曜 09:51 JST)、場中のランキングで当日の値上がり株まで追加していた。hot-refresh.yml /
+    us-hot-refresh.yml は SKIP_IF_DONE_THIS_WEEK=1 を渡し、今週の入れ替えが済んでいれば何もしない。
+    例外は「ブランチでの検証 push」と「Actions の手動実行で force にチェック」の2つだけ。決まった時刻の
+    起動は cron-job.org (月曜 07:11 / 20:11 JST) が担い、予定実行はその予備。cron-job.org の時刻設定ミスや
+    トークンの悪用で何度も起動されても2回目以降は何もしない。どちらも動かなければ火曜以降の鮮度点検が赤にする
 
 ## 4. 将来ロードマップ(ユーザーと合意済みの構想)
 
