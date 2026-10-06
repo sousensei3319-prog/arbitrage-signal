@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-05T16:45:17+00:00",
+ "generated_at": "2026-10-06T12:29:15+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -13,12 +13,12 @@
  "groups": {
   "candidate": {
    "h1": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 28,
+    "n_days": 1,
+    "mean_ret": -0.00651,
+    "mean_ex": -0.00873,
+    "n_ex": 28,
+    "win_rate_ex": 0.357
    },
    "h5": {
     "n": 0,
@@ -39,12 +39,12 @@
   },
   "near": {
    "h1": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 33,
+    "n_days": 1,
+    "mean_ret": -0.00127,
+    "mean_ex": -0.00348,
+    "n_ex": 33,
+    "win_rate_ex": 0.515
    },
    "h5": {
     "n": 0,
@@ -65,12 +65,12 @@
   },
   "other": {
    "h1": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 535,
+    "n_days": 1,
+    "mean_ret": 0.00271,
+    "mean_ex": 0.0005,
+    "n_ex": 535,
+    "win_rate_ex": 0.507
    },
    "h5": {
     "n": 0,
@@ -92,8 +92,8 @@
  },
  "note": "入口=記録時刻より後の最初の寄り。ex=同日の記録銘柄の中央値との差。評価日前の数字は参考 (判断に使わない)",
  "first_date": "2026-09-29",
- "last_date": "2026-10-02",
- "n_days": 4,
+ "last_date": "2026-10-06",
+ "n_days": 6,
  "primary_progress": {
   "n_days": 0,
   "target_days": 120,
