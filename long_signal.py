@@ -20,7 +20,7 @@ Long Signal Scanner v1 — ロング戦略 統合シグナル (A/B/C 全部入�
 
 === マクロ環境フィルタ (Layer 0) ===
   FGI + BTC方向で「今どの戦略がON/OFFか」を自動判定:
-    FGI≤30  → C(マクロ)ON (≤20は「極度の恐怖」表示) + A(踏み上げ)ON
+    FGI≤30  → C(マクロ)ON (20以下は表示が変わるだけ・売買の合図ではない) + A(踏み上げ)ON
     FGI 25-55 → A/B 中立
     FGI>70 + BTC急騰 → ロング全般OFF (ショート環境)
 
@@ -78,7 +78,7 @@ MIN_SCORE_A = int(os.environ.get("MIN_SCORE_A", "5"))
 MIN_SCORE_B = int(os.environ.get("MIN_SCORE_B", "5"))
 
 # C マクロ: FGI閾値
-FGI_STRONG_BUY = int(os.environ.get("FGI_STRONG_BUY", "20"))  # これ以下=「極度の恐怖」表示 (買い増しの合図ではない)
+FGI_STRONG_BUY = int(os.environ.get("FGI_STRONG_BUY", "20"))  # これ以下=表示を「20以下」にするだけ (売買の合図ではない)
 FGI_BUY        = int(os.environ.get("FGI_BUY", "30"))         # これ以下=C(恐怖の地合い)ON
 
 # HyperTracker確認: 高スコア銘柄のみ(予算100回/日を守る)
@@ -168,7 +168,7 @@ def macro_layer(fgi, btc_chg):
     elif fgi <= 75:      mood = "強欲"
     else:                mood = "極度の強欲"
 
-    # C(マクロ): FGI≤30 でON (≤20 は表示を「極度の恐怖」にするだけ)
+    # C(マクロ): FGI≤30 でON (20以下は表示が変わるだけ)。検証で FGI に買い場としての証拠は無かったので、色は中立 (⚪)
     c_on = fgi <= FGI_BUY
     # A(踏み上げ): 恐怖局面 or BTC急落後 = ショート過剰になりやすい
     a_on = fgi <= 55 or btc_crash
@@ -180,9 +180,9 @@ def macro_layer(fgi, btc_chg):
         verdict = f"⚠️ FGI{fgi}({mood})+BTC+{btc_chg:.1f}% — 高値掴みリスク。ロング慎重に"
         a_on = False; c_on = False
     elif fgi <= FGI_STRONG_BUY:
-        verdict = f"🟢🟢 FGI{fgi}({mood}) — C ON (積立は固定額のまま・増やさない)"
+        verdict = f"⚪ FGI{fgi}({mood}) — 恐怖ゾーン ({FGI_STRONG_BUY}以下)。売買の合図ではない"
     elif c_on:
-        verdict = f"🟢 FGI{fgi}({mood}) — 恐怖ゾーン(C ON)"
+        verdict = f"⚪ FGI{fgi}({mood}) — 恐怖ゾーン。売買の合図ではない"
     elif b_on:
         verdict = f"🟡 FGI{fgi}({mood}) BTC{btc_chg:+.1f}% — 順張り環境(B寄り)"
     else:
@@ -457,14 +457,14 @@ def build_rules_embed():
                        "**損切**: ブレイク水準割れ (浅く・速く)"),
              "inline": False},
             {"name": "C. マクロスイング (恐怖の地合い通知)",
-             "value": (f"**条件**: FGI≤{FGI_BUY} (恐怖)\n"
-                       "**検証(2026-10)**: 恐怖で買い増し・FGIで売買は、同じ予算の固定積立に負けた。"
-                       "FGI<10の90日後は平均+15%・7回中2回マイナスで、全日の平均(+14%)と差なし\n"
+             "value": (f"**条件**: FGI {FGI_BUY}以下 (恐怖)。売買の合図ではない\n"
+                       "**検証(2026-10)**: 恐怖の時に買い増しても、でたらめな週に買い増したのと区別できなかった。"
+                       "FGI10未満は7回だけ (90日後は平均+15%・2回マイナス。いつ買っても平均+14%)\n"
                        "**方針**: 固定額の自動積立を続ける (増やさない・止めない)。詳細は RULES.md C節"),
              "inline": False},
             {"name": "🔄 ショート戦略との使い分け",
              "value": ("FGI高(>70) = ショート環境 → unified_signal.py\n"
-                       "FGI低(<30) = ロング環境 → long_signal.py(これ)\n"
+                       "FGI低(<30) = 恐怖 → long_signal.py(これ)。恐怖だけでは買う理由にならない (RULES.md C節)\n"
                        "中立(30-70) = 個別銘柄の歪み次第で両建て判断"),
              "inline": False},
         ],
@@ -675,14 +675,14 @@ def main():
     # C マクロは銘柄でなく地合い通知
     embeds_first = [macro_embed]
     if ml["C"]:
-        c_strength = "🟢🟢 極度の恐怖" if (fgi and fgi <= FGI_STRONG_BUY) else "🟢 恐怖ゾーン"
+        c_strength = f"{FGI_STRONG_BUY}以下" if (fgi and fgi <= FGI_STRONG_BUY) else f"{FGI_BUY}以下"
         embeds_first.append({
-            "title": f"💎 Cマクロ(恐怖の地合い) — {c_strength}",
+            "title": f"ℹ️ Cマクロ — FGI 恐怖ゾーン ({c_strength})。売買の合図ではない",
             "description": (f"FGI {fgi}({fgi_label})\n"
                             "**積立は固定額のまま続ける (増やさない・止めない)**\n"
-                            "検証(2026-10): 恐怖での買い増し・FGIでの売買は固定積立に勝てなかった (RULES.md C節)\n"
+                            "検証(2026-10): 恐怖の時の買い増しや FGI での売買が、固定額の積立より良いという証拠は無かった (RULES.md C節)\n"
                             "→ ETFフロー: https://sosovalue.com/ja/assets/etf/us-btc-spot"),
-            "color": 0x00BFA5,
+            "color": 0x90A4AE,  # 中立の灰色 (買いを連想させる緑にしない)
         })
 
     if not signals and not ml["C"]:
