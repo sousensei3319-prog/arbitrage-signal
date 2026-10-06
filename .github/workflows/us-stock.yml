@@ -40,6 +40,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # GitHub の予定実行がまとめて遅れて起動すると、待機していた run はトリガー時点の古いコミットから始まり、
+      # 前の run と同じ1分足ファイルを書いて rebase が衝突し、結果が捨てられる (日本株の jp-stock.yml で
+      # 2026-10-05 に確認したのと同じ構造)。concurrency で直列化済みなので、開始時に最新へ揃えれば
+      # 前の run の保存を必ず含む。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'

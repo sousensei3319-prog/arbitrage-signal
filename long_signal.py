@@ -460,7 +460,7 @@ def build_rules_embed():
              "value": (f"**条件**: FGI {FGI_BUY}以下 (恐怖)。売買の合図ではない\n"
                        "**検証(2026-10)**: 恐怖の時に買い増しても、でたらめな週に買い増したのと区別できなかった。"
                        "FGI10未満は7回だけ (90日後は平均+15%・2回マイナス。いつ買っても平均+14%)\n"
-                       "**方針**: 固定額の自動積立を続ける (増やさない・止めない)。詳細は RULES.md C節"),
+                       "**方針**: 積立は固定額のまま (相場を理由に増やさない・止めない)。詳細は RULES.md C節"),
              "inline": False},
             {"name": "🔄 ショート戦略との使い分け",
              "value": ("FGI高(>70) = ショート環境 → unified_signal.py\n"
@@ -658,16 +658,14 @@ def main():
           f"スキャン {scan_time.strftime('%Y-%m-%d %H:%M JST')}")
 
     # ── Discord ──
-    # メンションは「個別銘柄シグナルあり」or「FGIが恐怖ゾーン(C)に新規突入」時のみ。
-    # 地合い(C)が継続中なだけで毎回鳴らさない (通知疲れ防止)。
+    # メンションは「個別銘柄シグナルあり」の時のみ。
+    # C (恐怖の地合い) は売買の合図ではないので鳴らさない (2026-10-06)。旧方式の「恐怖ゾーンに新規突入で
+    # メンション」は送信済みの記録を持たず、FGI は1日1回しか変わらないため、突入した日は15分ごとの
+    # スキャンのたびに (最大96回) 鳴る作りだった。
     has_coin_signal = bool(signals)
-    c_fresh_cross = (ml["C"] and fgi is not None and fgi_prev is not None
-                     and fgi_prev > FGI_BUY and fgi <= FGI_BUY)
-    should_mention = MENTION_EVERYONE and (has_coin_signal or c_fresh_cross)
+    should_mention = MENTION_EVERYONE and has_coin_signal
     mention = "@everyone" if should_mention else ""
     allowed = {"parse":["everyone"]} if should_mention else {"parse":[]}
-    if c_fresh_cross:
-        print("  → FGI恐怖ゾーン(C)に新規突入 → メンション")
 
     macro_embed = build_macro_embed(fgi, fgi_label, fgi_prev, btc_chg, btc_price, ml, scan_time)
     rules_embed = build_rules_embed()
@@ -679,7 +677,7 @@ def main():
         embeds_first.append({
             "title": f"ℹ️ Cマクロ — FGI 恐怖ゾーン ({c_strength})。売買の合図ではない",
             "description": (f"FGI {fgi}({fgi_label})\n"
-                            "**積立は固定額のまま続ける (増やさない・止めない)**\n"
+                            "**積立は固定額のまま (相場を理由に増やさない・止めない)**\n"
                             "検証(2026-10): 恐怖の時の買い増しや FGI での売買が、固定額の積立より良いという証拠は無かった (RULES.md C節)\n"
                             "→ ETFフロー: https://sosovalue.com/ja/assets/etf/us-btc-spot"),
             "color": 0x90A4AE,  # 中立の灰色 (買いを連想させる緑にしない)
