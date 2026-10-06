@@ -120,9 +120,10 @@ jobs:
           echo "::error::仮想台帳 (ledger.py) が失敗しました。収集データは保存済み。3営業日以内に直れば翌回に補完されます (補完分は集計から除外)"
           exit 1
 
-      # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (予定実行の時だけ。マージ直後の並走で誤報しないため)
+      # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (main の予定実行と cron-job.org/手動の起動の時。
+      # push 起動はマージ直後の並走で誤報しうるので点検しない)
       - name: Freshness check
-        if: ${{ always() && github.event_name == 'schedule' }}
+        if: ${{ always() && github.event_name != 'push' && github.ref == 'refs/heads/main' }}
         run: python .github/scripts/freshness_check.py jp
 
       - name: Notify failure (Discord)

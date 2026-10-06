@@ -162,12 +162,13 @@ workflow_dispatch API を直接叩いて場中30分ごとの実行を保証す�
   対処: ユーザーがPATを再発行し cron-job.org のジョブ設定を更新する
 - **PATをリポジトリにコミットするのは厳禁**(public repoのため。Discord Webhookと
   同じ扱い — secret scanningの対象になる前に絶対に入れない)
-- **同じPATを使う cron-job.org のジョブ (2026-10-05〜 5本)**: 日本株1分足収集 (jp-stock.yml・5分ごと) /
+- **同じPATを使う cron-job.org のジョブ (2026-10-06〜 7本)**: 日本株1分足収集 (jp-stock.yml・5分ごと) /
   日本株 話題枠 (hot-refresh.yml・月曜07:11 JST) / 米国株 話題枠 (us-hot-refresh.yml・月曜20:11 JST) /
   日本株 銘柄リスト (universe-refresh.yml・毎月4日06:41 JST) / 米国株 銘柄リスト (us-universe-refresh.yml・
-  毎月5日05:41 JST)。本文はすべて `{"ref":"main"}` 固定 (古いブランチを指定させない)。PATを再発行したら
-  **5本すべてのヘッダーを貼り替えて試験実行し 204 を確認**する (1本でも忘れると 401 で黙って止まり、
-  話題枠は遅れて動く予定実行に戻る)。PATの権限は「Only select repositories: arbitrage-signal」+
+  毎月5日05:41 JST) / 日本株 引け後処理 (jp-stock-history.yml・平日16:33 JST) / 米国株 引け後処理
+  (us-stock-history.yml・火〜土06:23 JST)。タイムゾーンはすべて Asia/Tokyo。本文はすべて `{"ref":"main"}` 固定
+  (古いブランチを指定させない)。PATを再発行したら**7本すべてのヘッダーを貼り替えて 204 を確認**する
+  (1本でも忘れると 401 で黙って止まり、そのジョブは遅れて動く予定実行に戻る)。PATの権限は「Only select repositories: arbitrage-signal」+
   「Actions: Read and write」(+自動で付く Metadata: Read-only) だけ。漏れた疑いがあれば先に Revoke し、
   Actions で無効化された workflow や予定外の時刻の起動が無いか確認する
 - GitHub側の schedule トリガーは**保険として残置**。外部cronと二重発火しても
@@ -410,6 +411,12 @@ workflowのenvのみで調整する(コード変更不要)。
     例外は「ブランチでの検証 push」と「Actions の手動実行で force にチェック」の2つだけ。決まった時刻の
     起動は cron-job.org (月曜 07:11 / 20:11 JST) が担い、予定実行はその予備。cron-job.org の時刻設定ミスや
     トークンの悪用で何度も起動されても2回目以降は何もしない。どちらも動かなければ火曜以降の鮮度点検が赤にする
+22. **引け後処理 (history) は日付が変わる前に動かす** (2026-10-06〜): GitHub の予定実行が 8〜9 時間遅れ、
+    日本の history (16:33 JST 予定) が翌 01:18 JST に動いた日、Yahoo の日足に当日 (10/5) が無かった
+    (1分足には327本あった。観測1回)。日足ファイルが前日止まりのため仮想台帳はその日を記録できず、
+    答え合わせも入らない (その日は次の実行で補完=集計外になる)。cron-job.org から平日 16:33 JST
+    (米国は火〜土 06:23 JST) に起動し、予定実行は予備にする。鮮度点検は schedule に加えて
+    workflow_dispatch (cron-job.org・手動) でも main なら動く
 
 ## 4. 将来ロードマップ(ユーザーと合意済みの構想)
 
