@@ -38,6 +38,15 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v5
+      # cron-job.org の起動と GitHub の予定実行は同じ時刻に入る。予定実行の遅れが前の run の所要時間より
+      # 短いと、待機していた方はトリガー時点の古いコミットから始まり、前の run が保存した仮想台帳を知らずに
+      # 同じ判定日を記録し直して上書きする (記録時刻がずれ「最初の記録が正」が崩れる。2026-10-06 の点検)。
+      # concurrency で直列化済みなので、開始時に最新へ揃えれば前の run の保存を必ず含む。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
@@ -120,9 +129,10 @@ jobs:
           echo "::error::仮想台帳 (ledger.py) が失敗しました。収集データは保存済み。3営業日以内に直れば翌回に補完されます (補完分は集計から除外)"
           exit 1
 
-      # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (予定実行の時だけ。マージ直後の並走で誤報しないため)
+      # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (main の予定実行と cron-job.org/手動の起動の時。
+      # push 起動はマージ直後の並走で誤報しうるので点検しない)
       - name: Freshness check
-        if: ${{ always() && github.event_name == 'schedule' }}
+        if: ${{ always() && github.event_name != 'push' && github.ref == 'refs/heads/main' }}
         run: python .github/scripts/freshness_check.py us
 
       - name: Notify failure (Discord)

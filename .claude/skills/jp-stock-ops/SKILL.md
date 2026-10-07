@@ -162,6 +162,15 @@ workflow_dispatch API を直接叩いて場中30分ごとの実行を保証す�
   対処: ユーザーがPATを再発行し cron-job.org のジョブ設定を更新する
 - **PATをリポジトリにコミットするのは厳禁**(public repoのため。Discord Webhookと
   同じ扱い — secret scanningの対象になる前に絶対に入れない)
+- **同じPATを使う cron-job.org のジョブ (2026-10-06〜 7本)**: 日本株1分足収集 (jp-stock.yml・5分ごと) /
+  日本株 話題枠 (hot-refresh.yml・月曜07:11 JST) / 米国株 話題枠 (us-hot-refresh.yml・月曜20:11 JST) /
+  日本株 銘柄リスト (universe-refresh.yml・毎月4日06:41 JST) / 米国株 銘柄リスト (us-universe-refresh.yml・
+  毎月5日05:41 JST) / 日本株 引け後処理 (jp-stock-history.yml・平日16:33 JST) / 米国株 引け後処理
+  (us-stock-history.yml・火〜土06:23 JST)。タイムゾーンはすべて Asia/Tokyo。本文はすべて `{"ref":"main"}` 固定
+  (古いブランチを指定させない)。PATを再発行したら**7本すべてのヘッダーを貼り替えて 204 を確認**する
+  (1本でも忘れると 401 で黙って止まり、そのジョブは遅れて動く予定実行に戻る)。PATの権限は「Only select repositories: arbitrage-signal」+
+  「Actions: Read and write」(+自動で付く Metadata: Read-only) だけ。漏れた疑いがあれば先に Revoke し、
+  Actions で無効化された workflow や予定外の時刻の起動が無いか確認する
 - GitHub側の schedule トリガーは**保険として残置**。外部cronと二重発火しても
   concurrency直列化 + 同じ足のupsert(上書き)で無害(データは重複しない)
 - 実測 (2026-10-03): jp-stock.yml の workflow_dispatch は**5分ごと・24時間・土日も**届いている
@@ -390,6 +399,27 @@ workflowのenvのみで調整する(コード変更不要)。
 19. **マージ/大量書き直しは市場の休み (週末) に**: upsert 導入後の初回は日本約700・米国約800ファイルを
     書き直す。平日の場中に5分ごとの収集と重なると history の1回pushが衝突して1日分が消える (緑)。
     データが衝突したら手で混ぜず、main 側を採用して各 refresh を再実行する
+20. **収集ジョブは開始時に最新コミットへ同期する** (jp-stock.yml の "Sync to latest branch head"):
+    checkout はトリガー時点のコミットなので、1回の所要時間 (621銘柄で約6分) が起動間隔 (cron-job.org の
+    5分) より長いと、待機していた run は前の run の保存前から始まり、同じ1分足ファイルを書いて rebase が
+    衝突 → 「push failed (race) - next run」で結果が捨てられる (2026-10-05 に1回おきに発生・緑のまま)。
+    データは次の run が当日分を取り直すので消えないが、更新間隔が倍 (約12分) になる。銘柄数を増やす時や
+    起動間隔を縮める時は、Actions の run 一覧で「所要時間 < 起動間隔」か、コミット間隔が倍になっていないかを見る。
+    2026-10-06 から us-stock.yml と日米の history も同じ同期をする。history は cron-job.org と予定実行が同じ時刻に
+    入るので、予定実行の遅れが短いと待機した方が古いコミットから始まり、前の run が保存した仮想台帳を知らずに
+    同じ判定日を記録し直して上書きしうる (記録時刻がずれる)。同期で「記録済みの日は記録しない」が効く
+21. **週次の話題枠入れ替えは週の最初の1回だけ** (2026-10-05〜): GitHub の予定実行は数時間遅れることがあり
+    (2026-10-05 は月曜 09:51 JST)、場中のランキングで当日の値上がり株まで追加していた。hot-refresh.yml /
+    us-hot-refresh.yml は SKIP_IF_DONE_THIS_WEEK=1 を渡し、今週の入れ替えが済んでいれば何もしない。
+    例外は「ブランチでの検証 push」と「Actions の手動実行で force にチェック」の2つだけ。決まった時刻の
+    起動は cron-job.org (月曜 07:11 / 20:11 JST) が担い、予定実行はその予備。cron-job.org の時刻設定ミスや
+    トークンの悪用で何度も起動されても2回目以降は何もしない。どちらも動かなければ火曜以降の鮮度点検が赤にする
+22. **引け後処理 (history) は日付が変わる前に動かす** (2026-10-06〜): GitHub の予定実行が 8〜9 時間遅れ、
+    日本の history (16:33 JST 予定) が翌 01:18 JST に動いた日、Yahoo の日足に当日 (10/5) が無かった
+    (1分足には327本あった。観測1回)。日足ファイルが前日止まりのため仮想台帳はその日を記録できず、
+    答え合わせも入らない (その日は次の実行で補完=集計外になる)。cron-job.org から平日 16:33 JST
+    (米国は火〜土 06:23 JST) に起動し、予定実行は予備にする。鮮度点検は schedule に加えて
+    workflow_dispatch (cron-job.org・手動) でも main なら動く
 
 ## 4. 将来ロードマップ(ユーザーと合意済みの構想)
 

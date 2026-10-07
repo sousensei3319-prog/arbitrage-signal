@@ -40,6 +40,16 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # checkout はトリガー時点のコミット。約620銘柄で1回約6分かかり、5分ごとの起動 (cron-job.org) より
+      # 長いため、待機していた run は前の run が保存する前のコミットから始まり、同じ1分足ファイルを書いて
+      # rebase が衝突し結果が捨てられていた (1回おき。2026-10-05 確認)。concurrency で直列化済みなので、
+      # 開始時に最新へ揃えれば前の run の保存を必ず含む。
+      - name: Sync to latest branch head
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          git reset -q --hard FETCH_HEAD
+          git log -1 --format='最新コミットへ同期: %h %s'
+
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
