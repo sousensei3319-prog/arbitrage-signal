@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-07T21:38:52+00:00",
+ "generated_at": "2026-10-08T01:38:21+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -17,12 +17,12 @@
  "groups": {
   "candidate": {
    "h1": {
-    "n": 64,
+    "n": 31,
     "n_days": 2,
-    "mean_ret": 0.00074,
-    "mean_ex": 0.00223,
-    "n_ex": 64,
-    "win_rate_ex": 0.578
+    "mean_ret": 0.00076,
+    "mean_ex": 7e-05,
+    "n_ex": 30,
+    "win_rate_ex": 0.533
    },
    "h5": {
     "n": 0,
@@ -43,12 +43,12 @@
   },
   "near": {
    "h1": {
-    "n": 108,
-    "n_days": 2,
-    "mean_ret": -0.00498,
-    "mean_ex": -0.0035,
-    "n_ex": 108,
-    "win_rate_ex": 0.481
+    "n": 51,
+    "n_days": 1,
+    "mean_ret": -0.00891,
+    "mean_ex": -0.00963,
+    "n_ex": 51,
+    "win_rate_ex": 0.431
    },
    "h5": {
     "n": 0,
@@ -69,12 +69,12 @@
   },
   "other": {
    "h1": {
-    "n": 1407,
-    "n_days": 2,
-    "mean_ret": -0.00187,
-    "mean_ex": -0.00053,
-    "n_ex": 1407,
-    "win_rate_ex": 0.497
+    "n": 713,
+    "n_days": 1,
+    "mean_ret": -0.00114,
+    "mean_ex": -0.00186,
+    "n_ex": 713,
+    "win_rate_ex": 0.502
    },
    "h5": {
     "n": 0,
