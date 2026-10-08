@@ -1,0 +1,31 @@
+name: Yahoo 1m probe (調査用・一時)
+
+# 1分足の寄り・引けの欠けを調べる一時的な調査。保存も通知もしない (ログに要約を出すだけ)。
+# 調査が終わったら main に入れずに消す。起動は調査用ブランチへの push だけ
+# (時刻を変えて再実行する時は .github/probe-trigger.txt を書き換えて push する)。
+on:
+  push:
+    branches: [ccr-44e74cc7-y92cr6]
+    paths:
+      - '.github/scripts/yahoo_1m_probe.py'
+      - '.github/workflows/yahoo-1m-probe.yml'
+      - '.github/probe-trigger.txt'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yahoo-1m-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Probe Yahoo 1m bars (open/close auctions)
+        run: python .github/scripts/yahoo_1m_probe.py
