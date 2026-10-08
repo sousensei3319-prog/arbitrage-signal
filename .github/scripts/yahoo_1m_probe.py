@@ -17,8 +17,7 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 JST = timezone(timedelta(hours=9))
 ET = ZoneInfo("America/New_York")
-TARGETS = [("7203.T", JST), ("9984.T", JST), ("1332.T", JST), ("6758.T", JST), ("8306.T", JST),
-           ("AAPL", ET), ("NVDA", ET), ("F", ET), ("KO", ET)]
+TARGETS = [("7203.T", JST), ("8306.T", JST), ("1332.T", JST), ("AAPL", ET), ("KO", ET)]
 
 
 def fetch(ticker, rng, interval, prepost=False):
@@ -52,6 +51,12 @@ def summarize(ticker, tz, rng, prepost=False):
         head = " ".join(f"{b[0][:5]}{'' if b[1] else '*'}:{fmt(b[4])}" for b in bars[:7])
         tail = " ".join(f"{b[0][:5]}{'' if b[1] else '*'}:{fmt(b[4])}" for b in bars[-3:])
         print(f"  {day} 足{len(bars)} 値なし{nulls} 出来高計{vol:.0f} | 最初 {head} | 最後 {tail}")
+        # 引け前後と、出来高の大きい足 (板寄せの出来高がどの足に入るか)
+        near_close = [b for b in bars if ("15:18" <= b[0][:5] <= "15:30") or ("15:55" <= b[0][:5] <= "16:00")]
+        if near_close:
+            print("     引け前後 " + " ".join(f"{b[0][:5]}:{fmt(b[4])}" for b in near_close))
+        top = sorted((b for b in bars if b[4]), key=lambda b: -b[4])[:4]
+        print("     出来高の大きい足 " + " ".join(f"{b[0][:5]}:{fmt(b[4])}" for b in top))
 
 
 def daily(ticker, tz):
