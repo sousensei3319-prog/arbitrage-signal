@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-10T01:36:07+00:00",
+ "generated_at": "2026-10-13T03:08:48+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -17,20 +17,20 @@
  "groups": {
   "candidate": {
    "h1": {
-    "n": 65,
-    "n_days": 3,
-    "mean_ret": 0.00067,
-    "mean_ex": 0.00218,
-    "n_ex": 64,
-    "win_rate_ex": 0.578
+    "n": 143,
+    "n_days": 4,
+    "mean_ret": 0.00312,
+    "mean_ex": 0.00349,
+    "n_ex": 143,
+    "win_rate_ex": 0.552
    },
    "h5": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 30,
+    "n_days": 1,
+    "mean_ret": -0.001,
+    "mean_ex": -0.00454,
+    "n_ex": 30,
+    "win_rate_ex": 0.567
    },
    "h20": {
     "n": 0,
@@ -43,20 +43,20 @@
   },
   "near": {
    "h1": {
-    "n": 110,
-    "n_days": 2,
-    "mean_ret": -0.00512,
-    "mean_ex": -0.0036,
-    "n_ex": 110,
-    "win_rate_ex": 0.491
+    "n": 249,
+    "n_days": 4,
+    "mean_ret": -0.00551,
+    "mean_ex": -0.00496,
+    "n_ex": 249,
+    "win_rate_ex": 0.498
    },
    "h5": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 51,
+    "n_days": 1,
+    "mean_ret": -0.0427,
+    "mean_ex": -0.04624,
+    "n_ex": 51,
+    "win_rate_ex": 0.353
    },
    "h20": {
     "n": 0,
@@ -69,20 +69,20 @@
   },
   "other": {
    "h1": {
-    "n": 1413,
-    "n_days": 3,
-    "mean_ret": -0.00191,
-    "mean_ex": -0.00058,
-    "n_ex": 1411,
+    "n": 2820,
+    "n_days": 4,
+    "mean_ret": -0.00133,
+    "mean_ex": -0.00117,
+    "n_ex": 2820,
     "win_rate_ex": 0.496
    },
    "h5": {
-    "n": 0,
-    "n_days": 0,
-    "mean_ret": null,
-    "mean_ex": null,
-    "n_ex": 0,
-    "win_rate_ex": null
+    "n": 712,
+    "n_days": 1,
+    "mean_ret": -0.00751,
+    "mean_ex": -0.01105,
+    "n_ex": 712,
+    "win_rate_ex": 0.507
    },
    "h20": {
     "n": 0,
@@ -96,8 +96,8 @@
  },
  "note": "入口=記録時刻より後の最初の寄り (判定日から日本1・米国2営業日より前にはしない)。ex=同日の記録銘柄の中央値との差。判定日の当日以降に話題枠へ追加された銘柄と、一部の銘柄だけで記録された日 (partial_dates) は除外。評価日前の数字は参考 (判断に使わない)",
  "first_date": "2026-09-29",
- "last_date": "2026-10-08",
- "n_days": 8,
+ "last_date": "2026-10-12",
+ "n_days": 10,
  "partial_dates": [
   "2026-10-06"
  ]
