@@ -1,0 +1,29 @@
+name: Crypto data probe (調査用・一時)
+
+# 戦略Aの「恐怖で+1点」を確かめるのに使えるデータが、ランナーから取れるかを調べる一時的な調査。
+# 保存も通知もしない (ログに要約を出すだけ)。調べ終わったら main に入れずに消す。起動は調査用ブランチへの push だけ。
+on:
+  push:
+    branches: [ccr-44e74cc7-y92cr6]
+    paths:
+      - '.github/scripts/crypto_data_probe.py'
+      - '.github/workflows/crypto-data-probe.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crypto-data-probe
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Probe crypto data sources (OKX / Hyperliquid / Kraken Futures)
+        run: python .github/scripts/crypto_data_probe.py
