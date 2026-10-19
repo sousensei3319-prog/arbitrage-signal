@@ -98,27 +98,53 @@ def load_1m(sym):
     return list(t), list(c), list(v)
 
 
-def load_1d(sym, cutoff_date, t1m, c1m, v1m):
-    """日足2年。最終日(cutoff)は寄り直後取得で不完全なので1分足から再構成。"""
+def load_1d(sym, cutoff_date, rows1m):
+    """日足2年 (cutoff_date までの1日1本)。rows1m は異常足を除いた1分足 (epoch, close, vol, turnover) の昇順。
+
+    - 日足ファイルに無い日は1分足から組み立てる。最終日 (取得の途中) のほか、引け後処理のデータ保存が
+      消えた日 (2026-10-08) も日足が欠ける。旧版は最終日だけを組み立てたため、その間の日が抜けていた
+    - 最終日は、日足ファイルの値 (引け後処理が取った確定値) の出来高の方が大きければそちらを使う。
+      1分足には寄り付き・大引けの板寄せの出来高が入らず、確定した日足の6〜7割にしかならない
+      (2026-09-29〜10-07 の実データの中央値 0.57〜0.72)。場中に動いた引け後処理が取った途中の日足は、
+      1分足の方が大きくなった時点で1分足に戻る
+    """
+    days = {}   # 日付 → (epoch, open, high, low, close, volume)
     p = os.path.join(DATA, f"{sym.replace('.', '_')}_1d.csv")
-    T, O, H, L, C, V = [], [], [], [], [], []
     if os.path.exists(p):
         with open(p, newline="", encoding="utf-8") as f:
             for row in csv.DictReader(f):
-                if row["timestamp_jst"][:10] >= cutoff_date:
+                d = row["timestamp_jst"][:10]
+                if d > cutoff_date:
                     continue
                 try:
-                    T.append(int(row["epoch"])); O.append(float(row["open"])); H.append(float(row["high"]))
-                    L.append(float(row["low"])); C.append(float(row["close"])); V.append(int(float(row["volume"] or 0)))
+                    days[d] = (int(row["epoch"]), float(row["open"]), float(row["high"]), float(row["low"]),
+                               float(row["close"]), int(float(row["volume"] or 0)))
                 except (ValueError, KeyError, TypeError):
                     continue
-    todays = sorted((t, c, v) for t, c, v in zip(t1m, c1m, v1m)
-                     if datetime.fromtimestamp(t, JST).strftime("%Y-%m-%d") == cutoff_date and v > 0)
-    if todays:
-        cs = [r[1] for r in todays]
-        T.append(todays[0][0]); O.append(cs[0]); H.append(max(cs)); L.append(min(cs))
-        C.append(cs[-1]); V.append(sum(r[2] for r in todays))
-    return {"t": T, "o": O, "h": H, "l": L, "c": C, "v": V} if T else None
+    by_day = {}
+    for e, c, v, _to in rows1m:
+        d = datetime.fromtimestamp(e, JST).strftime("%Y-%m-%d")
+        if d <= cutoff_date:
+            by_day.setdefault(d, []).append((e, c, v))
+    for d, bars in by_day.items():
+        cs = [b[1] for b in bars]
+        rec = (bars[0][0], cs[0], max(cs), min(cs), cs[-1], int(sum(b[2] for b in bars)))
+        if d not in days or (d == cutoff_date and rec[5] > days[d][5]):
+            days[d] = rec
+    if not days:
+        return None
+    keys = sorted(days)
+    T = [_day_epoch(k) for k in keys]
+    O, H, L, C, V = ([days[k][i] for k in keys] for i in range(1, 6))
+    return {"t": T, "o": O, "h": H, "l": L, "c": C, "v": V}
+
+
+def _day_epoch(day):
+    """日付 'YYYY-MM-DD' の寄り (9:00) の epoch。日足の時刻はこれにそろえる: Yahoo は当日分を引け時刻の仮の時刻
+    (15:30) で返すため、引け直後に取った日の足と次の日の足の間が24時間未満になり、1日窓の「直近」に2日分が
+    入りうる (2026-10-12 時点の日足ファイルに28行)。1分足から組み立てた日も最初の足の時刻ではなくこれを使う。"""
+    y, m, d = map(int, day.split("-"))
+    return int(datetime(y, m, d, 9, 0, tzinfo=JST).timestamp())
 
 
 def load_supply_demand():
@@ -156,10 +182,16 @@ def load_supply_demand():
     return agg
 
 
-def _stat_rows_intraday(t, c, v):
-    """window_stats向け: 出来高0を除いた(epoch,close,vol,turnover)。jp_money_flow.load_barsと同じ規則 (異常足の除外を含む)。"""
+def _clean_rows(t, c, v):
+    """出来高0と「累計出来高入り」異常足を除いた (epoch,close,vol,turnover) の昇順 (日足の組み立て用。
+    チャートの生データは残す)。"""
     rows = sorted(((tt, cc, vv, cc * vv) for tt, cc, vv in zip(t, c, v) if vv > 0), key=lambda r: r[0])
-    return jmf.drop_volume_glitches(rows)   # 「累計出来高入り」異常足を窓統計から除く (チャートの生データは残す)
+    return jmf.drop_volume_glitches(rows)
+
+
+def _stat_rows_intraday(clean):
+    """window_stats向け: jp_money_flow.load_barsと同じ規則 (出来高0・異常足・寄り付きの足を除く)。"""
+    return jmf.drop_opening_bars(clean)
 
 
 def _stat_rows_daily(d):
@@ -168,10 +200,39 @@ def _stat_rows_daily(d):
     return sorted(((t, c, v, c * v) for t, c, v in zip(d["t"], d["c"], d["v"]) if v > 0), key=lambda r: r[0])
 
 
+# 場の時間 (JST・平日)。寄りの 9:06 より前は窓統計に入れない (jp_money_flow.OPEN_SKIP_UNTIL_HM) ので 9:06 から
+SESSIONS = (("09:06", "11:30"), ("12:30", "15:30"))
+
+
+# 勢いを比べる条件: 直前の窓のうち場中が min(窓の半分, この秒数) 以上 (理由は compute_all_windows)
+MOM_MIN_OPEN_SEC = 15 * 60
+
+
+def _open_seconds(a, b):
+    """(a, b] (epoch 秒) に入る場中の1分足の時刻の数 × 60 (= 場中の長さ・秒)。祝日は見ない (直前の窓は最後の足から
+    最長8時間前までで、夜をまたいで前の営業日の場に届くことは無いため)。"""
+    a, b = int(a), int(b)
+    tot = 0
+    d = datetime.fromtimestamp(a, JST).date()
+    last = datetime.fromtimestamp(b, JST).date()
+    while d <= last:
+        if d.weekday() < 5:
+            for st, en in SESSIONS:
+                (hs, ms), (he, me) = map(int, st.split(":")), map(int, en.split(":"))
+                t0 = int(datetime(d.year, d.month, d.day, hs, ms, tzinfo=JST).timestamp())
+                t1 = int(datetime(d.year, d.month, d.day, he, me, tzinfo=JST).timestamp())
+                first = t0 if a < t0 else t0 + ((a - t0) // 60 + 1) * 60   # (a, b] に入る最初の足の時刻
+                hi = min(b, t1)
+                if hi >= first:
+                    tot += ((hi - first) // 60 + 1) * 60
+        d += timedelta(days=1)
+    return tot
+
+
 def compute_all_windows(per_ticker_rows):
     """per_ticker_rows: {sym: {"intraday": rows, "daily": rows}} から
     全銘柄×全窓の (recent, prev, med, total) を計算し、続けてクロス銘柄シェアを正規化する。
-    戻り値: {sym: {wkey: {surge, shareR, momentum, dBase, recent}}}
+    戻り値: {sym: {wkey: {surge, shareR, momentum, dBase, recent}}} (momentum は比べない時 None)
     """
     raw = {}
     intraday_total, daily_total = {}, {}
@@ -180,7 +241,9 @@ def compute_all_windows(per_ticker_rows):
         for w in WINS:
             src = rows["daily"] if w.get("daily") else rows["intraday"]
             recent, prev, med = jmf.window_stats(src, w["sec"])
-            wraw[w["k"]] = {"recent": recent, "prev": prev, "med": med}
+            wraw[w["k"]] = {"recent": recent, "prev": prev, "med": med,
+                           "prev_open": (_open_seconds(src[-1][0] - 2 * w["sec"], src[-1][0] - w["sec"])
+                                         if src and not w.get("daily") else None)}
         raw[sym] = wraw
         intraday_total[sym] = sum(r[3] for r in rows["intraday"])
         daily_total[sym] = sum(r[3] for r in rows["daily"])
@@ -190,7 +253,7 @@ def compute_all_windows(per_ticker_rows):
     sums = {}
     for w in WINS:
         s_r = sum(raw[sym][w["k"]]["recent"] for sym in raw) or 1.0
-        s_p = sum(raw[sym][w["k"]]["prev"] for sym in raw) or 1.0
+        s_p = sum(raw[sym][w["k"]]["prev"] for sym in raw)
         sums[w["k"]] = (s_r, s_p)
 
     result = {}
@@ -202,7 +265,17 @@ def compute_all_windows(per_ticker_rows):
             surge = (recent / med) if med > 0 else 0.0
             s_r, s_p = sums[k]
             shareR = recent / s_r * 100
-            shareP = prev / s_p * 100
+            shareP = (prev / s_p * 100) if s_p > 0 else 0.0
+            # 勢いは「直前の同じ長さの窓」と比べる。その窓のうち場中が min(窓の半分, 15分) に満たない銘柄は比べず
+            # null (画面は「—」・全体の過半なら「⏸ 判定待ち」)。旧版は直前の窓が場の外でもシェアそのものを勢いにし、
+            # 毎朝・毎昼に売買代金の大きい約30銘柄が🚨急騰に並んでいた (10/5〜10/9 の再現: 30分窓の 9:20 で28〜34件・
+            # 昼休み明け 12:45 で29〜37件・4時間窓は寄りから13時まで約30件)。「丸ごと場の外なら比べない」だけでは
+            # 比べ始めの直後 (直前の窓に場中が1〜2分だけ) に🚨が普段の1.5〜3倍に跳ねた (10/5〜10/19 の再現: 30分窓 9:37 で
+            # 中央値8件・4時間窓 13:07 で6件、普段は3〜6件・2件)。半分 (最大15分) を条件にするとどれも普段の水準になる
+            # (最大30分も試したが、60分窓の昼休み明けの判定待ちが 13:01〜13:58 と長くなるだけで件数は変わらない)。
+            # 直前の窓が場中で約定が無かっただけの銘柄は従来どおり比べる (本物の急増)
+            po = raw[sym][k]["prev_open"]
+            comparable = po is None or po >= min(w["sec"] / 2, MOM_MIN_OPEN_SEC)
             grand = grand_daily if w.get("daily") else grand_intraday
             total = daily_total[sym] if w.get("daily") else intraday_total[sym]
             shareBase = total / grand * 100
@@ -210,7 +283,7 @@ def compute_all_windows(per_ticker_rows):
                 "recent": round(recent),
                 "surge": round(surge, 3),
                 "shareR": round(shareR, 3),
-                "momentum": round(shareR - shareP, 3),
+                "momentum": round(shareR - shareP, 3) if comparable else None,
                 "dBase": round(shareR - shareBase, 3),
             }
         result[sym] = wres
@@ -256,9 +329,10 @@ def build(uni):
             continue
         latest_ts = max(latest_ts, t[-1])
         cutoff = datetime.fromtimestamp(t[-1], JST).strftime("%Y-%m-%d")
-        d = load_1d(sym, cutoff, t, c, v)
+        clean = _clean_rows(t, c, v)
+        d = load_1d(sym, cutoff, clean)
         per_ticker_rows[sym] = {
-            "intraday": _stat_rows_intraday(t, c, v),
+            "intraday": _stat_rows_intraday(clean),
             "daily": _stat_rows_daily(d),
         }
         pct = (c[-1] / c[0] - 1) * 100 if c and c[0] else 0.0

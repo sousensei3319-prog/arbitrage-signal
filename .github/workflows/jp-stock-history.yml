@@ -26,6 +26,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # 保存の後にダッシュボード (pages.yml) を起動する
 
 concurrency:
   group: jp-stock-history-${{ github.ref }}
@@ -94,24 +95,38 @@ jobs:
         continue-on-error: true
         run: python ledger.py jp
 
+      # 収集ジョブ (日本は cron-job.org から5分ごと・米国は遅れて動く予定実行) が同じ1分足ファイルを書くため、
+      # 旧版は取り込み (rebase) が衝突すると「push failed (race)」で日足・週足・月足・1分足の追取りを全部捨てていた
+      # (緑のまま。2026-10-07・10-08 の米国、10-08・10-09 の日本)。衝突した行だけ収集側 (後から取った値) を残して
+      # 取り込み (-X ours: rebase では取り込み先 = 最新のブランチ側)、push の競合は5回まで取り込み直す。
+      # 保存できなかった時は、台帳を保存した後に赤にする (下の「Data persist failure is red」)
       - name: Persist collected data
+        id: persist
+        continue-on-error: true
         run: |
           git config user.name "jp-stock-bot"
           git config user.email "actions@users.noreply.github.com"
           git add -- data/jp_stocks 2>/dev/null || true
           # 仮想台帳は次の step で別に (再試行付きで) 保存する
           git reset -q -- data/jp_stocks/ledger 2>/dev/null || true
-          if ! git diff --cached --quiet; then
-            git commit -m "chore: JP stock history (d/w/m/1m backfill/rotate) $(date -u +'%Y-%m-%d %H:%M')"
-          # rebase競合時はabortして「push failed (race)」を正しく踏ませる
-          # (競合したまま放置するとpushが「Everything up-to-date」となり
-          #  データ喪失がsuccessに見える。2026-07-09に並走runで実際に発生)
-          # 収集データは次回の取得で自然回復するので、ここは従来どおり1回だけ試す
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || { git rebase --abort 2>/dev/null || true; }
-            git push origin "HEAD:${GITHUB_REF_NAME}" || echo "push failed (race) - next run"
-          else
-            echo "新規バーなし"
+          if git diff --cached --quiet; then
+            echo "新規バーなし"; exit 0
           fi
+          git commit -q -m "chore: JP stock history (d/w/m/1m backfill/rotate) $(date -u +'%Y-%m-%d %H:%M')"
+          for i in 1 2 3 4 5; do
+            if git pull -q --rebase --autostash -X ours origin "${GITHUB_REF_NAME}"; then
+              if git push -q origin "HEAD:${GITHUB_REF_NAME}"; then
+                echo "push成功 (${i}回目)"; exit 0
+              fi
+              echo "push失敗 (${i}回目): 他のジョブが先に保存した → 取り込み直して再試行"
+            else
+              git rebase --abort 2>/dev/null || true
+              echo "取り込み失敗 (${i}回目): 衝突を自動で解決できなかった (ファイルの削除など)"
+            fi
+            sleep $((i * 4))
+          done
+          echo "::error::日足・週足・月足・1分足の追取りを5回試行しても保存できなかった"
+          exit 1
 
       # 仮想台帳は「次回で自然回復」しない (取りこぼした日は補完扱いで集計から外れる) ため、
       # 最新のブランチに自分のファイルだけを載せ直し、再試行付きで保存する。失敗は赤
@@ -123,10 +138,30 @@ jobs:
           git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q FETCH_HEAD
           bash .github/scripts/commit_back.sh "chore: 仮想台帳 JP $(date -u +'%Y-%m-%d %H:%M')" data/jp_stocks/ledger
 
-      - name: Ledger failure is red
+      # 確定した日足をダッシュボードに出す (pages.yml の予定実行は場中だけなので、引け後に届いた確定値は
+      # 次の場が始まるまで画面に出なかった)。起動できなくても結果は変えない
+      - name: Rebuild dashboard (Pages)
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' && steps.persist.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/kick_workflows.py --dispatch pages.yml
+
+      # 赤の理由と対処は RUNNER_TEMP/failure_notes.txt にも書き、Discord の失敗通知に載せる
+      - name: 台帳の記録に失敗したら赤にする
         if: steps.ledger.outcome == 'failure'
         run: |
-          echo "::error::仮想台帳 (ledger.py) が失敗しました。収集データは保存済み。3営業日以内に直れば翌回に補完されます (補完分は集計から除外)"
+          msg="仮想台帳 (ledger.py) の記録に失敗した (収集データの保存は別の step)。3営業日以内に直れば翌回に補完される (補完した日は評価から外れる)。2日続いたら Claude に伝える"
+          echo "::error::${msg}"
+          echo "・${msg}" >> "${RUNNER_TEMP}/failure_notes.txt"
+          exit 1
+
+      - name: データの保存に失敗したら赤にする
+        if: steps.persist.outcome == 'failure'
+        run: |
+          msg="日足・週足・月足・1分足の追取りを保存できなかった (収集と5回ぶつかった。仮想台帳は別に保存済み)。1回なら対応不要 (翌日の引け後処理が5日分を取り直す)。2日続いたら Claude に伝える"
+          echo "::error::${msg}"
+          echo "・${msg}" >> "${RUNNER_TEMP}/failure_notes.txt"
           exit 1
 
       # 週次の話題枠入れ替え・台帳が止まっていないかの点検 (main の予定実行と cron-job.org/手動の起動の時。

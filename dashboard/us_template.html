@@ -67,6 +67,10 @@
   .alert.calm{border-color:var(--border);background:var(--surface);}
   .alert .ttl{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:680;color:var(--alert-ink);margin-bottom:8px;}
   .alert.calm .ttl{color:var(--muted);font-weight:600;margin-bottom:0;}
+  .alert.wait{border-color:var(--border);background:var(--surface-2);}
+  .alert.wait .ttl{color:var(--ink-2);font-weight:620;margin-bottom:4px;}
+  .alert .sub{font-size:12px;color:var(--muted);line-height:1.6;}
+  .na{color:var(--muted);}
   .alert .items{display:flex;flex-wrap:wrap;gap:8px;}
   .alertpill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--alert-bd);border-radius:9px;padding:6px 11px;cursor:pointer;font-size:12.5px;transition:transform .12s,box-shadow .12s;font-family:var(--ui);color:var(--ink);}
   .alertpill:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
@@ -329,6 +333,11 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   let WKEY=D.meta.default_win||"5m", THR=0.5, SEL=(D_INITIAL&&D_INITIAL.code)||null, TF="5m";
   const winLabel=()=>WINLB[WKEY]||WKEY;
 
+  // 勢い: null は「直前の同じ長さの時間がほぼ取引時間外なので比べていない」(寄り付き直後)
+  const momOf=tk=>{const m=(tk.w[WKEY]||{}).momentum;return m==null?null:m;};
+  const momCell=tk=>{const m=momOf(tk);
+    if(m==null)return `<td class="na" title="直前の同じ長さの時間が取引時間外のため比べていません（寄り付き直後）">—</td>`;
+    return `<td class="${m>=THR?"flag":(m>0?"up":"down")}">${m>0?"+":""}${m.toFixed(2)}</td>`;};
   function render(){
     const hotN=D.meta.hot_n||0;
     $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span>`+
@@ -337,11 +346,14 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       `<span class="chip">売買代金=終値×出来高</span>`;
     $("#chartnote").textContent=`全${T.length}銘柄から検索して選択・足を切替（分足〜月足）`;
 
-    const flagged=T.filter(tk=>(tk.w[WKEY]||{}).momentum>=THR).sort((a,b)=>b.w[WKEY].momentum-a.w[WKEY].momentum);
+    const flagged=T.filter(tk=>momOf(tk)!=null&&momOf(tk)>=THR).sort((a,b)=>momOf(b)-momOf(a));
+    const nWait=T.filter(tk=>momOf(tk)==null).length;
     const al=$("#alert");
     if(flagged.length){
       al.innerHTML=`<div class="alert"><div class="ttl">🚨 急騰検知 — 直近${winLabel()}でシェアが +${THR}pp 以上 急伸（${flagged.length}件）</div>`+
-        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">▲+${tk.w[WKEY].momentum.toFixed(2)}pp</span><span class="sec">${tk.w[WKEY].surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
+        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">▲+${momOf(tk).toFixed(2)}pp</span><span class="sec">${tk.w[WKEY].surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
+    }else if(nWait*2>T.length){al.innerHTML=`<div class="alert wait"><div class="ttl">⏸ 判定待ち — 直近${winLabel()}の勢いはまだ比べられません</div>`+
+        `<div class="sub">比べる相手の「直前の同じ長さの時間」が取引時間外です（寄り付き直後はしばらくこの表示。始まる時刻は<a href="help.html#momentum">使い方ガイド</a>）。集中度のランキングはいつもどおり見られます。</div></div>`;
     }else{al.innerHTML=`<div class="alert calm"><div class="ttl">🟢 急騰なし — 直近${winLabel()}でシェア +${THR}pp 以上の急伸銘柄はありません</div></div>`;}
     al.querySelectorAll(".alertpill").forEach(b=>b.onclick=()=>select(b.dataset.code));
 
@@ -354,7 +366,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const rk=T.slice().sort((a,b)=>(b.w[WKEY]||{}).surge-(a.w[WKEY]||{}).surge);const top=rk.slice(0,18);
     const maxS=Math.max.apply(null,top.map(t=>t.w[WKEY].surge).concat([1.2])),scale=maxS*1.05,refPct=1/scale*100;
     $("#rank").innerHTML=top.map((tk,i)=>{const w=Math.max(1,tk.w[WKEY].surge/scale*100);
-      const mom=tk.w[WKEY].momentum>=THR?`<span class="flag">🚨+${tk.w[WKEY].momentum.toFixed(2)}pp</span>`:`<span class="${tk.w[WKEY].dBase>0?'up':tk.w[WKEY].dBase<0?'down':''}">Δ${tk.w[WKEY].dBase>0?"+":""}${tk.w[WKEY].dBase.toFixed(2)}p</span>`;
+      const mom=momOf(tk)!=null&&momOf(tk)>=THR?`<span class="flag">🚨+${momOf(tk).toFixed(2)}pp</span>`:`<span class="${tk.w[WKEY].dBase>0?'up':tk.w[WKEY].dBase<0?'down':''}">Δ${tk.w[WKEY].dBase>0?"+":""}${tk.w[WKEY].dBase.toFixed(2)}p</span>`;
       return `<div class="rrow${SEL===tk.code?' sel':''}" tabindex="0" data-code="${tk.code}" role="button">
         <div class="rname"><span class="n">${i+1}. ${tk.name}</span><span class="tags"><span class="c">${tk.code}</span><span class="sect" title="${tk.sector}">${tk.sector}</span></span></div>
         <div class="track"><div class="bar" style="width:${w}%;background:${BC[tk.bucket]}"></div><div class="refline" style="left:${refPct}%"></div></div>
@@ -362,15 +374,13 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     $("#rank").querySelectorAll(".rrow").forEach(r=>{r.onclick=()=>select(r.dataset.code);r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(r.dataset.code);}};});
 
     $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pct=tk.pct||0;
-      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     // 話題枠 一覧 (bucket=hot のみ・集中度順)。全銘柄表と同じ行→チャートの動線。
     const hotList=rk.filter(tk=>tk.bucket==="hot");
     $("#hotcount").textContent=hotList.length;
     $("#hottbl tbody").innerHTML=hotList.map((tk,i)=>{const pct=tk.pct||0;
-      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     renderGroups();
 

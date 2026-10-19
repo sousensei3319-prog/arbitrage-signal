@@ -11,6 +11,7 @@ upsertによる保存・query1/query2フォールバックのロジックは同�
     GitHub Actions等で定期実行し、毎回 RANGE 分を取得 → 既存CSVへ「同じ足は最新の
     取得値で上書き・新しい足は追加」(upsert) することで、実行間隔を超えた連続履歴を
     自前で積み上げる (2026-10-03 に「新規だけ追記」方式から変更 — 理由は merge_bars())。
+    ただし1分足は取得時刻より SETTLE_MIN 分以上前の、出来高のある足は上書きしない (2026-10-09〜。理由は SETTLE_MIN)。
   - NYSE/Nasdaqの休場日・時間外に実行しても新規バーが単に無いだけ
     (同じ足の重複が起きないので休場日カレンダー代わりになり、祝日リストは持たない)。
   - query1/query2 の2ホストへフォールバック (Yahoo側が片方だけ不調な場合がある)。
@@ -67,6 +68,18 @@ INTERVAL     = os.environ.get("INTERVAL") or "1m"
 DATA_DIR     = os.environ.get("DATA_DIR") or "data/us_stocks"
 DEADLINE_MIN = float(os.environ.get("FETCH_DEADLINE_MIN") or "5")
 SLEEP_SEC    = float(os.environ.get("SLEEP_SEC") or "0.4")
+# 1分足の「落ち着いた足」は、出来高のある既存の値を上書きしない (2026-10-09 追加)。
+# Yahoo は同じ足に複数の版を持ち、取得のたびにどれかを返す (日本株 2026-10-09 の実データ: 6645 の 9:00〜13:00 の
+# 合計が、続くコミットの間で 694,300 / 699,100 / 1,193,000 株を行き来した。最後の版は 10:51 の足に累計入りの
+# 異常値 500,400 株)。旧版は取得のたびに上書きしたため、保存される値は最後に当たった版しだいで、
+#   - 場中も足の時刻から27分以上たった足が書き換わり続けた (5銘柄・1日で925回。合計はほぼ同じ = 振り直し)
+#   - 累計入りの異常値が後から入った (10/9 の足で205銘柄・259本。5銘柄で調べると足の時刻の34分後〜翌日)
+#   - 夜間・土日も5分ごとに約600ファイル・約7,000行を書き換えてコミットし (10/10 土曜136回・10/11 日曜125回)、
+#     引け後処理のデータ保存が収集と衝突して消える原因にもなっていた (10/8・10/9)
+# 足が初めて届くのは足の時刻の19〜24分後 (収集のコミットと最新の足の差)、書き換えは27分後から。そこで
+# 取得時刻より SETTLE_MIN 分以上前の、出来高のある足は既存の値を残す。無い足と出来高0の足は埋める
+# (取りこぼしの回収・寄りの出来高の補完)。
+SETTLE_MIN = 25
 BACKOFF_STEP = 2.0    # 429を検知するたびに増やすスリープ秒
 BACKOFF_MAX  = 8.0    # 銘柄間スリープに上乗せする上限秒
 
@@ -160,7 +173,15 @@ def fetched_rows(ticker, timestamps, quote, interval):
     return out
 
 
-def merge_bars(path, ticker, timestamps, quote, interval):
+def _has_volume(row):
+    """保存済みの行 (8列) の出来高が正か。"""
+    try:
+        return float(row[7] or 0) > 0
+    except (ValueError, IndexError):
+        return False
+
+
+def merge_bars(path, ticker, timestamps, quote, interval, now=None):
     """取得結果を既存CSVへ「同じ足は最新の取得値で上書き(upsert)・新しい足は追加」で反映し、
     epoch昇順で書き直す。戻り値 (新規本数, 更新本数, 除去したゴミ行数)。
 
@@ -192,6 +213,7 @@ def merge_bars(path, ticker, timestamps, quote, interval):
                 existing[k] = row[:8]
 
     n_new = n_upd = 0
+    settled_before = (time.time() if now is None else now) - SETTLE_MIN * 60
     for k, row in fetched_rows(ticker, timestamps, quote, interval):
         old = existing.get(k)
         if row[7] == "":
@@ -199,6 +221,8 @@ def merge_bars(path, ticker, timestamps, quote, interval):
             if old is not None:
                 continue
             row = row[:7] + ["0"]
+        if interval == "1m" and old is not None and int(row[1]) < settled_before and _has_volume(old):
+            continue  # 落ち着いた足は既存の値を残す (SETTLE_MIN の説明参照)
         if old is None:
             n_new += 1
         elif old != row:
