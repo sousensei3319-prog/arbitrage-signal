@@ -33,7 +33,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # 遅れて来た予定実行は、その日の引け後処理が (日本株の収集の kick で) もう成功していれば何もしない。
+  # 予定実行は毎日数時間遅れるので、放っておくと毎日2回動き、鮮度点検の赤も2回 @everyone で届く (2026-10-19 の運用の反証)。
+  # 確かめられない時は動く (二重に動いても害は無い)
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      skip: ${{ steps.g.outputs.skip }}
+    steps:
+      - uses: actions/checkout@v5
+        if: github.event_name == 'schedule'
+        with:
+          sparse-checkout: .github/scripts
+      - id: g
+        if: github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/kick_workflows.py --skip-if-done jp-stock-history.yml >> "$GITHUB_OUTPUT"
+
   history:
+    needs: guard
+    if: ${{ !cancelled() && needs.guard.outputs.skip != 'true' }}
     runs-on: ubuntu-latest
     # 各取得stepの締切(10+10+10+16分)+台帳+保存が収まる長さ (620〜810銘柄化で重くなったため35→60)
     timeout-minutes: 60
@@ -106,8 +127,13 @@ jobs:
         run: |
           git config user.name "jp-stock-bot"
           git config user.email "actions@users.noreply.github.com"
+          # 仮想台帳は次の step で別に (再試行付きで) 保存する。下の取り込み (autostash) で台帳が衝突すると、作業ツリーの台帳に
+          # 衝突の印が残り次の step がそれを保存してしまう (今は台帳を書くのが history だけなので起きないが、手で直した日に起きる。
+          # 2026-10-19 の運用の反証)。この run が作った台帳を退避し、どの終わり方でも元に戻す
+          keep="${RUNNER_TEMP}/ledger_keep"; rm -rf "$keep"; cp -a data/jp_stocks/ledger "$keep" 2>/dev/null || true
+          restore_ledger() { if [ -d "$keep" ]; then rm -rf data/jp_stocks/ledger && cp -a "$keep" data/jp_stocks/ledger; fi; }
+          trap restore_ledger EXIT
           git add -- data/jp_stocks 2>/dev/null || true
-          # 仮想台帳は次の step で別に (再試行付きで) 保存する
           git reset -q -- data/jp_stocks/ledger 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "新規バーなし"; exit 0
@@ -136,7 +162,9 @@ jobs:
         env: { COMMIT_BOT_NAME: 'jp-stock-bot' }
         run: |
           git fetch -q origin "${GITHUB_REF_NAME}" && git reset -q FETCH_HEAD
-          bash .github/scripts/commit_back.sh "chore: 仮想台帳 JP $(date -u +'%Y-%m-%d %H:%M')" data/jp_stocks/ledger
+          bash .github/scripts/commit_back.sh "chore: 仮想台帳 JP $(date -u +'%Y-%m-%d %H:%M')" data/jp_stocks/ledger || {
+            echo "・仮想台帳を保存できなかった (再試行しても失敗)。きょうの判定日は次の引け後処理で補完扱いになる (評価から外れる)。2日続いたら Claude に伝える" >> "${RUNNER_TEMP}/failure_notes.txt"
+            exit 1; }
 
       # 確定した日足をダッシュボードに出す (pages.yml の予定実行は場中だけなので、引け後に届いた確定値は
       # 次の場が始まるまで画面に出なかった)。起動できなくても結果は変えない
@@ -149,15 +177,17 @@ jobs:
 
       # 赤の理由と対処は RUNNER_TEMP/failure_notes.txt にも書き、Discord の失敗通知に載せる
       - name: 台帳の記録に失敗したら赤にする
-        if: steps.ledger.outcome == 'failure'
+        if: ${{ !cancelled() && steps.ledger.outcome == 'failure' }}
         run: |
           msg="仮想台帳 (ledger.py) の記録に失敗した (収集データの保存は別の step)。3営業日以内に直れば翌回に補完される (補完した日は評価から外れる)。2日続いたら Claude に伝える"
           echo "::error::${msg}"
           echo "・${msg}" >> "${RUNNER_TEMP}/failure_notes.txt"
           exit 1
 
+      # 前の赤の step が exit 1 しても動くよう !cancelled() を付ける (付けないと暗黙の success() で飛ばされ、両方失敗した日に
+      # 保存の失敗の理由が通知に載らない。2026-10-19 の運用の反証)
       - name: データの保存に失敗したら赤にする
-        if: steps.persist.outcome == 'failure'
+        if: ${{ !cancelled() && steps.persist.outcome == 'failure' }}
         run: |
           msg="日足・週足・月足・1分足の追取りを保存できなかった (収集と5回ぶつかった。仮想台帳は別に保存済み)。1回なら対応不要 (翌日の引け後処理が5日分を取り直す)。2日続いたら Claude に伝える"
           echo "::error::${msg}"

@@ -13,9 +13,12 @@
 記録し直さず、1分足は落ち着いた足を上書きしないので害は無い)。
 
   jp-history: 平日 (JST) 16:35〜23:59 に、その日 16:00 JST 以降に作られた jp-stock-history.yml の run が無ければ起動
-  us-history: 平日 (ET) 16:35〜23:59 に、その日 16:00 ET 以降に作られた us-stock-history.yml の run が無ければ起動
-              (米国の日足はその日の夜に銘柄ごとに出るので、この時刻の台帳は前の営業日を記録する = 従来どおり)
-  us-collect: 平日 (ET) 9:40〜16:40 に、直近 14 分以内に作られた us-stock.yml の run が無ければ起動 (約15分ごと)
+  us-history: 平日 (ET) 16:50〜23:59 に、その日 16:45 ET 以降に作られた us-stock-history.yml の run が無ければ起動
+              (米国の日足はその日の夜に銘柄ごとに出るので、この時刻の台帳は前の営業日を記録する = 従来どおり。
+               16:50 にするのは、引けの足 (15:59) を含む money_flow を米国の収集が保存した後に始めるため: 台帳は
+               money_flow の最新足が 15:50 以降の時だけ引け時点の値を残すので、早すぎると mf_* が空のまま確定する。
+               冬時間は予定実行 21:23 UTC = 16:23 EST が 16:45 より前なので「起動済み」に数えない)
+  us-collect: 平日 (ET) 9:40〜16:45 に、直近 14 分以内に作られた us-stock.yml の run が無ければ起動 (約15分ごと)
   jp-hot:     月曜 (JST) 7:15〜8:45 に、その日 7:00 JST 以降に作られた hot-refresh.yml の run が無ければ起動
   us-hot:     月曜 (ET) 7:15〜9:15 に、その日 6:00 ET 以降に作られた us-hot-refresh.yml の run が無ければ起動
               (話題枠の入れ替えは「今週済みなら何もしない」ので、重なっても1回分しか動かない)
@@ -24,8 +27,12 @@
 使い方: GITHUB_TOKEN / GITHUB_REPOSITORY を渡して
         python .github/scripts/kick_workflows.py                 (上の表どおりに起動)
         python .github/scripts/kick_workflows.py --dispatch pages.yml   (指定の workflow を main で1回起動)
+        python .github/scripts/kick_workflows.py --skip-if-done jp-stock-history.yml
+            (遅れて来た予定実行の入口で使う。直近の 16:00 (現地) 以降に成功した同じ workflow の run があれば
+             skip=true を出力する。kick と遅れた予定実行で毎日2回動き、赤の通知も2回飛ぶのを防ぐ)
         (workflow の permissions に actions: write が要る。起動できなくても exit 0 = 呼び出し元を赤にしない)
 """
+import http.client
 import json
 import os
 import sys
@@ -37,13 +44,15 @@ from zoneinfo import ZoneInfo
 JST = timezone(timedelta(hours=9))
 ET = ZoneInfo("America/New_York")
 API = "https://api.github.com"
+# 通信の失敗 (HTTP の 4xx/5xx・接続・応答の途中切れ http.client.IncompleteRead・JSON の壊れ)
+ERRORS = (urllib.error.URLError, OSError, ValueError, http.client.HTTPException)
 
 # since: その日のこの時刻 (現地) 以降に作られた run があれば起動済み / recent_min: 直近この分数以内に作られた run があれば起動済み
 # days: 曜日 (月=0)。省略は平日
 RULES = [
     {"name": "jp-history", "wf": "jp-stock-history.yml", "tz": JST, "start": (16, 35), "end": (23, 59), "since": (16, 0)},
-    {"name": "us-history", "wf": "us-stock-history.yml", "tz": ET, "start": (16, 35), "end": (23, 59), "since": (16, 0)},
-    {"name": "us-collect", "wf": "us-stock.yml", "tz": ET, "start": (9, 40), "end": (16, 40), "recent_min": 14},
+    {"name": "us-history", "wf": "us-stock-history.yml", "tz": ET, "start": (16, 50), "end": (23, 59), "since": (16, 45)},
+    {"name": "us-collect", "wf": "us-stock.yml", "tz": ET, "start": (9, 40), "end": (16, 45), "recent_min": 14},
     {"name": "jp-hot", "wf": "hot-refresh.yml", "tz": JST, "days": (0,), "start": (7, 15), "end": (8, 45), "since": (7, 0)},
     {"name": "us-hot", "wf": "us-hot-refresh.yml", "tz": ET, "days": (0,), "start": (7, 15), "end": (9, 15), "since": (6, 0)},
 ]
@@ -87,6 +96,27 @@ def api(method, path, token, body=None):
         return r.status, (json.loads(data) if data else None)
 
 
+def last_since(rule, now_utc):
+    """now 以前で直近の since 時刻 (現地) と、now の20時間前の遅い方。since より前なら前日の since
+    (日付をまたいで遅れた予定実行も前日分とみなす)。20時間で切るのは、since より早く来た予定実行 (冬時間の米国 16:23 EST) が
+    前日の成功を見て飛ばないようにするため (kick が止まっている日にその日の処理が1本も動かなくなる)"""
+    now = now_utc.astimezone(rule["tz"])
+    h, m = rule["since"]
+    t = now.replace(hour=h, minute=m, second=0, microsecond=0)
+    t = t if t <= now else t - timedelta(days=1)
+    return max(t.astimezone(timezone.utc), now_utc - timedelta(hours=20))
+
+
+def succeeded_after(runs, after_utc, self_id):
+    """after_utc 以降に作られ、成功で終わった、自分以外の run があるか。"""
+    for r in runs:
+        if str(r.get("id")) == str(self_id) or r.get("conclusion") != "success":
+            continue
+        if started_after([r], after_utc):
+            return True
+    return False
+
+
 def dispatch(wf, token, repo):
     st, _ = api("POST", f"/repos/{repo}/actions/workflows/{wf}/dispatches", token, {"ref": "main"})
     return st
@@ -99,8 +129,22 @@ def main():
     if len(sys.argv) >= 3 and sys.argv[1] == "--dispatch":
         try:
             print(f"{sys.argv[2]} を起動した (HTTP {dispatch(sys.argv[2], token, repo)})")
-        except (urllib.error.URLError, OSError, ValueError) as e:
+        except ERRORS as e:
             print(f"::warning::{sys.argv[2]} を起動できなかった ({type(e).__name__}: {e})")
+        return
+    if len(sys.argv) >= 3 and sys.argv[1] == "--skip-if-done":
+        rule = next((r for r in RULES if r["wf"] == sys.argv[2] and "since" in r), None)
+        skip = False
+        if rule:
+            try:
+                _, data = api("GET", f"/repos/{repo}/actions/workflows/{rule['wf']}/runs?branch=main&per_page=20", token)
+                after = last_since(rule, datetime.now(timezone.utc))
+                skip = succeeded_after((data or {}).get("workflow_runs") or [], after, os.environ.get("GITHUB_RUN_ID"))
+                print(f"{rule['wf']}: 現地 {after.astimezone(rule['tz']):%m-%d %H:%M} 以降に成功した run が"
+                      + ("ある → この予定実行は何もしない" if skip else "無い → 動く"), file=sys.stderr)
+            except ERRORS as e:   # 分からない時は動く (二重に動いても害は無い)
+                print(f"::warning::{rule['wf']}: 確かめられなかったので動く ({type(e).__name__}: {e})", file=sys.stderr)
+        print(f"skip={'true' if skip else 'false'}")
         return
     now_utc = datetime.now(timezone.utc)
     for rule in RULES:
@@ -114,7 +158,7 @@ def main():
                 print(f"{rule['name']}: 起動済み (現地 {after.astimezone(rule['tz']):%H:%M} 以降に run あり)")
                 continue
             print(f"{rule['name']}: {rule['wf']} を起動した (HTTP {dispatch(rule['wf'], token, repo)}・現地 {now:%m-%d %H:%M})")
-        except (urllib.error.URLError, OSError, ValueError) as e:
+        except ERRORS as e:
             # 起動できなくても収集は止めない。続けば鮮度点検 (補完の日の増加・収集の停止) が赤にする
             print(f"::warning::{rule['name']}: 起動できなかった ({type(e).__name__}: {e})")
 

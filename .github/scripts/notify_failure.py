@@ -40,8 +40,11 @@ if len(notes) > 1400:   # Discord の本文は2000文字まで
     notes = notes[:1400] + "…(続きはログ)"
 lines = [("@everyone " if mention else "") + f"⚠️ **{os.environ.get('GITHUB_WORKFLOW', 'workflow')}** が失敗しました"
          + (f" — {what}" if what else "")]
-lines += ([notes] if notes else
-          ["データを書き換えずに止めたか、保存に失敗しています。ログの赤いエラー行 (::error::) を確認してください。"])
+if notes:
+    lines.append(notes)
+# 理由が書かれていない step の失敗 (取得の失敗など) もあるので、定型の案内は常に付ける
+lines.append("データを書き換えずに止めたか、保存に失敗しています。ログの赤いエラー行 (::error::) を確認してください。"
+             if not notes else "ほかの赤いエラー行 (::error::) もログで確認してください。")
 lines.append(run_url)
 payload = {"content": "\n".join(lines), "allowed_mentions": {"parse": ["everyone"] if mention else []}}
 req = urllib.request.Request(url, data=json.dumps(payload).encode(), method="POST",

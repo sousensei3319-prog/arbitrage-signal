@@ -25,9 +25,11 @@ site/us/index.html + site/us/data/*.json を書き出す。
 依存なし (標準ライブラリのみ)。実行: python dashboard/build_us_dashboard.py
 """
 
+import bisect
 import csv
 import json
 import os
+import statistics
 import sys
 import time
 from datetime import datetime, timedelta
@@ -53,11 +55,11 @@ WINS = [
     {"k": "30m",  "sec": 30 * 60},
     {"k": "60m",  "sec": 60 * 60},
     {"k": "240m", "sec": 240 * 60},
-    {"k": "1d",   "sec": 1 * 86400, "daily": True},
-    {"k": "1w",   "sec": 5 * 86400, "daily": True},
-    {"k": "1M",   "sec": 21 * 86400, "daily": True},
+    {"k": "1d",   "sec": 1 * 86400, "daily": True, "bars": 1},     # 日足系は営業日の本数で区切る (_bar_window_stats)
+    {"k": "1w",   "sec": 5 * 86400, "daily": True, "bars": 5},
+    {"k": "1M",   "sec": 21 * 86400, "daily": True, "bars": 21},
 ]
-DEFAULT_WKEY = "5m"
+DEFAULT_WKEY = "30m"   # 画面に出るまで20〜40分遅れるので5分窓は既定に向かない (2026-10-19 トレーダーの反証)
 
 
 def load_universe():
@@ -101,8 +103,9 @@ def load_1d(sym, cutoff_date, rows1m):
     - 日足ファイルに無い日は1分足から組み立てる。米国の日足はその日の夜 (ET) に銘柄ごとに順に出るため、
       引け後処理が早く動いた日は前日分がまだ無く、旧版 (最終日だけ組み立て) では前日が抜けていた
       (2026-10-09: 738銘柄中715銘柄で 10/7 が無い)。引け後処理のデータ保存が消えた日も同じ
-    - 最終日は、日足ファイルの値 (確定値) の出来高の方が大きければそちらを使う。1分足には大引けのクロス
-      (16:00) の出来高が入らず、確定した日足の8割弱にしかならない (2026-09-28〜10-06 の実データの中央値 0.70〜0.80)
+    - 日足ファイルに確定値がある日は、最終日も必ずそちらを使う。1分足には大引けのクロス (16:00) の出来高が入らず、
+      確定した日足の8割弱にしかならない (2026-09-28〜10-06 の実データの中央値 0.70〜0.80)。旧版は最終日だけ
+      「1分足の方が大きければ1分足」にしていたが、累計入りの異常足で膨らんだ1分足を確定値より優先しうる (2026-10-19 の反証)
     """
     days = {}   # 日付 → (epoch, open, high, low, close, volume)
     p = os.path.join(DATA, f"{sym.replace('.', '_')}_1d.csv")
@@ -125,7 +128,7 @@ def load_1d(sym, cutoff_date, rows1m):
     for d, bars in by_day.items():
         cs = [b[1] for b in bars]
         rec = (bars[0][0], cs[0], max(cs), min(cs), cs[-1], int(sum(b[2] for b in bars)))
-        if d not in days or (d == cutoff_date and rec[5] > days[d][5]):
+        if d not in days:
             days[d] = rec
     if not days:
         return None
@@ -184,21 +187,53 @@ def _open_seconds(a, b):
     return tot
 
 
+def _bar_window_stats(rows, n):
+    """日足系の窓 (n 本 = n 営業日) の (recent, prev, 中央値)。直近 n 本・その前の n 本・過去を n 本ずつ区切ったブロック
+    (直近のブロックを除く) の中央値。旧版は暦の秒で区切っていたため、月曜・連休明けは1日窓の「直前の窓」が土日で空になり、
+    勢いがシェアそのものになって🚨が大型株に約30件並んでいた (2026-10-19 月曜: 日本31件・米国28件)。1週窓も曜日によって
+    3〜5本 (月曜は木・金・月の3本)、1か月窓は約15本で、名前どおりの長さではなかった。"""
+    to = [r[3] for r in rows]
+    if not to:
+        return 0.0, 0.0, 0.0
+    recent = sum(to[-n:])
+    prev = sum(to[-2 * n:-n]) if len(to) > n else 0.0
+    blocks = [sum(to[i - n:i]) for i in range(len(to) - n, n - 1, -n)]
+    # 過去のブロックが無い (上場・話題枠入りから 2n 本未満) ときは直近自身を基準にする = 集中度 1.0 (旧 window_stats と同じ)
+    return recent, prev, (statistics.median(blocks) if blocks else recent)
+
+
+def _window_change(rows, w, eps):
+    """窓の値動き (%): 窓の始まり以前の最後の終値 → 最後の終値。日足系は n 本前の終値から。"""
+    if not rows:
+        return 0.0
+    c1 = rows[-1][1]
+    if w.get("daily"):
+        n = w["bars"]
+        c0 = rows[-n - 1][1] if len(rows) > n else rows[0][1]
+    else:
+        i = bisect.bisect_right(eps, rows[-1][0] - w["sec"]) - 1
+        c0 = rows[i][1] if i >= 0 else rows[0][1]
+    return (c1 / c0 - 1) * 100 if c0 else 0.0
+
+
 def compute_all_windows(per_ticker_rows):
     """per_ticker_rows: {sym: {"intraday": rows, "daily": rows}} から
     全銘柄×全窓の (recent, prev, med, total) を計算し、続けてクロス銘柄シェアを正規化する。
-    戻り値: {sym: {wkey: {surge, shareR, momentum, dBase, recent}}} (momentum は比べない時 None)
+    戻り値: {sym: {wkey: {surge, shareR, momentum, dBase, recent, chg}}} (momentum は比べない時 None・chg は窓の値動き%)
     """
     raw = {}
     intraday_total, daily_total = {}, {}
     for sym, rows in per_ticker_rows.items():
         wraw = {}
+        eps = [r[0] for r in rows["intraday"]]
         for w in WINS:
             src = rows["daily"] if w.get("daily") else rows["intraday"]
-            recent, prev, med = umf.window_stats(src, w["sec"])
+            recent, prev, med = (_bar_window_stats(src, w["bars"]) if w.get("daily")
+                                 else umf.window_stats(src, w["sec"]))
             wraw[w["k"]] = {"recent": recent, "prev": prev, "med": med,
                            "prev_open": (_open_seconds(src[-1][0] - 2 * w["sec"], src[-1][0] - w["sec"])
-                                         if src and not w.get("daily") else None)}
+                                         if src and not w.get("daily") else None),
+                           "chg": _window_change(src, w, None if w.get("daily") else eps)}
         raw[sym] = wraw
         intraday_total[sym] = sum(r[3] for r in rows["intraday"])
         daily_total[sym] = sum(r[3] for r in rows["daily"])
@@ -239,6 +274,7 @@ def compute_all_windows(per_ticker_rows):
                 "surge": round(surge, 3),
                 "shareR": round(shareR, 3),
                 "momentum": round(shareR - shareP, 3) if comparable else None,
+                "chg": round(raw[sym][k]["chg"], 2),   # 窓の値動き (%)。急増は値下がりでも点くので札に向きを出す
                 "dBase": round(shareR - shareBase, 3),
             }
         result[sym] = wres
@@ -329,6 +365,10 @@ def build(uni):
             # 「ストップ高/安」の推定はしない。単に「最後の約定はいつでどう動いたか」の事実)
             move = ((cc[-1] / oo[-1] - 1) * 100) if (oo and cc and oo[-1]) else 0.0
             entry["stale"] = True
+            # 最新の取引日に約定の無い銘柄は勢いを比べない (窓は銘柄ごとの最後の足が基準なので、何日・何週間も前の足が
+            # 「直近」になり、米国では 8/19 に止まった銘柄が2か月後も🚨に出ていた。2026-10-19 のトレーダーの反証)
+            for wv in entry["w"].values():
+                wv["momentum"] = None
             entry["last_date"] = f"{st_date.month}/{st_date.day}"
             entry["move_pct"] = round(move, 1)
         summary_tickers.append(entry)
@@ -343,6 +383,7 @@ def build(uni):
     meta = {
         "start": datetime.fromtimestamp(d0, ET).strftime("%Y-%m-%d %H:%M"),
         "end": datetime.fromtimestamp(d1, ET).strftime("%Y-%m-%d %H:%M") if d1 else "-",
+        "end_epoch": int(d1) if d1 else None,   # 画面で「約◯分前のデータ」を出す (閲覧した時刻との差)
         "n": len(summary_tickers),
         # 話題枠(hot)銘柄数 — ヘッダーの「話題枠 +N」表示用。leader/core(Nasdaq100/S&P500)は
         # 固定の指数母数で、増減するのは話題枠だけなので、その分を可視化する。
