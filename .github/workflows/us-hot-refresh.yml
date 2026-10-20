@@ -63,7 +63,12 @@ jobs:
         env:
           RANK_TOP: '30'
           ABSENT_WEEKS: '4'
-          KEEP_SURGE: '1.3'
+          # 除外: 圏外4週以上で、直近5営業日の売買代金が話題枠に入る前の KEEP_RATIO 倍未満、かつ上位 KEEP_TOP_PCT% 外
+          # (日足が STOP_DAYS 営業日届かない銘柄も外す)。1週に外すのは MAX_REMOVE 件まで、冷めた順
+          KEEP_RATIO: '2.5'
+          KEEP_TOP_PCT: '10'
+          STOP_DAYS: '5'
+          MAX_REMOVE: '30'
           FETCH_DEADLINE_MIN: '5'
           HOT_ADDED_OUT: ${{ runner.temp }}/hot_added.txt
           # 今週の入れ替えが済んでいれば何もしない (週の最初の1回だけが入れ替える)。例外は2つだけ:
