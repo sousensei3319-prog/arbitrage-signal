@@ -136,6 +136,9 @@
   .hotchg .nm{font-weight:660;}
   .hotchg .rs{color:var(--ink-2);}
   .hotchg .none{color:var(--muted);font-size:12.5px;}
+  .hotchg .hotrule{font-size:12.5px;line-height:1.75;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:8px 12px;}
+  .hotchg .hotrule .sub{color:var(--muted);}
+  .pendmark{font-size:10px;color:var(--muted);font-weight:700;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:0 4px;}
   .tbl-scroll{overflow-x:auto;margin-top:10px;}
   table{border-collapse:collapse;width:100%;font-size:12px;min-width:700px;}
   th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -291,17 +294,29 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+fmtComment(t)+"</li>";}).join("");
   }
   // 今週の話題枠 入れ替え (hot_refresh.py の出力。追加/除外の根拠付き)
+  // 外す条件を満たしたが1週の上限で来週以降に回した銘柄 (話題枠一覧に「外す予定」と出す)
+  const HOT_CARRIED=new Set((D_HOTCHANGES&&D_HOTCHANGES.carried)||[]);
   if(D_HOTCHANGES){
-    var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[];
-    if(_add.length||_rm.length){
+    var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[], _rule=D_HOTCHANGES.rule;
+    var _md=function(s){var m=/^\d{4}-(\d\d)-(\d\d)$/.exec(s||"");return m?(+m[1])+"/"+(+m[2]):"";};
+    if(_add.length||_rm.length||HOT_CARRIED.size){
       document.getElementById("hotchangesec").style.display="";
       document.getElementById("hotchangenote").textContent=
-        (D_HOTCHANGES.week||"")+" 時点・話題枠 全"+(D_HOTCHANGES.hot_total||"?")+"銘柄（毎週月曜 自動更新）";
+        (_md(D_HOTCHANGES.date)?_md(D_HOTCHANGES.date)+" の入れ替え":(D_HOTCHANGES.week||"")+" 時点")+
+        "・話題枠 全"+(D_HOTCHANGES.hot_total||"?")+"銘柄（毎週月曜 自動更新）";
       var rowHtml=function(kind,x){
         return '<div class="row"><span class="tag '+(kind==="add"?"add":"rm")+'">'+(kind==="add"?"＋追加":"－除外")+
           '</span><span><span class="nm">'+escHtml(x.name)+'</span> <span class="tnum" style="color:var(--muted)">'+
           escHtml(x.code)+'</span> <span class="rs">— '+escHtml(x.reason)+'</span></span></div>';};
       var h='<div class="hotchg">';
+      if(_rule){
+        h+='<div class="hotrule"><b>外す条件</b>：毎週月曜の朝に、前の営業日のランキング上位'+_rule.rank_top+'位を確かめ、'+
+          _rule.absent_weeks+'回続けて出ていない話題株のうち、直近5営業日（'+_md(_rule.from)+'〜'+_md(_rule.to)+'）の1日平均の売買代金が'+
+          '<b>'+escHtml(_rule.floor)+'未満</b>（小さすぎる）か、'+(_rule.big?'<b>'+escHtml(_rule.big)+'未満</b>（指数の銘柄の真ん中より小さい）で':'')+
+          '<b>話題枠に入る前の'+_rule.keep_ratio+'倍未満</b>まで落ち着いた銘柄。株価データがとだえた銘柄も外します。'+
+          '外すのは1週'+_rule.max_remove+'件までで、売買の少ない順'+(HOT_CARRIED.size?'（残り'+HOT_CARRIED.size+'件は来週以降。話題枠一覧に「外す予定」）':'')+'。'+
+          '<br><span class="sub">除外は監視リストの整理で、値下がりや売りのサインではありません。指数の銘柄は外れても元の区分で監視を続けます。</span></div>';
+      }
       h+=_add.length?_add.map(function(a){return rowHtml("add",a);}).join(""):'<div class="none">今週の新規追加はありません。</div>';
       h+=_rm.length?_rm.map(function(r){return rowHtml("rm",r);}).join(""):'<div class="none">今週の除外はありません。</div>';
       h+='</div>';
@@ -381,7 +396,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     $("#hottbl tbody").innerHTML=hotList.map((tk,i)=>{const pct=tk.pct||0;
       const sd=D_SUPPLY[tk.code];
       const sdCell=sd?`<span title="大口(0.5%以上)報告 ${sd.n}件・${sd.date}公表">${sd.pct.toFixed(2)}%</span>`:"—";
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（ストップ高・売買停止などの可能性）">⏸本日約定なし</span>':''}${HOT_CARRIED.has(tk.code.replace(/\.T$/,""))?' <span class="pendmark" title="外す条件を満たしています。1週の上限のため来週以降に外します">外す予定</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${yen(tk.w[WKEY].recent)}円</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td><td class="supply">${sdCell}</td></tr>`;}).join("");
 
     renderGroups();
 
