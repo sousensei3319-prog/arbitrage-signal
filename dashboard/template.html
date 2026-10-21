@@ -313,8 +313,9 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
         h+='<div class="hotrule"><b>外す条件</b>：毎週月曜の朝に、前の営業日のランキング上位'+_rule.rank_top+'位を確かめ、'+
           _rule.absent_weeks+'回続けて出ていない話題株のうち、直近5営業日（'+_md(_rule.from)+'〜'+_md(_rule.to)+'）の1日平均の売買代金が'+
           '<b>'+escHtml(_rule.floor)+'未満</b>（小さすぎる）か、'+(_rule.big?'<b>'+escHtml(_rule.big)+'未満</b>（指数の銘柄の真ん中より小さい）で':'')+
-          '<b>話題枠に入る前の'+_rule.keep_ratio+'倍未満</b>まで落ち着いた銘柄。株価データがとだえた銘柄も外します。'+
+          '<b>話題枠に入る前の'+_rule.keep_ratio+'倍未満</b>まで落ち着いた銘柄（入る前と比べられない、上場して間もない銘柄なども含む）。株価データがとだえた銘柄も外します。'+
           '外すのは1週'+_rule.max_remove+'件までで、売買の少ない順'+(HOT_CARRIED.size?'（残り'+HOT_CARRIED.size+'件は来週以降。話題枠一覧に「外す予定」）':'')+'。'+
+          (_rule.skipped?'<br><b>⚠ '+escHtml(_rule.skipped)+'</b>':'')+
           '<br><span class="sub">除外は監視リストの整理で、値下がりや売りのサインではありません。指数の銘柄は外れても元の区分で監視を続けます。</span></div>';
       }
       h+=_add.length?_add.map(function(a){return rowHtml("add",a);}).join(""):'<div class="none">今週の新規追加はありません。</div>';

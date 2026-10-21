@@ -97,8 +97,10 @@ jobs:
 
       # 仮想台帳の答え合わせ待ちなのにユニバースから外れた銘柄 (話題枠の除外など) の日足だけ取り続ける。
       # 取らないと、外れた銘柄の +20日 が永久に空欄のまま集計から消える (生き残った銘柄だけが残る偏り)
+      # 話題枠から外した銘柄も約1か月は答え合わせを待つ。外す件数が増えた (日本30・米国60件/週) ので締め切りを 3→6 分に
+      # (コード順なので締め切りで切れると毎日同じ銘柄が欠け、外した銘柄だけ答えが空のまま抜ける。締め切りの合計は60分の内)
       - name: Keep daily bars for ledger rows outside the universe
-        env: { INTERVAL: '1d', RANGE: '3mo', SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '3' }
+        env: { INTERVAL: '1d', RANGE: '3mo', SLEEP_SEC: '0.4', FETCH_DEADLINE_MIN: '6' }
         run: |
           P=$(python ledger.py us --pending-codes 2>/dev/null || true)
           if [ -n "$P" ]; then

@@ -37,8 +37,10 @@ JP版(hot_refresh.py)との差分:
     約190件が片付くのに3〜4か月かかる → ユーザーの判断で60件)
   - 直近5営業日は「9割以上の銘柄に日足がある最新日」まで。その日の日足が無い・5日のうち3日に満たない銘柄は判定を見送る (残す)
   - custom_groups.csv 掲載の恒久テーマ銘柄(半導体等)は保護し、絶対に外さない。指数構成銘柄は leader/core に戻す
-  - 日足の最新日が STALE_DAYS(10)暦日より古い時と、leader/core でも日足が止まった銘柄が多い時 (5銘柄かつ2%超) は、
-    データの障害とみなして日足を使う除外をしない (障害で一斉に外さない)
+  - 日足の最新日が STALE_DAYS(7)暦日より古い時 (月曜の朝の祝日のすき間は最大約5暦日) は、日足を使う除外をしない。
+    leader/core でも日足が止まった銘柄が多い時 (5銘柄かつ2%超) は、「データがとだえた」による除外をしない
+    (取得の障害で一斉に外さない。売買代金による判定は、基準日の日足がある銘柄だけで続ける)。見送った理由は
+    hot_changes_latest.json の rule.skipped に入れ、ダッシュボードに出す (「除外はありません」と区別するため)
   圏外の週数は「最後にランキングで見た週から何週たったか」を超えない (2026-W41 は入れ替えが2回動き、1回目にランキングで
   見た銘柄を2回目に圏外と数えていた)。
   旧ルール (〜2026-10-20) の「money_flow.csv の集中度 < 1.3」は、指数銘柄でも約9割が1.3未満になり、話題が続いているかを
@@ -101,7 +103,7 @@ MIN_TURNOVER = float(os.environ.get("MIN_TURNOVER") or "1e7")    # 1日の売買
 STOP_DAYS = int(os.environ.get("STOP_DAYS") or "5")        # この営業日数以上、日足も1分足も無ければ「データがとだえた」
 MAX_REMOVE = int(os.environ.get("MAX_REMOVE") or "60")     # 1週に外す上限 (売買の少ない順)
 RECENT_DAYS, BASE_DAYS, BASE_MIN = 5, 60, 20               # 直近5営業日 / 入る前の60営業日の日中央値 (20日未満は測れない)
-STALE_DAYS = 10                                            # 日足の最新日がこの暦日数より古ければ、日足を使う除外はしない
+STALE_DAYS = 7                                             # 日足の最新日がこの暦日数より古ければ、日足を使う除外はしない
 FETCH_DEADLINE_MIN = float(os.environ.get("FETCH_DEADLINE_MIN") or "5")
 # 1 の時、今週の入れ替えが済んでいれば何もしない (入れ替えは週の最初の1回だけ)
 SKIP_IF_DONE_THIS_WEEK = (os.environ.get("SKIP_IF_DONE_THIS_WEEK") or "") == "1"
@@ -203,11 +205,13 @@ def load_index_members():
 
 
 def fmt_money(v):
-    """1億以上は億 (10億未満は小数2桁まで・末尾の0は省く)、それ未満は万で表す。例: 1億ドル・1.02億ドル・39.1億ドル・1,000万ドル"""
+    """1億以上は億 (10億未満は小数2桁まで・末尾の0は省く)、それ未満は万で表す。どちらも切り捨て (境目の1億ドル未満を
+    「1億ドル」と出さない)。例: 1億ドル・1.02億ドル・39.1億ドル・9,999万ドル"""
     if v < 1e8:
-        return f"{v / 1e4:,.0f}万ドル"
-    s = f"{v / 1e8:,.{2 if v < 1e9 else 1}f}"
-    return (s.rstrip("0").rstrip(".") if "." in s else s) + "億ドル"
+        return f"{int(v / 1e4):,}万ドル"
+    ip, fp = f"{v / 1e8:,.6f}".split(".")              # 切り捨て (文字列で切るので小数の誤差が出ない)
+    s = f"{ip}.{fp[:2 if v < 1e9 else 1]}".rstrip("0").rstrip(".")
+    return s + "億ドル"
 
 
 def weeks_between(a, b):
@@ -232,8 +236,11 @@ def load_turnover(codes):
                             m[d] = float(r["close"]) * float(r.get("volume") or 0)
                     except (KeyError, TypeError, ValueError):
                         pass
-        except OSError:
-            pass
+        except (OSError, UnicodeDecodeError, csv.Error) as e:
+            # 壊れたファイル1つで週次の入れ替え全体を止めない (その銘柄は日足が無い扱い。1分足があれば「とだえた」にはしない)
+            if not isinstance(e, FileNotFoundError):
+                print(f"::warning::{code} の日足を読めない ({type(e).__name__}) — この銘柄は日足が無い扱い")
+            m = {}
         out[code] = m
     return out
 
@@ -271,7 +278,7 @@ def activity(turnover, today, index_codes):
         last = max(m) if m else ""
         lag[c] = sum(1 for d in cal if d > last)
     idx = sorted(avg[c] for c in index_codes if avg.get(c) is not None)
-    big = idx[min(len(idx) - 1, int(len(idx) * KEEP_INDEX_PCT / 100))] if idx else float("inf")
+    big = idx[min(len(idx) - 1, max(0, int(len(idx) * KEEP_INDEX_PCT / 100)))] if idx else float("inf")
     stale = ref is None or (date.fromisoformat(today) - date.fromisoformat(ref)).days > STALE_DAYS
     return {"ref": ref, "win": win, "cal": cal, "avg": avg, "lag": lag, "big": big, "index_n": len(idx), "stale": stale}
 
@@ -327,7 +334,7 @@ def judge(code, absent, added, act, turnover, stop_ok):
     ratio = v / base
     if ratio >= KEEP_RATIO:
         return "keep", f"入る前の{KEEP_RATIO:g}倍以上 (話題が続いている)", ""
-    return "remove", v, head + f"・話題枠に入る前の{ratio:.1f}倍"
+    return "remove", v, head + f"・話題枠に入る前の{int(ratio * 10) / 10:.1f}倍"   # 切り捨て (2.46倍を2.5倍と出さない)
 
 
 def load_state():
@@ -436,7 +443,7 @@ def main():
             surviving.append(r)
             continue
         code = r["code"]
-        st = state.setdefault(code, {"absent": 0, "last_seen": week})
+        st = state.setdefault(code, {"absent": 0})   # last_seen は入れない (記録の無い銘柄を「今週ランキングで見た」扱いにしない)
         if code in trend_codes:
             st["absent"] = 0; st["last_seen"] = week
         elif code not in added_codes and st.get("counted_week") != week and st.get("last_seen") != week:
@@ -451,7 +458,7 @@ def main():
 
         if code in protected:
             surviving.append(r); keep_why["恒久テーマ銘柄 (保護)"] += 1; continue
-        if code in trend_codes or code in added_codes:
+        if code in trend_codes or code in added_codes or st.get("last_seen") == week:
             surviving.append(r); keep_why["今週ランキングに登場"] += 1; continue
         first_added = min(filter(None, [st.get("added"), added_log.get(code)]), default="")
         verdict, key, reason = judge(code, st.get("absent", 0), first_added, act, turnover, stop_ok)
@@ -479,7 +486,7 @@ def main():
             # 指数構成銘柄はユニバースから消さず、本来の層(leader/core)へ戻して監視を継続
             r["bucket"] = index_members[code]
             surviving.append(r)
-            reason += f" → 指数の銘柄なので「{BUCKET_LABEL[index_members[code]]}」に戻して監視を続ける"
+            reason += f" → 指数の銘柄なので「{BUCKET_LABEL.get(index_members[code], index_members[code])}」に戻して監視を続ける"
         removed.append({"code": code, "name": r["name"], "reason": reason})
         state.pop(code, None)
 
@@ -523,7 +530,10 @@ def main():
     # rule/carried はダッシュボードの「今週の話題枠 入れ替え」欄の説明用 (外す条件・判定に使った期間・翌週以降に回した銘柄)
     rule = {"absent_weeks": ABSENT_WEEKS, "keep_ratio": KEEP_RATIO, "max_remove": MAX_REMOVE,
             "big": fmt_money(act["big"]) if act["index_n"] else "", "floor": fmt_money(MIN_TURNOVER),
-            "from": act["win"][0] if act["win"] else "", "to": act["ref"] or "", "rank_top": RANK_TOP}
+            "from": act["win"][0] if act["win"] else "", "to": act["ref"] or "", "rank_top": RANK_TOP,
+            "skipped": (f"株価データ (日足) が {act['ref'] or '—'} で止まっているため、今週は売買代金による除外を見送りました"
+                        if act["stale"] else "" if stop_ok else
+                        "指数の銘柄でも株価データ (日足) がとだえた銘柄が多いため、今週は「データがとだえた」による除外を見送りました")}
     json.dump({"week": week, "date": today, "added": latest_added, "removed": latest_removed,
                "hot_total": len(hot_now), "rule": rule, "carried": carried},
               open(HOT_LATEST, "w", encoding="utf-8"), ensure_ascii=False)
