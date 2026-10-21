@@ -12,6 +12,7 @@ upsertによる保存・query1/query2フォールバックのロジックは同�
     取得値で上書き・新しい足は追加」(upsert) することで、実行間隔を超えた連続履歴を
     自前で積み上げる (2026-10-03 に「新規だけ追記」方式から変更 — 理由は merge_bars())。
     ただし1分足は取得時刻より SETTLE_MIN 分以上前の、出来高のある足は上書きしない (2026-10-09〜。理由は SETTLE_MIN)。
+    その出来高0の足も、出来高0の別の版 (値段だけ違う) では書き換えない (2026-10-22〜)。
   - NYSE/Nasdaqの休場日・時間外に実行しても新規バーが単に無いだけ
     (同じ足の重複が起きないので休場日カレンダー代わりになり、祝日リストは持たない)。
   - query1/query2 の2ホストへフォールバック (Yahoo側が片方だけ不調な場合がある)。
@@ -78,7 +79,9 @@ SLEEP_SEC    = float(os.environ.get("SLEEP_SEC") or "0.4")
 #     引け後処理のデータ保存が収集と衝突して消える原因にもなっていた (10/8・10/9)
 # 足が初めて届くのは足の時刻の19〜24分後 (収集のコミットと最新の足の差)、書き換えは27分後から。そこで
 # 取得時刻より SETTLE_MIN 分以上前の、出来高のある足は既存の値を残す。無い足と出来高0の足は埋める
-# (取りこぼしの回収・寄りの出来高の補完)。
+# (取りこぼしの回収・寄りの出来高の補完)。ただし出来高0の足を出来高0の別の版では書き換えない (2026-10-22〜):
+# 取引の無い足の値段は版ごとに少しずつ違い (日本の 9:05 の足の終値 1935/1940 など)、夜間も5分ごとに約18銘柄を
+# 書き換えてコミットしていた (マージ直後の 10/22 5:35・5:41 JST。どちらも出来高0→出来高0 の18行だけ)。
 SETTLE_MIN = 25
 BACKOFF_STEP = 2.0    # 429を検知するたびに増やすスリープ秒
 BACKOFF_MAX  = 8.0    # 銘柄間スリープに上乗せする上限秒
@@ -221,8 +224,9 @@ def merge_bars(path, ticker, timestamps, quote, interval, now=None):
             if old is not None:
                 continue
             row = row[:7] + ["0"]
-        if interval == "1m" and old is not None and int(row[1]) < settled_before and _has_volume(old):
-            continue  # 落ち着いた足は既存の値を残す (SETTLE_MIN の説明参照)
+        if (interval == "1m" and old is not None and int(row[1]) < settled_before
+                and (_has_volume(old) or not _has_volume(row))):
+            continue  # 落ち着いた足は既存の値を残す。出来高0の足も出来高0の版では書き換えない (SETTLE_MIN の説明参照)
         if old is None:
             n_new += 1
         elif old != row:
