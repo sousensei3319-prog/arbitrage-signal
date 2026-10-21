@@ -79,6 +79,13 @@ VOLUME_GLITCH_MIN_STOCKS = int(os.environ.get("VOLUME_GLITCH_MIN_STOCKS") or "3"
 GLITCH_FROM_HM, GLITCH_UNTIL_HM = "10:00", "15:50"   # 判定する時間帯 (ET。寄りの板寄せ直後と引けのクロスは対象外)
 GLITCH_SKIP_HM = ()
 
+# 寄り付きの足の除外 (2026-10-09 追加)。9:30 の足 (寄りのクロス = 板寄せ。その後の1分の約10倍の出来高) が、
+# 日によって一部の銘柄だけ出来高0で保存される (2026-09-28〜10-08 の実データ: 0 の銘柄が日に6〜178 / 約730。
+# 収集時の Yahoo の応答が0で、後日 Yahoo が直すと入る)。朝の集中度が銘柄によって偽に膨らむ・縮むので、
+# 窓統計では 9:30 の足を使わない (日本版の 9:06 より前と同じ考え方。チャート用の生データと日足の組み立てには残す)。
+# 大引けのクロス (16:00 の足) は Yahoo の1分足に毎日出来高0で入らないので、もともと毎日そろって除かれている。
+OPEN_SKIP_UNTIL_HM = "09:31"
+
 # 米国には JPX 空売り残高報告に相当する日次の公的個別開示が無い (下記_commentary末尾参照)。
 # SUPPLY_CSVは将来的に何らかの需給データソースが用意された場合の受け皿として関数だけ残す
 # (ファイル不存在なら load_short_positions() は空dictを返し、以下のロジックは素通りする)。
@@ -246,17 +253,37 @@ def _raw_bars(sym):
     return rows
 
 
+def drop_opening_bars(rows, tz=None, until_hm=None):
+    """(epoch, close, volume, turnover) のリストから、その日の until_hm (既定 OPEN_SKIP_UNTIL_HM) より前の
+    足 (寄りのクロス) を除いたリストを返す。"""
+    tz = tz or ET
+    h, m = map(int, (until_hm or OPEN_SKIP_UNTIL_HM).split(":"))
+    cut = h * 3600 + m * 60
+    offsets = {}   # UTC日 → 時差(秒)。夏時間の切り替えは日曜の未明 (場の外) なので1日の中では変わらない
+    out = []
+    for row in rows:
+        day = row[0] // 86400
+        off = offsets.get(day)
+        if off is None:
+            off = offsets[day] = int(datetime.fromtimestamp(row[0], tz).utcoffset().total_seconds())
+        if (row[0] + off) % 86400 >= cut:
+            out.append(row)
+    return out
+
+
 def load_bars(sym, stats=None):
-    """(epoch, close, volume, turnover) のリストを返す。出来高0のバーと、複数銘柄で同時に起きた
-    「累計出来高入り」異常足は除外。除外足は analyze() が全銘柄を見て確定した _GLITCH_DROP を使う
-    (未確定なら除外しない = 単独呼び出しでは生データのまま)。"""
+    """(epoch, close, volume, turnover) のリストを返す。出来高0のバー・複数銘柄で同時に起きた
+    「累計出来高入り」異常足・寄り付きの足 (9:30) は除外。異常足は analyze() が全銘柄を見て確定した
+    _GLITCH_DROP を使う (未確定なら異常足は除外しない = 単独呼び出しでは寄り付きの足だけを除く)。"""
     rows = _raw_bars(sym)
-    if INTERVAL != "1m" or not _GLITCH_DROP or sym not in _GLITCH_DROP:
+    if INTERVAL != "1m":
         return rows
-    drop = _GLITCH_DROP[sym]
-    if stats is not None:
-        stats["dropped"] = stats.get("dropped", 0) + len(drop)
-    return [r for r in rows if r[0] not in drop]
+    drop = (_GLITCH_DROP or {}).get(sym)
+    if drop:
+        if stats is not None:
+            stats["dropped"] = stats.get("dropped", 0) + len(drop)
+        rows = [r for r in rows if r[0] not in drop]
+    return drop_opening_bars(rows)
 
 
 def window_blocks(rows, win_sec):

@@ -63,7 +63,14 @@ jobs:
         env:
           RANK_TOP: '30'
           ABSENT_WEEKS: '4'
-          KEEP_SURGE: '1.3'
+          # 除外 (圏外4週以上の話題株を、直近5営業日の1日平均の売買代金で判定): 指数の銘柄の KEEP_INDEX_PCT%点以上は残す (大きい)・
+          # MIN_TURNOVER (ドル) 未満は外す (小さすぎる)・その間は話題枠に入る前の KEEP_RATIO 倍未満なら外す。日足も1分足も
+          # STOP_DAYS 営業日とだえた銘柄も外す。1週に外すのは MAX_REMOVE 件まで、売買の少ない順
+          KEEP_RATIO: '2.5'
+          KEEP_INDEX_PCT: '50'
+          MIN_TURNOVER: '10000000'
+          STOP_DAYS: '5'
+          MAX_REMOVE: '60'
           FETCH_DEADLINE_MIN: '5'
           HOT_ADDED_OUT: ${{ runner.temp }}/hot_added.txt
           # 今週の入れ替えが済んでいれば何もしない (週の最初の1回だけが入れ替える)。例外は2つだけ:

@@ -67,6 +67,10 @@
   .alert.calm{border-color:var(--border);background:var(--surface);}
   .alert .ttl{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:680;color:var(--alert-ink);margin-bottom:8px;}
   .alert.calm .ttl{color:var(--muted);font-weight:600;margin-bottom:0;}
+  .alert.wait{border-color:var(--border);background:var(--surface-2);}
+  .alert.wait .ttl{color:var(--ink-2);font-weight:620;margin-bottom:4px;}
+  .alert .sub{font-size:12px;color:var(--muted);line-height:1.6;}
+  .na{color:var(--muted);}
   .alert .items{display:flex;flex-wrap:wrap;gap:8px;}
   .alertpill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--alert-bd);border-radius:9px;padding:6px 11px;cursor:pointer;font-size:12.5px;transition:transform .12s,box-shadow .12s;font-family:var(--ui);color:var(--ink);}
   .alertpill:hover{transform:translateY(-1px);box-shadow:var(--shadow);}
@@ -132,6 +136,9 @@
   .hotchg .nm{font-weight:660;}
   .hotchg .rs{color:var(--ink-2);}
   .hotchg .none{color:var(--muted);font-size:12.5px;}
+  .hotchg .hotrule{font-size:12.5px;line-height:1.75;color:var(--ink-2);background:var(--surface-2);border-radius:8px;padding:8px 12px;}
+  .hotchg .hotrule .sub{color:var(--muted);}
+  .pendmark{font-size:10px;color:var(--muted);font-weight:700;white-space:nowrap;border:1px solid var(--border);border-radius:4px;padding:0 4px;}
   .tbl-scroll{overflow-x:auto;margin-top:10px;}
   table{border-collapse:collapse;width:100%;font-size:12px;min-width:700px;}
   th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -181,7 +188,7 @@
         <button data-w="1d">日足</button><button data-w="1w">週足</button><button data-w="1M">月足</button>
       </div>
     </div>
-    <div class="ctl"><span class="lbl">急騰しきい値</span>
+    <div class="ctl"><span class="lbl">急増しきい値</span>
       <div class="seg" id="thrseg"><button data-t="0.2">+0.2pp</button><button data-t="0.5">+0.5pp</button><button data-t="1.0">+1.0pp</button></div>
     </div>
   </div>
@@ -284,17 +291,30 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
       var em=/^※/.test(t);return "<li style=\"color:"+(em?"var(--muted)":"var(--ink)")+"\">"+fmtComment(t)+"</li>";}).join("");
   }
   // 今週の話題枠 入れ替え (us_hot_refresh.py の出力。追加/除外の根拠付き)
+  // 外す条件を満たしたが1週の上限で来週以降に回した銘柄 (話題枠一覧に「外す予定」と出す)
+  const HOT_CARRIED=new Set((D_HOTCHANGES&&D_HOTCHANGES.carried)||[]);
   if(D_HOTCHANGES){
-    var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[];
-    if(_add.length||_rm.length){
+    var _add=D_HOTCHANGES.added||[], _rm=D_HOTCHANGES.removed||[], _rule=D_HOTCHANGES.rule;
+    var _md=function(s){var m=/^\d{4}-(\d\d)-(\d\d)$/.exec(s||"");return m?(+m[1])+"/"+(+m[2]):"";};
+    if(_add.length||_rm.length||HOT_CARRIED.size){
       document.getElementById("hotchangesec").style.display="";
       document.getElementById("hotchangenote").textContent=
-        (D_HOTCHANGES.week||"")+" 時点・話題枠 全"+(D_HOTCHANGES.hot_total||"?")+"銘柄（毎週月曜 自動更新）";
+        (_md(D_HOTCHANGES.date)?_md(D_HOTCHANGES.date)+" の入れ替え":(D_HOTCHANGES.week||"")+" 時点")+
+        "・話題枠 全"+(D_HOTCHANGES.hot_total||"?")+"銘柄（毎週月曜 自動更新）";
       var rowHtml=function(kind,x){
         return '<div class="row"><span class="tag '+(kind==="add"?"add":"rm")+'">'+(kind==="add"?"＋追加":"－除外")+
           '</span><span><span class="nm">'+escHtml(x.name)+'</span> <span class="tnum" style="color:var(--muted)">'+
           escHtml(x.code)+'</span> <span class="rs">— '+escHtml(x.reason)+'</span></span></div>';};
       var h='<div class="hotchg">';
+      if(_rule){
+        h+='<div class="hotrule"><b>外す条件</b>：毎週月曜の朝に、前の営業日のランキング上位'+_rule.rank_top+'位を確かめ、'+
+          _rule.absent_weeks+'回続けて出ていない話題株のうち、直近5営業日（'+_md(_rule.from)+'〜'+_md(_rule.to)+'）の1日平均の売買代金が'+
+          '<b>'+escHtml(_rule.floor)+'未満</b>（小さすぎる）か、'+(_rule.big?'<b>'+escHtml(_rule.big)+'未満</b>（指数の銘柄の真ん中より小さい）で':'')+
+          '<b>話題枠に入る前の'+_rule.keep_ratio+'倍未満</b>まで落ち着いた銘柄（入る前と比べられない、上場して間もない銘柄なども含む）。株価データがとだえた銘柄も外します。'+
+          '外すのは1週'+_rule.max_remove+'件までで、売買の少ない順'+(HOT_CARRIED.size?'（残り'+HOT_CARRIED.size+'件は来週以降。話題枠一覧に「外す予定」）':'')+'。'+
+          (_rule.skipped?'<br><b>⚠ '+escHtml(_rule.skipped)+'</b>':'')+
+          '<br><span class="sub">除外は監視リストの整理で、値下がりや売りのサインではありません。指数の銘柄は外れても元の区分で監視を続けます。</span></div>';
+      }
       h+=_add.length?_add.map(function(a){return rowHtml("add",a);}).join(""):'<div class="none">今週の新規追加はありません。</div>';
       h+=_rm.length?_rm.map(function(r){return rowHtml("rm",r);}).join(""):'<div class="none">今週の除外はありません。</div>';
       h+='</div>';
@@ -329,20 +349,33 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   let WKEY=D.meta.default_win||"5m", THR=0.5, SEL=(D_INITIAL&&D_INITIAL.code)||null, TF="5m";
   const winLabel=()=>WINLB[WKEY]||WKEY;
 
+  // 勢い: null は「直前の同じ長さの時間がほぼ取引時間外なので比べていない」(寄り付き直後)
+  const momOf=tk=>{const m=(tk.w[WKEY]||{}).momentum;return m==null?null:m;};
+  // 窓の値動き (急増は値下がりでも点くので向きを出す)
+  const chgTag=tk=>{const c=(tk.w[WKEY]||{}).chg;if(c==null)return "";return `<span class="${c>=0?'up':'down'}" style="font-family:var(--num);font-size:11.5px">${c>=0?'▲+':'▼'}${c.toFixed(1)}%</span>`;};
+  const momCell=tk=>{const m=momOf(tk);
+    if(m==null)return `<td class="na" title="直前の同じ長さの時間が取引時間外のため比べていません（寄り付き直後）">—</td>`;
+    return `<td class="${m>=THR?"flag":(m>0?"up":"down")}">${m>0?"+":""}${m.toFixed(2)}</td>`;};
   function render(){
     const hotN=D.meta.hot_n||0;
-    $("#meta").innerHTML=`<span class="chip">最新 <b class="tnum">${D.meta.end}</b></span>`+
+    // データの時刻と、見ている今との差 (Yahoo 自体が約15〜20分遅れ。収集・ページの更新でさらに遅れる)
+    const ageMin=D.meta.end_epoch?Math.max(0,Math.round((Date.now()/1000-D.meta.end_epoch)/60)):null;
+    const ageTxt=ageMin==null?"":ageMin<120?`約${ageMin}分前`:ageMin<2880?`約${Math.round(ageMin/60)}時間前`:`約${Math.round(ageMin/1440)}日前`;
+    $("#meta").innerHTML=`<span class="chip" title="データの時刻 (見ている今からの遅れ)">最新 <b class="tnum">${D.meta.end}</b>${ageTxt?`（${ageTxt}）`:""}</span>`+
       `<span class="chip"><b class="tnum">${T.length}</b> 銘柄</span>`+
       (hotN>0?`<span class="chip" title="S&P500+Nasdaq-100の指数母数に、話題枠(自動入替)を加えた分">話題枠 <b class="tnum">+${hotN}</b></span>`:``)+
       `<span class="chip">売買代金=終値×出来高</span>`;
     $("#chartnote").textContent=`全${T.length}銘柄から検索して選択・足を切替（分足〜月足）`;
 
-    const flagged=T.filter(tk=>(tk.w[WKEY]||{}).momentum>=THR).sort((a,b)=>b.w[WKEY].momentum-a.w[WKEY].momentum);
+    const flagged=T.filter(tk=>momOf(tk)!=null&&momOf(tk)>=THR).sort((a,b)=>momOf(b)-momOf(a));
+    const nWait=T.filter(tk=>momOf(tk)==null).length;
     const al=$("#alert");
     if(flagged.length){
-      al.innerHTML=`<div class="alert"><div class="ttl">🚨 急騰検知 — 直近${winLabel()}でシェアが +${THR}pp 以上 急伸（${flagged.length}件）</div>`+
-        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">▲+${tk.w[WKEY].momentum.toFixed(2)}pp</span><span class="sec">${tk.w[WKEY].surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
-    }else{al.innerHTML=`<div class="alert calm"><div class="ttl">🟢 急騰なし — 直近${winLabel()}でシェア +${THR}pp 以上の急伸銘柄はありません</div></div>`;}
+      al.innerHTML=`<div class="alert"><div class="ttl">🚨 売買代金の急増 — 直近${winLabel()}でシェアが +${THR}pp 以上 増えた銘柄（${flagged.length}件・値下がりでも点きます）</div>`+
+        `<div class="items">`+flagged.map(tk=>`<button class="alertpill" data-code="${tk.code}"><span class="nm">${tk.name}</span><span class="jump">シェア+${momOf(tk).toFixed(2)}pp</span>${chgTag(tk)}<span class="sec">${tk.w[WKEY].surge.toFixed(1)}x · ${tk.sector}</span></button>`).join("")+`</div></div>`;
+    }else if(nWait*2>T.length){al.innerHTML=`<div class="alert wait"><div class="ttl">⏸ 判定待ち — 直近${winLabel()}の勢いはまだ比べられません</div>`+
+        `<div class="sub">比べる相手の「直前の同じ長さの時間」が取引時間外です（寄り付き直後はしばらくこの表示。始まる時刻は<a href="help.html#momentum">使い方ガイド</a>）。集中度のランキングはいつもどおり見られます（寄りで大きく動いた銘柄はそちらの上位に出ます）。</div></div>`;
+    }else{al.innerHTML=`<div class="alert calm"><div class="ttl">🟢 急増なし — 直近${winLabel()}でシェアが +${THR}pp 以上 増えた銘柄はありません</div></div>`;}
     al.querySelectorAll(".alertpill").forEach(b=>b.onclick=()=>select(b.dataset.code));
 
     const bk={};T.forEach(tk=>{const b=bk[tk.bucket]||(bk[tk.bucket]={r:0,n:0});b.r+=(tk.w[WKEY]||{}).recent||0;b.n++;});
@@ -354,7 +387,7 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     const rk=T.slice().sort((a,b)=>(b.w[WKEY]||{}).surge-(a.w[WKEY]||{}).surge);const top=rk.slice(0,18);
     const maxS=Math.max.apply(null,top.map(t=>t.w[WKEY].surge).concat([1.2])),scale=maxS*1.05,refPct=1/scale*100;
     $("#rank").innerHTML=top.map((tk,i)=>{const w=Math.max(1,tk.w[WKEY].surge/scale*100);
-      const mom=tk.w[WKEY].momentum>=THR?`<span class="flag">🚨+${tk.w[WKEY].momentum.toFixed(2)}pp</span>`:`<span class="${tk.w[WKEY].dBase>0?'up':tk.w[WKEY].dBase<0?'down':''}">Δ${tk.w[WKEY].dBase>0?"+":""}${tk.w[WKEY].dBase.toFixed(2)}p</span>`;
+      const mom=momOf(tk)!=null&&momOf(tk)>=THR?`<span class="flag">🚨+${momOf(tk).toFixed(2)}pp</span>`:`<span class="${tk.w[WKEY].dBase>0?'up':tk.w[WKEY].dBase<0?'down':''}">Δ${tk.w[WKEY].dBase>0?"+":""}${tk.w[WKEY].dBase.toFixed(2)}p</span>`;
       return `<div class="rrow${SEL===tk.code?' sel':''}" tabindex="0" data-code="${tk.code}" role="button">
         <div class="rname"><span class="n">${i+1}. ${tk.name}</span><span class="tags"><span class="c">${tk.code}</span><span class="sect" title="${tk.sector}">${tk.sector}</span></span></div>
         <div class="track"><div class="bar" style="width:${w}%;background:${BC[tk.bucket]}"></div><div class="refline" style="left:${refPct}%"></div></div>
@@ -362,15 +395,13 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
     $("#rank").querySelectorAll(".rrow").forEach(r=>{r.onclick=()=>select(r.dataset.code);r.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select(r.dataset.code);}};});
 
     $("#tbl tbody").innerHTML=rk.map((tk,i)=>{const pct=tk.pct||0;
-      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:${BC[tk.bucket]}"></span>${tk.name}${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸</span>':''}</td><td style="color:var(--ink-2)">${tk.sector}</td><td>${BL[tk.bucket]}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     // 話題枠 一覧 (bucket=hot のみ・集中度順)。全銘柄表と同じ行→チャートの動線。
     const hotList=rk.filter(tk=>tk.bucket==="hot");
     $("#hotcount").textContent=hotList.length;
     $("#hottbl tbody").innerHTML=hotList.map((tk,i)=>{const pct=tk.pct||0;
-      const mc=tk.w[WKEY].momentum>=THR?"flag":(tk.w[WKEY].momentum>0?"up":"down");
-      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸本日約定なし</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td><td class="${mc}">${tk.w[WKEY].momentum>0?"+":""}${tk.w[WKEY].momentum.toFixed(2)}</td><td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
+      return `<tr data-code="${tk.code}"><td>${i+1}</td><td class="nm"><span class="bdot" style="background:var(--b-hot)"></span>${tk.name} <span class="c" style="color:var(--muted);font-family:var(--num);font-size:10px">${tk.code}</span>${tk.stale?' <span class="stalemark" title="本日まだ約定なし（売買停止・データ遅延などの可能性）">⏸本日約定なし</span>':''}${HOT_CARRIED.has(tk.code)?' <span class="pendmark" title="外す条件を満たしています。1週の上限のため来週以降に外します">外す予定</span>':''}</td><td style="color:var(--ink-2)">${tk.sector||"—"}</td><td>${tk.w[WKEY].surge.toFixed(2)}x</td><td>${usd(tk.w[WKEY].recent)}</td>${momCell(tk)}<td class="${pct>0?'up':'down'}">${pct>0?"+":""}${pct.toFixed(2)}%</td></tr>`;}).join("");
 
     renderGroups();
 
@@ -714,15 +745,15 @@ const D_HOTCHANGES = __HOTCHANGES__;</script>
   $("#tfseg").querySelector('[data-tf="5m"]').setAttribute("aria-pressed","true");
 
   $("#thrhint").innerHTML=
-    `<b>「急騰しきい値」とは</b>　各銘柄の<b>ユニバース内シェア</b>（全${T.length}銘柄の売買代金に占める割合）が、`+
-    `<b>直前の同じ集計窓</b>と比べて何pp増えたら「急騰」🚨として点灯するかの感度です。`+
+    `<b>「急増しきい値」とは</b>　各銘柄の<b>ユニバース内シェア</b>（全${T.length}銘柄の売買代金に占める割合）が、`+
+    `<b>直前の同じ集計窓</b>と比べて何pp増えたら「急増」🚨として点灯するかの感度です（値下がりでも点きます。売買の合図ではありません）。`+
     `<b>+0.2pp</b>＝敏感（小さな動きも多く拾う）／<b>+0.5pp</b>＝標準／<b>+1.0pp</b>＝厳選（大口の動きだけ）。`+
-    `集計窓を切り替えると、その窓での急騰を判定します。`;
+    `集計窓を切り替えると、その窓での急増を判定します。`;
 
   $("#footer").innerHTML=
     `<div><b>用語の読み方</b></div>`+
     `<div><b>・集中度</b>：各銘柄の直近窓の売買代金が、平常時（履歴の同じ窓幅の中央値）の何倍か。大きいほど「いつもより資金が集まっている」。</div>`+
-    `<div><b>・勢いΔpp</b>：直前の同じ窓と比べたユニバース内シェアの増減（pp）。急騰しきい値を超えると🚨アラート点灯。</div>`+
+    `<div><b>・勢いΔpp</b>：直前の同じ窓と比べたユニバース内シェアの増減（pp）。急増しきい値を超えると🚨アラート点灯。</div>`+
     `<div><b>・シェア／通常時比</b>：全${T.length}銘柄の売買代金に占める割合と、その平常水準（履歴中央値）との差。</div>`+
     `<div><b>・業種別シェア</b>：GICS公式11セクター＋独自区分「半導体」。勢力図マップは面積＝シェア、色＝通常時からの増減（緑＝増・赤＝減）。</div>`+
     `<div class="warn" style="margin-top:4px"><b>データ範囲</b>：分足系（1分〜4時間の集計窓と分足チャート）は1分足の保持期間（<b>${D.meta.start} 〜 ${D.meta.end} ET</b>のローリング窓）から。日／週／月（日足〜月足）は日足2年から自前で集約（Yahooの月足APIが新規上場銘柄で不安定なため）。板情報は使わず売買代金の集中で資金の向きを近似する（真の板／歩み値のリアルタイムは無料枠の対象外）。米国には日本のJPX空売り残高報告に相当する日次の公的個別開示が無いため需給レイヤーは未収録。監視対象は S&P500＋Nasdaq-100＋話題枠で構成する全${T.length}銘柄。銘柄別チャートは選択時に読み込み。データ出所：Yahoo Finance／最新 ${D.meta.end} ET。使い方の詳細は<a href="help.html" style="color:var(--accent)">📖 使い方ガイド</a>へ。<b>本ツールは事実の可視化であり、投資助言ではありません。</b></div>`;

@@ -27,6 +27,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # 最後の step で引け後処理・米国の収集・話題枠の入れ替えを起動する (kick_workflows.py)
 
 # 同時実行するとCSVコミットバックが競合するため直列化
 concurrency:
@@ -91,3 +92,14 @@ jobs:
           else
             echo "新規バーなし (立会時間外/休場日/既に取得済み)"
           fi
+
+      # 引け後処理 (日米)・米国の収集・週次の話題枠の入れ替えを決まった時刻に起動する。GitHub の予定実行は数時間遅れ、
+      # 日本の引け後処理が日付をまたいで仮想台帳がその日を記録できなかった (2026-10-13)・米国の収集が場の6時間後まで
+      # 動かなかった (2026-10-19)。この収集は cron-job.org から5分ごとに確実に起動されるので、その最後で
+      # 「まだ起動されていなければ」起動する (時間帯と条件は kick_workflows.py)。起動できなくても収集の結果は変えない
+      - name: Kick history / US collector / hot refresh
+        if: ${{ !cancelled() && github.ref == 'refs/heads/main' }}
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python .github/scripts/kick_workflows.py

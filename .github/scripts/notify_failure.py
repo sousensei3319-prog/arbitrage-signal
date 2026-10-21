@@ -12,6 +12,8 @@
         run: python .github/scripts/notify_failure.py
 Webhook の URL は表示しない (public repo のため。secret scanning で無効化される)。
 送信に失敗しても workflow の結果は変えない (exit 0)。
+前の step が RUNNER_TEMP/failure_notes.txt に書いた赤の理由と対処 (freshness_check.py・保存の再試行) を
+本文に載せる (2026-10-19 追加: 理由がログにしか無く、通知から何をすればよいか分からなかった)。
 """
 import json
 import os
@@ -27,10 +29,23 @@ what = os.environ.get("NOTIFY_WHAT") or ""
 mention = (os.environ.get("MENTION_EVERYONE") or "1") == "1"
 run_url = "{}/{}/actions/runs/{}".format(os.environ.get("GITHUB_SERVER_URL", "https://github.com"),
                                          os.environ.get("GITHUB_REPOSITORY", ""), os.environ.get("GITHUB_RUN_ID", ""))
+notes = ""
+notes_path = os.path.join(os.environ.get("RUNNER_TEMP") or "", "failure_notes.txt") if os.environ.get("RUNNER_TEMP") else ""
+if notes_path and os.path.exists(notes_path):
+    try:
+        notes = open(notes_path, encoding="utf-8").read().strip()
+    except OSError:
+        notes = ""
+if len(notes) > 1400:   # Discord の本文は2000文字まで
+    notes = notes[:1400] + "…(続きはログ)"
 lines = [("@everyone " if mention else "") + f"⚠️ **{os.environ.get('GITHUB_WORKFLOW', 'workflow')}** が失敗しました"
-         + (f" — {what}" if what else ""),
-         "データを書き換えずに止めたか、保存に失敗しています。ログの赤いエラー行 (::error::) を確認してください。",
-         run_url]
+         + (f" — {what}" if what else "")]
+if notes:
+    lines.append(notes)
+# 理由が書かれていない step の失敗 (取得の失敗など) もあるので、定型の案内は常に付ける
+lines.append("データを書き換えずに止めたか、保存に失敗しています。ログの赤いエラー行 (::error::) を確認してください。"
+             if not notes else "ほかの赤いエラー行 (::error::) もログで確認してください。")
+lines.append(run_url)
 payload = {"content": "\n".join(lines), "allowed_mentions": {"parse": ["everyone"] if mention else []}}
 req = urllib.request.Request(url, data=json.dumps(payload).encode(), method="POST",
                              headers={"Content-Type": "application/json", "User-Agent": "arbitrage-signal-failure-notify/1.0"})

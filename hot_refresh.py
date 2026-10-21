@@ -12,11 +12,28 @@ Yahoo Finance Japan の「出来高」「値上がり率」ランキング上位
 追加ルール:
   ランキング上位(各RANK_TOP位まで)の、universe外・普通株(ETF/投信/REIT等を除外)を hot に追加。
 
-除外ルール (hot枠のみ・leader/core は対象外):
-  - ABSENT_WEEKS(4)週連続で全ランキング圏外、かつ直近の売買代金が平常水準
-    (money_flow.csv の surge_ratio < KEEP_SURGE(1.3)) の hot 銘柄を外す
-  - ただし custom_groups.csv 掲載の恒久テーマ銘柄(半導体等)は保護し、絶対に外さない
-  - 直近で集中(surge >= KEEP_SURGE)している銘柄は話題継続中とみなし残す
+除外ルール (hot枠のみ・leader/core は対象外。2026-10-21〜「話題枠に入る前の売買代金と比べる」+ 銘柄の大きさ):
+  ABSENT_WEEKS(4)週連続で全ランキング圏外の hot 銘柄を、直近5営業日の1日平均の売買代金 (日足の終値×出来高) で判定する
+  - 指数の銘柄 (leader/core) の KEEP_INDEX_PCT(50)%点 (=中央値) 以上 → 残す (大きい。指数の銘柄は大きさに関係なく残るのと揃える)
+  - MIN_TURNOVER (1億円) 未満 → 外す (小さすぎる。入る前がほぼ売買ゼロの銘柄は倍率が大きく出て、話題の続きを見分けられない)
+  - その間 → 話題枠に入る前 (最初に追加された日より前の60営業日) の1日あたり中央値の KEEP_RATIO(2.5)倍以上なら残す、
+    未満なら外す。入る前が20営業日に満たない (上場して間もない)・追加日の記録が無い銘柄は外す
+  - 日足が STOP_DAYS(5)営業日以上とだえ、その間の1分足も無い銘柄 (上場廃止・売買停止・名証/福証などだけの上場で東証の
+    データが無い) は、圏外の週数に関係なく外す (今週ランキングに出ている銘柄は除く)。日足だけが欠けた銘柄 (引け後処理の
+    取得が締め切りで打ち切られると、取得順で最後の hot だけが欠ける) は外さない
+  - 1週に外すのは MAX_REMOVE(30)件まで、データがとだえた銘柄 → 1日の売買代金が少ない順。残りは翌週以降に回す
+    (判定に誤りがあっても一度に大量には外さない)
+  - 直近5営業日は「9割以上の銘柄に日足がある最新日」まで。その日の日足が無い・5日のうち3日に満たない銘柄は判定を見送る (残す)
+  - custom_groups.csv 掲載の恒久テーマ銘柄(半導体等)は保護し、絶対に外さない。指数構成銘柄は leader/core に戻す
+  - 日足の最新日が STALE_DAYS(7)暦日より古い時 (月曜の朝の祝日のすき間は最大約5暦日) は、日足を使う除外をしない。
+    leader/core でも日足が止まった銘柄が多い時 (5銘柄かつ2%超) は、「データがとだえた」による除外をしない
+    (取得の障害で一斉に外さない。売買代金による判定は、基準日の日足がある銘柄だけで続ける)。見送った理由は
+    hot_changes_latest.json の rule.skipped に入れ、ダッシュボードに出す (「除外はありません」と区別するため)
+  圏外の週数は「最後にランキングで見た週から何週たったか」を超えない (2026-W41 は入れ替えが2回動き、1回目にランキングで
+  見た銘柄を2回目に圏外と数えていた)。
+  旧ルール (〜2026-10-20) の「money_flow.csv の集中度 < 1.3」は、指数銘柄でも約9割が1.3未満になり、話題が続いているかを
+  見分けていなかった (除外が実際には「圏外4週」だけで決まり、米国の話題枠は毎週約20件増えて336銘柄に)。入る前の倍率だけで
+  判定する案は、反証 (2026-10-21) で入る前から大きかった銘柄を先に外し、ほぼ売買の無い銘柄を残すと分かったので、大きさを足した。
 
 universe_refresh.py(月次)は既存 universe.csv の hot コードを温存する設計なので、
 本スクリプトが universe.csv の hot 行を書き換えれば月次再構築とも自然に協調する。
@@ -51,11 +68,13 @@ import os
 import re
 import socket
 import ssl
+import statistics
 import sys
 import unicodedata
 import urllib.request
 import urllib.error
-from datetime import datetime, timezone, timedelta
+from collections import Counter
+from datetime import date, datetime, timezone, timedelta
 
 JST = timezone(timedelta(hours=9))
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "jp_stocks")
@@ -64,7 +83,6 @@ CUSTOM_GROUPS_CSV = os.path.join(DATA_DIR, "custom_groups.csv")
 HOT_STATE = os.path.join(DATA_DIR, "hot_state.json")
 HOT_LOG = os.path.join(DATA_DIR, "hot_changes_log.csv")
 HOT_LATEST = os.path.join(DATA_DIR, "hot_changes_latest.json")
-MONEY_FLOW_CSV = os.path.join(DATA_DIR, "money_flow.csv")
 # universe_refresh.py が書く指数構成銘柄一覧 (code,index_bucket)。話題枠から外す銘柄が
 # 指数構成銘柄なら、ユニバースから消さずに leader/core へ戻すために使う
 INDEX_MEMBERS_CSV = os.path.join(DATA_DIR, "index_members.csv")
@@ -72,11 +90,18 @@ INDEX_MEMBERS_CSV = os.path.join(DATA_DIR, "index_members.csv")
 LISTED_NAMES_CSV = os.path.join(DATA_DIR, "listed_names.csv")
 
 FIELDNAMES = ["code", "name", "bucket", "sector", "group"]
+BUCKET_LABEL = {"leader": "けん引大型", "core": "主力"}   # ダッシュボードの区分の表示名 (template.html の BL と同じ)
 
 # 調整パラメータ (環境変数で上書き可)
 RANK_TOP = int(os.environ.get("RANK_TOP") or "30")        # 各ランキングの採用上位数
 ABSENT_WEEKS = int(os.environ.get("ABSENT_WEEKS") or "4")  # 連続圏外で除外する週数
-KEEP_SURGE = float(os.environ.get("KEEP_SURGE") or "1.3")  # これ以上の集中度なら残す
+KEEP_RATIO = float(os.environ.get("KEEP_RATIO") or "2.5")  # 1日の売買代金が入る前のこの倍以上なら残す (話題が続いている)
+KEEP_INDEX_PCT = float(os.environ.get("KEEP_INDEX_PCT") or "50")  # 指数の銘柄の売買代金のこの%点以上なら残す (大きい)
+MIN_TURNOVER = float(os.environ.get("MIN_TURNOVER") or "1e8")    # 1日の売買代金がこれ (円) 未満なら倍率に関係なく外す
+STOP_DAYS = int(os.environ.get("STOP_DAYS") or "5")        # この営業日数以上、日足も1分足も無ければ「データがとだえた」
+MAX_REMOVE = int(os.environ.get("MAX_REMOVE") or "30")     # 1週に外す上限 (売買の少ない順)
+RECENT_DAYS, BASE_DAYS, BASE_MIN = 5, 60, 20               # 直近5営業日 / 入る前の60営業日の日中央値 (20日未満は測れない)
+STALE_DAYS = 7                                             # 日足の最新日がこの暦日数より古ければ、日足を使う除外はしない
 FETCH_DEADLINE_MIN = float(os.environ.get("FETCH_DEADLINE_MIN") or "5")
 # 1 の時、今週の入れ替えが済んでいれば何もしない (入れ替えは週の最初の1回だけ)
 SKIP_IF_DONE_THIS_WEEK = (os.environ.get("SKIP_IF_DONE_THIS_WEEK") or "") == "1"
@@ -249,18 +274,137 @@ def load_index_members():
     return out
 
 
-def load_surge():
-    """money_flow.csv から {code: surge_ratio} を読む(除外判定の集中度チェック用)。"""
-    surge = {}
-    if os.path.exists(MONEY_FLOW_CSV):
-        with open(MONEY_FLOW_CSV, encoding="utf-8") as f:
+def fmt_money(v):
+    """1億以上は億 (10億未満は小数2桁まで・末尾の0は省く)、それ未満は万で表す。どちらも切り捨て (境目の1億円未満を
+    「1億円」と出さない)。例: 1億円・1.02億円・39.1億円・9,999万円"""
+    if v < 1e8:
+        return f"{int(v / 1e4):,}万円"
+    ip, fp = f"{v / 1e8:,.6f}".split(".")              # 切り捨て (文字列で切るので小数の誤差が出ない)
+    s = f"{ip}.{fp[:2 if v < 1e9 else 1]}".rstrip("0").rstrip(".")
+    return s + "億円"
+
+
+def weeks_between(a, b):
+    """週の名前 (2026-W41) どうしの差 (週)。読めなければ None。"""
+    try:
+        return (date.fromisocalendar(int(b[:4]), int(b[6:]), 1) - date.fromisocalendar(int(a[:4]), int(a[6:]), 1)).days // 7
+    except (TypeError, ValueError):
+        return None
+
+
+def load_turnover(codes):
+    """{code: {日付: 売買代金 (日足の終値×出来高)}}。日足ファイルが無い・読めない銘柄は空。"""
+    out = {}
+    for code in codes:
+        m = {}
+        try:
+            with open(os.path.join(DATA_DIR, f"{code}_T_1d.csv"), encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    try:
+                        d = (r.get("timestamp_jst") or "")[:10]
+                        if d:
+                            m[d] = float(r["close"]) * float(r.get("volume") or 0)
+                    except (KeyError, TypeError, ValueError):
+                        pass
+        except (OSError, UnicodeDecodeError, csv.Error) as e:
+            # 壊れたファイル1つで週次の入れ替え全体を止めない (その銘柄は日足が無い扱い。1分足があれば「とだえた」にはしない)
+            if not isinstance(e, FileNotFoundError):
+                print(f"::warning::{code} の日足を読めない ({type(e).__name__}) — この銘柄は日足が無い扱い")
+            m = {}
+        out[code] = m
+    return out
+
+
+def last_1m_date(code):
+    """1分足ファイルの最後の足の日付 (無い・読めない時は "")。日足だけが欠けた銘柄を「データがとだえた」と誤って外さないために見る。"""
+    try:
+        with open(os.path.join(DATA_DIR, f"{code}_T_1m.csv"), "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - 1024))
+            lines = f.read().decode("utf-8", "replace").strip().splitlines()
+    except OSError:
+        return ""
+    return lines[-1][:10] if lines and lines[-1][:4].isdigit() else ""
+
+
+def activity(turnover, today, index_codes):
+    """除外の判定に使う日足の値をまとめて求める。
+    営業日の暦 cal は「半数以上の銘柄に日足がある日」(新しく入った銘柄の初期取得だけが先に進んでいても暦を進めない)。
+    直近5営業日 win は「9割以上の銘柄に日足がある最新日 ref」まで (取り込み途中の日で比べない)。
+    返り値: avg={code: 直近5営業日の1日平均の売買代金。ref の日足があり、5日のうち3日以上ある時だけ} /
+            lag={code: 最新の営業日まで日足が届いていない営業日数} / big=指数の銘柄 (index_codes) の KEEP_INDEX_PCT%点 /
+            stale=日足が古すぎて判定に使えない"""
+    have = [m for m in turnover.values() if m]
+    n = len(have)
+    cnt = Counter(d for m in have for d in m)
+    cal = sorted(d for d, k in cnt.items() if k * 2 >= n)
+    full = [d for d in cal if cnt[d] >= 0.9 * n]
+    ref = full[-1] if full else (cal[-1] if cal else None)
+    win = [d for d in cal if ref and d <= ref][-RECENT_DAYS:]
+    avg, lag = {}, {}
+    for c, m in turnover.items():
+        vals = [m[d] for d in win if d in m]
+        avg[c] = statistics.fmean(vals) if ref in m and len(vals) >= 3 else None
+        last = max(m) if m else ""
+        lag[c] = sum(1 for d in cal if d > last)
+    idx = sorted(avg[c] for c in index_codes if avg.get(c) is not None)
+    big = idx[min(len(idx) - 1, max(0, int(len(idx) * KEEP_INDEX_PCT / 100)))] if idx else float("inf")
+    stale = ref is None or (date.fromisoformat(today) - date.fromisoformat(ref)).days > STALE_DAYS
+    return {"ref": ref, "win": win, "cal": cal, "avg": avg, "lag": lag, "big": big, "index_n": len(idx), "stale": stale}
+
+
+def pre_entry_level(m, added):
+    """話題枠に入る前 (追加日より前) の直近 BASE_DAYS 営業日の、1日あたりの売買代金の中央値。
+    BASE_MIN 日に満たない (上場して間もない) か、追加日が分からない時は None。"""
+    if not added:
+        return None
+    pre = [m[d] for d in sorted(m) if d < added][-BASE_DAYS:]
+    if len(pre) < BASE_MIN:
+        return None
+    med = statistics.median(pre)
+    return med if med > 0 else None
+
+
+def load_added_dates():
+    """hot_changes_log.csv から {code: 最初に追加された日}。入る前の水準は最初の追加より前で測る
+    (再追加された銘柄の「入る前」に前回の話題の期間を混ぜない)。hot_state.json に追加日が無い銘柄の補いにもなる。"""
+    out = {}
+    if os.path.exists(HOT_LOG):
+        with open(HOT_LOG, encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                c = (r.get("code") or "").split(".")[0]
-                try:
-                    surge[c] = float(r.get("surge_ratio") or 0)
-                except ValueError:
-                    pass
-    return surge
+                if r.get("action") == "add" and (r.get("code") or "").strip():
+                    out.setdefault(r["code"].strip(), (r.get("date") or "").strip())
+    return out
+
+
+def judge(code, absent, added, act, turnover, stop_ok):
+    """外すなら ("remove", 順番の鍵, 理由)、残すなら ("keep", 残す理由の分類, "")。順番の鍵が小さいほど先に外す
+    (データがとだえた銘柄 → 1日の売買代金が少ない順。1週の上限 MAX_REMOVE を超えた分は翌週以降)。"""
+    lag = act["lag"].get(code, 0)
+    if stop_ok and lag >= STOP_DAYS and last_1m_date(code) < act["cal"][-STOP_DAYS]:
+        if not turnover.get(code):
+            return "remove", -1.0, "日ごとの株価データ (日足) が1本も取れない (名古屋・福岡などの取引所だけに上場している可能性。原因は未確認)"
+        return "remove", -1.0, f"日ごとの株価データ (日足) が{lag}営業日とだえた (原因は未確認: 買収・上場廃止・売買停止など)"
+    if absent < ABSENT_WEEKS:
+        return "keep", "圏外の週数が足りない", ""
+    if act["stale"]:
+        return "keep", "日足が古いため判定を見送り", ""
+    v = act["avg"].get(code)
+    if v is None:
+        return "keep", "直近の日足が足りないため判定を見送り", ""
+    if v >= act["big"]:
+        return "keep", f"売買代金が指数の銘柄の{KEEP_INDEX_PCT:g}%点以上 (大きい)", ""
+    head = f"圏外{absent}週・1日の売買代金 {fmt_money(v)}"
+    if v < MIN_TURNOVER:
+        return "remove", v, head + f" ({fmt_money(MIN_TURNOVER)}未満で小さすぎる)"
+    base = pre_entry_level(turnover.get(code) or {}, added)
+    if base is None:
+        return "remove", v, head + ("・話題枠に入った日の記録が無く、入る前と比べられない" if not added
+                                     else "・上場して間もなく、入る前の売買代金が無い")
+    ratio = v / base
+    if ratio >= KEEP_RATIO:
+        return "keep", f"入る前の{KEEP_RATIO:g}倍以上 (話題が続いている)", ""
+    return "remove", v, head + f"・話題枠に入る前の{int(ratio * 10) / 10:.1f}倍"   # 切り捨て (2.46倍を2.5倍と出さない)
 
 
 def load_state():
@@ -329,24 +473,32 @@ def main():
     rows = load_universe_rows()
     protected = load_protected()
     index_members = load_index_members()
-    surge = load_surge()
     state = load_state()
 
     existing_codes = {r["code"] for r in rows}
     hot_rows = [r for r in rows if r["bucket"] == "hot"]
     hot_codes = {r["code"] for r in hot_rows}
     # leader/core のコードは絶対に触らない
-    non_hot_codes = existing_codes - hot_codes
 
-    added, removed, kept = [], [], []
+    added, removed = [], []
+    keep_why = Counter()
 
     # 2) 追加: ランキング上位の universe外・普通株を hot に (上限なし)
+    ever_added = load_added_dates()
     for code, info in trending.items():
         if code in existing_codes:
             # 既存hotが再登場 → 圏外カウントをリセット
             if code in hot_codes:
                 state.setdefault(code, {})["absent"] = 0
                 state[code]["last_seen"] = week
+            continue
+        # ランキングは全市場が対象なので、名証・福証などだけに上場している銘柄も載る。それらは東証のコード (XXXX.T)
+        # では取れず、日足が1本もできない (2026-10 に 2467・275A・3260 が毎回 404。3260 は7月にも追加→除外されていた)。
+        # 前にも追加して日足が取れなかった、東証の普通株一覧に無いコードは、また追加しない (追加と除外の繰り返しを防ぐ)
+        if (listed and code not in listed and code in ever_added
+                and not os.path.exists(os.path.join(DATA_DIR, f"{code}_T_1d.csv"))):
+            print(f"  追加しない {code} {info['name']} — 前にも追加したが東証のデータが取れなかった"
+                  " (名証・福証などだけに上場している可能性)")
             continue
         # 新規追加
         rows.append({"code": code, "name": info["name"], "bucket": "hot",
@@ -357,9 +509,24 @@ def main():
         added.append({"code": code, "name": info["name"],
                       "reason": f"{'・'.join(info['sources'][:3])} にランクイン(ユニバース外の話題株として新規採用)"})
 
-    # 3) 圏外カウント更新 & 除外判定 (hot枠のみ・保護銘柄と集中中は残す)
+    # 3) 圏外カウント更新 & 除外判定 (hot枠のみ・保護銘柄と話題が続いている銘柄は残す)
     trend_codes = set(trending)
     added_codes = {a["code"] for a in added}
+    turnover = load_turnover([r["code"] for r in rows])
+    non_hot = [r["code"] for r in rows if r["bucket"] != "hot"]
+    act = activity(turnover, today, non_hot)
+    added_log = ever_added
+    core_stopped = sum(1 for c in non_hot if act["lag"].get(c, 0) >= STOP_DAYS)
+    # leader/core でも日足が止まった銘柄が多い = 銘柄ではなく取得の障害。「データがとだえた」で外さない
+    stop_ok = not act["stale"] and core_stopped <= max(5, 0.02 * len(non_hot))
+    print(f"除外の判定に使う日足: 直近5営業日 {act['win'][0] if act['win'] else '-'}〜{act['ref']} / 大きさで残す線 "
+          f"(指数の銘柄{act['index_n']}の{KEEP_INDEX_PCT:g}%点) {fmt_money(act['big']) if act['index_n'] else 'なし'}/日 / "
+          f"小さすぎる線 {fmt_money(MIN_TURNOVER)}/日 / leader・coreで日足が止まった銘柄 {core_stopped}")
+    if act["stale"]:
+        print(f"::warning::日足の最新日 ({act['ref']}) が古いため、今週は日足を使う除外をしない (引け後処理の失敗を疑う)")
+    elif not stop_ok:
+        print(f"::warning::leader/core でも日足が止まった銘柄が {core_stopped} あるため、今週は「データがとだえた」で外さない (取得の障害を疑う)")
+    candidates = []   # (順番の鍵, 行, 理由)
     surviving = []
     for r in rows:
         if r["bucket"] != "hot":
@@ -373,30 +540,52 @@ def main():
                             "reason": "ランキング上の広告/記事リンクを銘柄と誤認して追加された行のため除外"})
             state.pop(code, None)
             continue
-        st = state.setdefault(code, {"absent": 0, "last_seen": week})
+        st = state.setdefault(code, {"absent": 0})   # last_seen は入れない (記録の無い銘柄を「今週ランキングで見た」扱いにしない)
         if code in trend_codes:
             st["absent"] = 0; st["last_seen"] = week
-        elif code not in added_codes and st.get("counted_week") != week:
-            # 同じ週に再実行(手動dispatch・push失敗後の再実行等)しても二重に数えない
+        elif code not in added_codes and st.get("counted_week") != week and st.get("last_seen") != week:
+            # 同じ週に再実行(手動dispatch・push失敗後の再実行等)しても二重に数えない。同じ週の前の実行でランキングに
+            # 出ていた銘柄も数えない (2026-W41 は2回動き、1回目に見た銘柄を2回目に圏外と数えていた)
             st["absent"] = st.get("absent", 0) + 1
             st["counted_week"] = week
+        # 圏外の週数は「最後にランキングで見た週から何週たったか」を超えない (W41 の数え過ぎもここで直る)
+        gap = weeks_between(st.get("last_seen"), week)
+        if gap is not None and 0 <= gap < st.get("absent", 0):
+            st["absent"] = gap
 
-        s = surge.get(code, 0.0)
         if code in protected:
-            surviving.append(r); kept.append((code, "恒久テーマ銘柄(保護)")); continue
-        if st.get("absent", 0) >= ABSENT_WEEKS and s < KEEP_SURGE:
-            reason = f"{st['absent']}週連続でランキング圏外・直近の集中度{s:.2f}x(<{KEEP_SURGE})のため除外"
-            if code in index_members:
-                # 指数構成銘柄はユニバースから消さず、本来の層(leader/core)へ戻して監視を継続
-                r["bucket"] = index_members[code]
-                surviving.append(r)
-                reason += f" (指数構成銘柄のため {index_members[code]} 層として監視は継続)"
-            removed.append({"code": code, "name": r["name"], "reason": reason})
-            state.pop(code, None)
-        else:
+            surviving.append(r); keep_why["恒久テーマ銘柄 (保護)"] += 1; continue
+        if code in trend_codes or code in added_codes or st.get("last_seen") == week:
+            surviving.append(r); keep_why["今週ランキングに登場"] += 1; continue
+        first_added = min(filter(None, [st.get("added"), added_log.get(code)]), default="")
+        verdict, key, reason = judge(code, st.get("absent", 0), first_added, act, turnover, stop_ok)
+        if verdict == "keep":
+            surviving.append(r); keep_why[key] += 1; continue
+        candidates.append((key, r, reason))
+
+    # データがとだえた銘柄 → 売買の少ない順に、1週の上限まで外す (同じ週に既に外した分も数える)。残りは翌週以降
+    candidates.sort(key=lambda x: x[0])
+    prev_removed = 0
+    try:
+        prev = json.load(open(HOT_LATEST, encoding="utf-8"))
+        if prev.get("week") == week:
+            prev_removed = len(prev.get("removed") or [])
+    except (OSError, ValueError):
+        pass
+    budget = max(0, MAX_REMOVE - prev_removed - len(removed))
+    carried = []
+    for i, (key, r, reason) in enumerate(candidates):
+        code = r["code"]
+        if i >= budget:
+            surviving.append(r); carried.append(code)
+            keep_why[f"1週の上限 ({MAX_REMOVE}件) のため翌週以降に回す"] += 1; continue
+        if code in index_members:
+            # 指数構成銘柄はユニバースから消さず、本来の層(leader/core)へ戻して監視を継続
+            r["bucket"] = index_members[code]
             surviving.append(r)
-            if st.get("absent", 0) > 0:
-                kept.append((code, f"圏外{st['absent']}週目だが集中度{s:.2f}x等で継続"))
+            reason += f" → 指数の銘柄なので「{BUCKET_LABEL.get(index_members[code], index_members[code])}」に戻して監視を続ける"
+        removed.append({"code": code, "name": r["name"], "reason": reason})
+        state.pop(code, None)
 
     # 4) 書き出し (universe.csv は leader>core>hot 並びを維持)
     order = {"leader": 0, "core": 1, "hot": 2}
@@ -435,8 +624,15 @@ def main():
             latest_removed = [x for x in prev_r + removed if x.get("code") not in undone | redone]
     except (OSError, ValueError):
         pass
+    # rule/carried はダッシュボードの「今週の話題枠 入れ替え」欄の説明用 (外す条件・判定に使った期間・翌週以降に回した銘柄)
+    rule = {"absent_weeks": ABSENT_WEEKS, "keep_ratio": KEEP_RATIO, "max_remove": MAX_REMOVE,
+            "big": fmt_money(act["big"]) if act["index_n"] else "", "floor": fmt_money(MIN_TURNOVER),
+            "from": act["win"][0] if act["win"] else "", "to": act["ref"] or "", "rank_top": RANK_TOP,
+            "skipped": (f"株価データ (日足) が {act['ref'] or '—'} で止まっているため、今週は売買代金による除外を見送りました"
+                        if act["stale"] else "" if stop_ok else
+                        "指数の銘柄でも株価データ (日足) がとだえた銘柄が多いため、今週は「データがとだえた」による除外を見送りました")}
     json.dump({"week": week, "date": today, "added": latest_added, "removed": latest_removed,
-               "hot_total": len(hot_now)},
+               "hot_total": len(hot_now), "rule": rule, "carried": carried},
               open(HOT_LATEST, "w", encoding="utf-8"), ensure_ascii=False)
     # 今回の実行で追加した銘柄だけを workflow に渡す (初期履歴の取得とコミット対象用)。
     # 週の合算(latest)を使うと、同じ週の再実行で既に収集中の銘柄を取り直し、収集ジョブと衝突する
@@ -450,9 +646,10 @@ def main():
     print(f"追加 {len(added)}件:")
     for a in added:
         print(f"  + {a['code']} {a['name']} — {a['reason']}")
-    print(f"除外 {len(removed)}件:")
+    print(f"除外 {len(removed)}件 (外す候補 {len(candidates)}件・1週の上限 {MAX_REMOVE}件・翌週以降に回す {len(carried)}件):")
     for rm in removed:
         print(f"  - {rm['code']} {rm['name']} — {rm['reason']}")
+    print("残した話題枠の銘柄の理由: " + (" / ".join(f"{k} {v}件" for k, v in keep_why.most_common()) or "なし"))
 
 
 if __name__ == "__main__":

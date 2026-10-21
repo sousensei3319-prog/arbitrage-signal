@@ -66,15 +66,35 @@ SUPPLY_CSV = os.environ.get("SUPPLY_DEMAND_CSV") or os.path.join(DATA_DIR, "supp
 #   - 2026-07〜09 に日本株で2,062件 (85%が8月)。複数銘柄で同じ時刻に起き (47%が±1分以内に5銘柄以上)、
 #     起きた日は1分足の合計が公式の日出来高を超える (77%の日。普段は3%) = 二重計上
 #   - この足1本で直近30分の集中度が中央値1.0倍→8.2倍に跳ね、85%が2倍超の偽の点灯になっていた
-# 寄り直後 (累計が小さい)・後場寄り/引けの板寄せ (本物の大きな約定) は判定しない。
+# 寄り直後 (その日20本目まで・累計が小さい) と引け前の板寄せ (15:25〜) は判定しない (2026-10-19 に後場寄りも判定するよう変更・下)。
 # 日本の大口のブロック取引は ToSTNeT 等の立会外で約定し1分足に載らないため、場中の1分に
 # 「その日の累計」が値動きなしで入る足はまず実在しない (米国版は単独の大口が本物なので条件を変えている)。
 # チャート用の生データは消さない。
 VOLUME_GLITCH_RATIO = float(os.environ.get("VOLUME_GLITCH_RATIO") or "0.9")
 VOLUME_GLITCH_MAX_MOVE = 0.005
 VOLUME_GLITCH_MIN_BARS = 20   # その日それまでに出来高のある足が20本以上ある時だけ判定 (薄商い銘柄の通常の約定を誤って除かない)
-GLITCH_FROM_HM, GLITCH_UNTIL_HM = "10:00", "15:20"   # 判定する時間帯 (JST)
-GLITCH_SKIP_HM = ("11:30", "12:30", "12:31")         # 前場引け・後場寄りの板寄せは対象外
+# 判定する時間帯 (JST)。寄りの足 (9:00〜9:05) の後から、引け前の板寄せ (15:25〜) の前まで。2026-10-19 に広げた:
+#   - 終わり 15:20 → 15:25: 15:20〜15:24 の累計入りが5日で16件 (10/19 三井不動産 15:21 に808万株・前後は1分6万株) あり、
+#     引け後〜翌朝の画面の🚨の先頭に出ていた
+#   - 始まり 10:00 → 9:06・昼休み前後 (11:30・12:30・12:31) も対象に: 10:00 より前や 12:30 に入った累計入りが累計を膨らませ、
+#     以後の累計入りがすべてすり抜けていた (3449 の 10/15: 確定日足 35.6万株に対し1分足 103万株。9:20 62,100 → 9:32 69,300 →
+#     10:09 115,900 … と「その時点の累計」が並ぶ)。広げると、1分足の合計が確定日足の1.05倍を超える銘柄が 10/8〜10/15 で
+#     1日47〜94 → 20〜50、10/07 (取り直しで昼休み前後が約185銘柄で累計入りになった日) は367 → 91。
+#     本物の寄り・後場寄りの板寄せは値段が動くか前場の合計の9割に届かないので、値動き<0.5% の条件で残る
+GLITCH_FROM_HM, GLITCH_UNTIL_HM = "09:06", "15:25"
+GLITCH_SKIP_HM = ()
+
+# 寄り付きの足の除外 (2026-10-09 追加)。Yahoo の1分足は、寄り付き (9:00 の板寄せ) と最初の5分の
+# 出来高の入り方が日・銘柄によって違う (保存済みの実データ 2026-07〜10 で確認):
+#   - 週の最初の取引日 (月曜・連休明け) だけ 9:00〜9:04 の足があり、9:00 の足に寄りの出来高が入る
+#     (6月末〜10月の15週すべてで91〜99%の銘柄。それ以外の日はほぼ0)
+#   - それ以外の日は 9:00〜9:04 の足が無く、9:05 の足が出来高0 (約8割の銘柄) か、寄りからの出来高の
+#     塊 (約2割。売買代金の大きい銘柄ほど少ない)。後日 Yahoo が直すと 9:05 に塊が入る (10/7 のトヨタ 0 → 220万株)
+# この違いで朝の集中度が偽に膨らんでいた (30分窓の 9:15 時点で「2倍以上」が月曜 343銘柄 → 除くと58、
+# 他の日も33〜45銘柄が塊だけで2倍以上)。毎日・全銘柄でそろえるため、窓統計では OPEN_SKIP_UNTIL_HM より
+# 前の足を使わない (チャート用の生データと日足の組み立てには残す)。大引け (15:25〜15:30) の板寄せは
+# Yahoo の1分足に毎日入らない (15:25〜15:29 は値なし・15:30 は出来高0) ので、もともと毎日そろって除かれている。
+OPEN_SKIP_UNTIL_HM = "09:06"
 
 
 def load_short_positions():
@@ -199,8 +219,27 @@ def drop_volume_glitches(rows, tz=None, from_hm=None, until_hm=None, skip_hm=Non
     return out
 
 
+def drop_opening_bars(rows, tz=None, until_hm=None):
+    """(epoch, close, volume, turnover) のリストから、その日の until_hm (既定 OPEN_SKIP_UNTIL_HM) より前の
+    足 (寄り付きの板寄せと最初の数分) を除いたリストを返す。"""
+    tz = tz or JST
+    h, m = map(int, (until_hm or OPEN_SKIP_UNTIL_HM).split(":"))
+    cut = h * 3600 + m * 60
+    offsets = {}   # UTC日 → 時差(秒)。夏時間の切り替えは日曜の未明 (場の外) なので1日の中では変わらない
+    out = []
+    for row in rows:
+        day = row[0] // 86400
+        off = offsets.get(day)
+        if off is None:
+            off = offsets[day] = int(datetime.fromtimestamp(row[0], tz).utcoffset().total_seconds())
+        if (row[0] + off) % 86400 >= cut:
+            out.append(row)
+    return out
+
+
 def load_bars(sym, stats=None):
-    """(epoch, close, volume, turnover) のリストを返す。出来高0のバーと「累計出来高入り」異常足は除外。"""
+    """(epoch, close, volume, turnover) のリストを返す。出来高0のバー・「累計出来高入り」異常足・
+    寄り付きの足 (OPEN_SKIP_UNTIL_HM より前) は除外。"""
     path = os.path.join(DATA_DIR, f"{sym.replace('.', '_')}_{INTERVAL}.csv")
     if not os.path.exists(path):
         return []
@@ -216,7 +255,7 @@ def load_bars(sym, stats=None):
                 continue  # 寄り前/引け後の板寄せ相当バー
             rows.append((int(r["epoch"]), c, v, c * v))
     rows.sort(key=lambda x: x[0])
-    return drop_volume_glitches(rows, stats=stats) if INTERVAL == "1m" else rows
+    return drop_opening_bars(drop_volume_glitches(rows, stats=stats)) if INTERVAL == "1m" else rows
 
 
 def window_blocks(rows, win_sec):
