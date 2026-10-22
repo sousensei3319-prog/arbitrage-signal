@@ -56,6 +56,14 @@
  記録していた。こうした日 (記録行が universe_n の8割未満) は集計から外す)
 ジョブが落ちて記録できなかった日は、直近 LEDGER_BACKFILL_DAYS 営業日以内なら翌回に
 日足だけで補完し backfilled=1 を付ける (mf_* は空。集計から除外)。
+米国は判定日の翌営業日以降に、確定した日足だけで記録する (2026-10-23〜。寄り 9:30 ET より前は前の日の続きとみなす)。
+ Yahoo の米国の日足の当日分は、引け直後に暫定値で出る日も夜まで出ない日もあり、当日に暫定値で記録する日と
+ 翌日に確定値で記録する日が混ざって、正しく記録された前の日に補完の印が付いていた (10/14・10/20)。
+ 確定した日足は出来高が100株単位 (9/1〜10/20 の107銘柄 3,745本すべて)、引け直後の暫定値は端数
+ (10/21: 107本中106本) なので、出来高が100株単位でない日足は数えない・記録しない (取り直しに失敗した銘柄)。
+ ただし確定値でも出来高が端数で届く銘柄 (HUBB は10月の日足がすべて端数) があるので、前の日足も端数の銘柄は確定扱い。
+ 記録には判定日の夕方に控えた銘柄リスト (ledger/uni_pending.json) を使う (金曜の分を月曜に記録しても、
+ 月曜朝の話題枠の入れ替えで外れた銘柄が抜けない)。控えが無い日は今の銘柄リストで記録し backfilled=1。
 
 評価の事前登録 (2026-10-04 固定。結果を見てから変えない):
   主要評価項目: 日本・flag=candidate・backfilled=0・分割疑いなし の ex_5。
@@ -124,12 +132,15 @@ MARKETS = {
     # mf_close_hm: money_flow の最新バー時刻がこれ以降なら「引け時点の値」とみなして保存する
     # open_hm: 寄り付きの現地時刻 (入口 = 記録時刻より後の最初の寄り)
     # entry_lag: 入口を判定日から何営業日後より前にしないか (通常の記録時刻での入口に合わせて固定)
+    # 米国だけ (2026-10-23〜): record_next_day = 判定日の翌営業日以降に記録 (寄りより前は前の日の続き) /
+    #   final_lot = 出来高がこの株数の倍数の日足だけを確定値として数える・記録する /
+    #   eval_from = 集計をこの判定日から数える (それより前は groups_before_eval_from に参考として集計)
     "jp": {"dir": "data/jp_stocks", "tz": timezone(timedelta(hours=9)), "ts_col": "timestamp_jst",
            "suffix": "_T", "mf_suffix": ".T", "final_hm": (16, 0), "mf_close_hm": "15:20", "open_hm": (9, 0),
            "entry_lag": 1},
     "us": {"dir": "data/us_stocks", "tz": ZoneInfo("America/New_York"), "ts_col": "timestamp_et",
            "suffix": "", "mf_suffix": "", "final_hm": (16, 30), "mf_close_hm": "15:50", "open_hm": (9, 30),
-           "entry_lag": 2},
+           "entry_lag": 2, "record_next_day": True, "final_lot": 100, "eval_from": "2026-10-23"},
 }
 
 SNAP_COLS = ["date", "code", "name", "bucket", "group", "hot_added", "close", "turnover", "med20_turnover",
@@ -150,7 +161,11 @@ PREREG = {
     "amendments": ["2026-10-06 (成績は見ずに記録の仕方だけ修正): 話題枠に判定日の当日以降に追加された銘柄は"
                    "記録・集計しない / 入口を判定日から日本1・米国2営業日より前にしない",
                    "2026-10-07 (同上): 判定日は日足が9割以上の銘柄でそろった日だけ。一部の銘柄だけで記録された日"
-                   "(記録行が universe_n の8割未満。米国 10/06) は集計から外す"],
+                   "(記録行が universe_n の8割未満。米国 10/06) は集計から外す",
+                   "2026-10-23 (同上・米国だけ): 判定日の翌営業日以降に、確定した日足 (出来高が100株単位) だけで記録し、"
+                   "判定日の夕方に控えた銘柄リストを使う (控えが無い日は backfilled=1)。米国の集計は 2026-10-23 以降の"
+                   "判定日から (それより前の米国の行は書き換えず、groups_before_eval_from に参考として別に集計)。"
+                   "日本は変更なし"],
 }
 
 
@@ -206,6 +221,19 @@ def load_daily(path, ts_col, cutoff_date):
     return [by_date[k] for k in sorted(by_date)]
 
 
+def is_final(bars, i, cfg):
+    """日足 bars[i] (date, o, h, l, c, v) が確定値か。final_lot のある市場 (米国) は、出来高がその倍数なら確定値。
+    端数でも、前の日足も端数の銘柄は確定値でも端数で届く銘柄 (HUBB など) とみなして確定扱いにする
+    (前の日まで100株単位で届いていた銘柄の端数だけを暫定値とみなす)。"""
+    lot = cfg.get("final_lot")
+    if not lot:
+        return True
+
+    def round_lot(v):
+        return v == int(v) and int(v) % lot == 0
+    return round_lot(bars[i][5]) or (i > 0 and not round_lot(bars[i - 1][5]))
+
+
 MF_KEEP_DAYS = 10   # 引け時点の money_flow スナップショットを保持する日数 (記録に使い終わるまで)
 
 
@@ -247,6 +275,30 @@ def update_mf_pending(d, mf_suffix, close_hm):
     return pending, (mf_date if mf_hm >= close_hm else None)
 
 
+def read_uni_pending(d):
+    """{判定日: その日の夕方に控えた銘柄リスト} (米国だけが使う)。無ければ空。"""
+    try:
+        return json.load(open(os.path.join(d, "ledger", "uni_pending.json"), encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def update_uni_pending(d, uni, date):
+    """引け時点の money_flow を控えた日 date の銘柄リストを控える (米国)。最初の控えを正とする:
+    同じ日に後から動いた実行 (月曜の寄り前の話題枠の入れ替えの後に、まだ金曜の money_flow のまま動いた実行など) で
+    書き換えない。MF_KEEP_DAYS 日分だけ持つ。"""
+    pending = read_uni_pending(d)
+    if date and date not in pending:
+        pending[date] = [{k: u[k] for k in ("code", "name", "bucket", "group")} for u in uni]
+    for k in sorted(pending)[:-MF_KEEP_DAYS]:
+        pending.pop(k, None)
+    path = os.path.join(d, "ledger", "uni_pending.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(pending, f, ensure_ascii=False, separators=(",", ":"))
+    return pending
+
+
 def read_ledger(d):
     """全月の台帳 → {(date, code): row(dict)}。古い列構成のファイルも読める (無い列は空)。"""
     out = {}
@@ -282,10 +334,11 @@ def _late_hot(r):
     return bool(r.get("hot_added")) and r["hot_added"] >= r["date"]
 
 
-def snapshot_rows(date, uni, daily, mf_day, backfilled, now_iso, hot_added=None):
+def snapshot_rows(date, uni, daily, mf_day, backfilled, now_iso, hot_added=None, cfg=None):
     """判定日 date の全ユニバース銘柄の記録行 (その日に日足がある銘柄のみ)。
     判定日の当日以降に話題枠へ追加された銘柄は入れない (その日の動きで選ばれた可能性があり、
-    追加の時刻は記録していないため、寄り前の追加も含めて追加日の分は入れない)。"""
+    追加の時刻は記録していないため、寄り前の追加も含めて追加日の分は入れない)。
+    cfg に final_lot がある市場 (米国) は、その日の日足が確定していない銘柄 (取り直しに失敗した銘柄) を入れない。"""
     hot_added = hot_added or {}
     out = []
     for u in uni:
@@ -294,7 +347,7 @@ def snapshot_rows(date, uni, daily, mf_day, backfilled, now_iso, hot_added=None)
             continue
         bars = daily.get(u["code"]) or []
         idx = next((i for i in range(len(bars) - 1, -1, -1) if bars[i][0] == date), None)
-        if idx is None or idx == 0:
+        if idx is None or idx == 0 or (cfg and not is_final(bars, idx, cfg)):
             continue
         d, o, h, l, c, v = bars[idx]
         prev_c = bars[idx - 1][4]
@@ -446,6 +499,24 @@ def _partial_dates(rows):
     return {x for x, k in n.items() if uni_n.get(x) and k < PARTIAL_SHARE * uni_n[x]}
 
 
+def _groups(ok):
+    """flag別×期間別の件数・平均 (ret が記入済みの行のみ)。"""
+    groups = {}
+    for flag in ("candidate", "near", ""):
+        g = {}
+        for h in HORIZONS:
+            rs = [r for r in ok if r["flag"] == flag and r.get(f"ret_{h}")]
+            ex = [float(r[f"ex_{h}"]) for r in rs if r.get(f"ex_{h}")]
+            ret = [float(r[f"ret_{h}"]) for r in rs]
+            g[f"h{h}"] = {"n": len(ret), "n_days": len({r["date"] for r in rs}),
+                          "mean_ret": round(sum(ret) / len(ret), 5) if ret else None,
+                          "mean_ex": round(sum(ex) / len(ex), 5) if ex else None,
+                          "n_ex": len(ex),
+                          "win_rate_ex": round(sum(1 for x in ex if x > 0) / len(ex), 3) if ex else None}
+        groups[flag or "other"] = g
+    return groups
+
+
 def summarize(rows, mkt):
     """flag別×期間別の成績 (ret が記入済みの行のみ。backfilled行・分割疑いの行・当日以降に話題枠へ
     追加された銘柄の行・一部の銘柄だけで記録された日は除外) と、
@@ -461,20 +532,15 @@ def summarize(rows, mkt):
                                                           dates[-1] if dates else None, len(dates))
     partial = _partial_dates(rows)
     out["partial_dates"] = sorted(partial)
-    ok = [r for r in rows.values() if r["backfilled"] != "1" and not r.get("split_date") and not _late_hot(r)
-          and r["date"] not in partial]
-    for flag in ("candidate", "near", ""):
-        g = {}
-        for h in HORIZONS:
-            rs = [r for r in ok if r["flag"] == flag and r.get(f"ret_{h}")]
-            ex = [float(r[f"ex_{h}"]) for r in rs if r.get(f"ex_{h}")]
-            ret = [float(r[f"ret_{h}"]) for r in rs]
-            g[f"h{h}"] = {"n": len(ret), "n_days": len({r["date"] for r in rs}),
-                          "mean_ret": round(sum(ret) / len(ret), 5) if ret else None,
-                          "mean_ex": round(sum(ex) / len(ex), 5) if ex else None,
-                          "n_ex": len(ex),
-                          "win_rate_ex": round(sum(1 for x in ex if x > 0) / len(ex), 3) if ex else None}
-        out["groups"][flag or "other"] = g
+    ok_all = [r for r in rows.values() if r["backfilled"] != "1" and not r.get("split_date") and not _late_hot(r)
+              and r["date"] not in partial]
+    # 米国は記録の仕方を変えた後の判定日から数える (2026-10-23 の追記)。それより前は参考として別に集計する
+    eval_from = MARKETS[mkt].get("eval_from")
+    ok = [r for r in ok_all if not eval_from or r["date"] >= eval_from]
+    out["groups"] = _groups(ok)
+    if eval_from:
+        out["eval_from"] = eval_from
+        out["groups_before_eval_from"] = _groups([r for r in ok_all if r["date"] < eval_from])
     if mkt == "jp" and 5 in HORIZONS:
         daymeans = {}
         for r in ok:
@@ -492,7 +558,8 @@ def summarize(rows, mkt):
 
 def pending_codes(d, uni):
     """答え合わせ待ち (ret が未記入・分割疑いなし・直近 PENDING_SESSIONS 判定日以内) なのに
-    ユニバースから外れた銘柄のコード一覧。"""
+    ユニバースから外れた銘柄のコード一覧。米国は、控えた銘柄リストにあってまだ記録していない日の、
+    今のユニバースに無い銘柄も足す (金曜の夕方にあり月曜朝に外れた銘柄の金曜の確定値を、月曜の記録の前に取る)。"""
     rows = read_ledger(d)
     dates = sorted({k[0] for k in rows})[-PENDING_SESSIONS:]
     recent = set(dates)
@@ -502,6 +569,10 @@ def pending_codes(d, uni):
         if date in recent and code not in in_uni and not r.get("split_date") \
                 and not all(r.get(f"ret_{h}") for h in HORIZONS):
             out.add(code)
+    recorded = {k[0] for k in rows}
+    for date, snap in read_uni_pending(d).items():
+        if date not in recorded:
+            out |= {u["code"] for u in snap if u["code"] not in in_uni}
     return sorted(out)
 
 
@@ -525,14 +596,21 @@ def main():
 
     t0 = time.time()
     now = _now_utc().astimezone(tz)
-    # 当日の日足は引け後(final_hm)まで未確定とみなして使わない
-    hh, mm = cfg["final_hm"]
-    cutoff = now.strftime("%Y-%m-%d") if (now.hour, now.minute) < (hh, mm) else \
-        (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    if cfg.get("record_next_day"):
+        # 米国 (2026-10-23〜): 当日の日足は使わない (暫定値のことがある)。寄り (open_hm) より前は前の日の続きとみなし、
+        # その「きょう」より前の日だけを使う = 判定日の翌営業日以降に確定値で記録する (遅れた実行が日付をまたいでも同じ)
+        oh, om = cfg["open_hm"]
+        cutoff = (now - timedelta(hours=oh, minutes=om)).strftime("%Y-%m-%d")
+    else:
+        # 当日の日足は引け後(final_hm)まで未確定とみなして使わない
+        hh, mm = cfg["final_hm"]
+        cutoff = now.strftime("%Y-%m-%d") if (now.hour, now.minute) < (hh, mm) else \
+            (now + timedelta(days=1)).strftime("%Y-%m-%d")
 
     rows = read_ledger(d)
     hot_added = load_hot_added(d)
-    codes = {u["code"] for u in uni} | {k[1] for k in rows}
+    uni_pending = read_uni_pending(d) if cfg.get("record_next_day") else {}
+    codes = {u["code"] for u in uni} | {k[1] for k in rows} | {u["code"] for v in uni_pending.values() for u in v}
     daily = {}
     for code in codes:
         if time.time() - t0 > DEADLINE_MIN * 60:
@@ -548,13 +626,17 @@ def main():
         print("日足データが無い。記録をスキップ。"); return
     cover = {}
     for bars in have:
-        for b in bars[-(BACKFILL_DAYS + 10):]:
-            cover[b[0]] = cover.get(b[0], 0) + 1
+        for j in range(max(0, len(bars) - (BACKFILL_DAYS + 10)), len(bars)):
+            if is_final(bars, j, cfg):   # 米国は確定した日足 (出来高が100株単位) だけを数える
+                cover[bars[j][0]] = cover.get(bars[j][0], 0) + 1
+    if not cover:
+        print("確定した日足が無い。記録をスキップ。"); return
     best = max(cover[x] for x in sorted(cover)[-5:])
     latest = max(x for x, n in cover.items() if n >= MIN_COVERAGE * best)
     for x in sorted(cover):
         if x > latest:
-            print(f"⚠️ {x} の日足はまだ {cover[x]}/{best} 銘柄だけ — そろうまで判定日にしない (次回以降に記録)")
+            print(f"⚠️ {x} の{'確定した' if cfg.get('final_lot') else ''}日足はまだ {cover[x]}/{best} 銘柄だけ"
+                  " — そろうまで判定日にしない (次回以降に記録)")
     calendar = sorted({b[0] for u in uni for b in (daily.get(u["code"]) or []) if b[0] <= latest})
     targets = [x for x in calendar[-(BACKFILL_DAYS + 1):]]
     recorded = {k[0] for k in rows}
@@ -563,23 +645,29 @@ def main():
     print(f"money_flow 引け時点スナップショット: "
           + (f"{mf_saved} を保存" if mf_saved else "今回は引け後の値ではないため保存なし")
           + f" (保持中 {sorted(pending)})")
-    now_iso = _now_utc().isoformat(timespec="seconds")
+    if cfg.get("record_next_day"):
+        uni_pending = update_uni_pending(d, uni, mf_saved)
+    now_iso = now.astimezone(timezone.utc).isoformat(timespec="seconds")
     touched, new_n = set(), 0
     for date in targets:
         if date in recorded:
             continue
-        backfilled = date != latest
-        snap = snapshot_rows(date, uni, daily, pending.get(date, {}), backfilled, now_iso, hot_added)
+        # 米国: 判定日の夕方に控えた銘柄リストで記録する (控えが無い日は、後から入れ替わった銘柄が混ざりうるので補完扱い)
+        no_snap = bool(cfg.get("record_next_day")) and date not in uni_pending
+        uni_d = uni_pending.get(date) or uni
+        backfilled = date != latest or no_snap
+        snap = snapshot_rows(date, uni_d, daily, pending.get(date, {}), backfilled, now_iso, hot_added, cfg)
         for r in snap:
             rows[(r["date"], r["code"])] = r
         if snap:
             touched.add(date[:7]); new_n += len(snap)
             nc = sum(1 for r in snap if r["flag"] == "candidate")
             nn = sum(1 for r in snap if r["flag"] == "near")
-            late = sum(1 for u in uni if u["bucket"] == "hot" and hot_added.get(u["code"], "") >= date)
+            late = sum(1 for u in uni_d if u["bucket"] == "hot" and hot_added.get(u["code"], "") >= date)
             print(f"記録: {date} {len(snap)}銘柄 (候補{nc}・惜しくも候補外{nn})"
                   + (f" ※判定日の当日以降に話題枠へ追加された{late}銘柄は除外" if late else "")
-                  + (" ※取りこぼし日の補完(backfilled)" if backfilled else "")
+                  + (" ※取りこぼし日の補完(backfilled)" if date != latest else "")
+                  + (" ※判定日の夕方の銘柄リストの控えが無いので今の銘柄リストで記録・補完扱い(backfilled)" if no_snap else "")
                   + ("" if date in pending else " ※この日の引け時点のmoney_flowが未保存のためmf_*は空"))
 
     # 答え合わせで書き換わりうる行 (直近の判定日・未記入) だけ控えておき、変わった月だけ書き直す
