@@ -258,6 +258,7 @@ def score_squeeze_long(min_fr, ls_ratio, drawdown_pct, oi_chg, fgi):
     min_fr: 取引所間で最も低いFR (マイナスほど良い)
     ls_ratio: 個人L/S比 (低いほどショート偏り=良い)
     drawdown_pct: 7日高値からの下落率 (マイナス。深いほど底値圏)
+    fgi: 点数には使わない (2026-10 の答え合わせで「恐怖の日の方が上がりやすい」根拠が無かった。RULES.md A節)
     """
     score = 0; reasons = []
     # FRマイナス過熱 = ショートが過剰に積み上がりFRを払っている
@@ -283,9 +284,8 @@ def score_squeeze_long(min_fr, ls_ratio, drawdown_pct, oi_chg, fgi):
             score += 2; reasons.append(f"7日高値から{drawdown_pct:.0f}%暴落(+2)")
         elif drawdown_pct < -12:
             score += 1; reasons.append(f"7日高値から{drawdown_pct:.0f}%下落(+1)")
-    # FGI恐怖ボーナス
-    if fgi is not None and fgi <= 30:
-        score += 1; reasons.append(f"FGI恐怖{fgi}(+1)")
+    # 旧「FGI≤30 で +1点」は外した (2026-10-22〜)。事前に決めた比べ方で、恐怖の日のこの形の+3日騰落は
+    # それ以外の日より −0.84pt (t=−1.2) で「根拠なし」だった。FGI は地合いの表示 (macro_layer) だけに使う
     return min(score, 10), reasons
 
 
@@ -448,7 +448,9 @@ def build_rules_embed():
              "value": ("**条件**: FRマイナス過熱 + L/Sショート偏り + 暴落後の底値\n"
                        "**入**: 下げ止まり確認 (1h終値が直近高値/EMA上抜け)\n"
                        "**利確**: TP1=直近戻り高値 / TP2=暴落の半値戻し\n"
-                       "**損切**: 直近安値割れ"),
+                       "**損切**: 直近安値割れ\n"
+                       "**検証(2026-10)**: 「恐怖(FGI30以下)で+1点」は根拠が無く外した。この形 (FR+下落) の3日後は、"
+                       "BTCより平均0.2〜0.8ポイント低かった (参考値)。売買の合図としての実績はまだ無い"),
              "inline": False},
             {"name": "B. モメンタム順張り (Breakout)",
              "value": ("**条件**: 初動(1h+3〜12%) + OI増 + 出来高急増 + 上昇トレンド\n"
@@ -484,6 +486,11 @@ def build_signal_embed(c, scan_time):
                   f"出来高 {fmt_vol(c['vol'])}"), "inline":False},
         {"name":"スコア根拠", "value":"\n".join(c["reasons"]) or "なし", "inline":False},
     ]
+    if strat == "A":
+        fields.append({"name":"検証メモ",
+            "value":("2026-10 の答え合わせ (2023-07〜2026-09・85銘柄) では、この形 (FR+下落) の3日後は、"
+                     "BTCより平均0.2〜0.8ポイント低かった (参考値)。売買の合図としての実績はまだ無い"),
+            "inline":False})
     lv = c["levels"]
     plan = [
         f"🟡 エントリー: {fmt_price(lv['entry'])} ({c['entry_note']})",
