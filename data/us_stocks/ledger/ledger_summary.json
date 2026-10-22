@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-22T22:28:57+00:00",
+ "generated_at": "2026-10-22T23:04:57+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -11,10 +11,99 @@
   "no_peeking": "評価日までは有意かどうかで判断しない (件数・欠測の健全性の確認のみ)",
   "amendments": [
    "2026-10-06 (成績は見ずに記録の仕方だけ修正): 話題枠に判定日の当日以降に追加された銘柄は記録・集計しない / 入口を判定日から日本1・米国2営業日より前にしない",
-   "2026-10-07 (同上): 判定日は日足が9割以上の銘柄でそろった日だけ。一部の銘柄だけで記録された日(記録行が universe_n の8割未満。米国 10/06) は集計から外す"
+   "2026-10-07 (同上): 判定日は日足が9割以上の銘柄でそろった日だけ。一部の銘柄だけで記録された日(記録行が universe_n の8割未満。米国 10/06) は集計から外す",
+   "2026-10-23 (同上・米国だけ): 判定日の翌営業日以降に、確定した日足 (出来高が100株単位) だけで記録し、判定日の夕方に控えた銘柄リストを使う (控えが無い日は backfilled=1)。米国の集計は 2026-10-23 以降の判定日から (それより前の米国の行は書き換えず、groups_before_eval_from に参考として別に集計)。日本は変更なし"
   ]
  },
  "groups": {
+  "candidate": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  },
+  "near": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  },
+  "other": {
+   "h1": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h5": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   },
+   "h20": {
+    "n": 0,
+    "n_days": 0,
+    "mean_ret": null,
+    "mean_ex": null,
+    "n_ex": 0,
+    "win_rate_ex": null
+   }
+  }
+ },
+ "note": "入口=記録時刻より後の最初の寄り (判定日から日本1・米国2営業日より前にはしない)。ex=同日の記録銘柄の中央値との差。判定日の当日以降に話題枠へ追加された銘柄と、一部の銘柄だけで記録された日 (partial_dates) は除外。評価日前の数字は参考 (判断に使わない)",
+ "first_date": "2026-09-29",
+ "last_date": "2026-10-22",
+ "n_days": 18,
+ "partial_dates": [
+  "2026-10-06"
+ ],
+ "eval_from": "2026-10-23",
+ "groups_before_eval_from": {
   "candidate": {
    "h1": {
     "n": 302,
@@ -93,12 +182,5 @@
     "win_rate_ex": null
    }
   }
- },
- "note": "入口=記録時刻より後の最初の寄り (判定日から日本1・米国2営業日より前にはしない)。ex=同日の記録銘柄の中央値との差。判定日の当日以降に話題枠へ追加された銘柄と、一部の銘柄だけで記録された日 (partial_dates) は除外。評価日前の数字は参考 (判断に使わない)",
- "first_date": "2026-09-29",
- "last_date": "2026-10-22",
- "n_days": 18,
- "partial_dates": [
-  "2026-10-06"
- ]
+ }
 }
