@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-23T21:28:29+00:00",
+ "generated_at": "2026-10-26T21:31:46+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -97,8 +97,8 @@
  },
  "note": "入口=記録時刻より後の最初の寄り (判定日から日本1・米国2営業日より前にはしない)。ex=同日の記録銘柄の中央値との差。判定日の当日以降に話題枠へ追加された銘柄と、一部の銘柄だけで記録された日 (partial_dates) は除外。評価日前の数字は参考 (判断に使わない)",
  "first_date": "2026-09-29",
- "last_date": "2026-10-22",
- "n_days": 18,
+ "last_date": "2026-10-23",
+ "n_days": 19,
  "partial_dates": [
   "2026-10-06"
  ],
@@ -106,20 +106,20 @@
  "groups_before_eval_from": {
   "candidate": {
    "h1": {
-    "n": 302,
-    "n_days": 9,
-    "mean_ret": 0.00344,
-    "mean_ex": 0.00184,
-    "n_ex": 302,
-    "win_rate_ex": 0.556
+    "n": 335,
+    "n_days": 10,
+    "mean_ret": 0.003,
+    "mean_ex": 0.00168,
+    "n_ex": 335,
+    "win_rate_ex": 0.546
    },
    "h5": {
-    "n": 181,
-    "n_days": 6,
-    "mean_ret": -0.00917,
-    "mean_ex": -0.01738,
-    "n_ex": 181,
-    "win_rate_ex": 0.436
+    "n": 240,
+    "n_days": 7,
+    "mean_ret": -0.00759,
+    "mean_ex": -0.01711,
+    "n_ex": 240,
+    "win_rate_ex": 0.433
    },
    "h20": {
     "n": 0,
@@ -132,20 +132,20 @@
   },
   "near": {
    "h1": {
-    "n": 566,
-    "n_days": 9,
-    "mean_ret": -0.00117,
-    "mean_ex": -0.00298,
-    "n_ex": 566,
-    "win_rate_ex": 0.475
+    "n": 608,
+    "n_days": 10,
+    "mean_ret": -0.00084,
+    "mean_ex": -0.00244,
+    "n_ex": 608,
+    "win_rate_ex": 0.482
    },
    "h5": {
-    "n": 326,
-    "n_days": 6,
-    "mean_ret": -0.01573,
-    "mean_ex": -0.02366,
-    "n_ex": 326,
-    "win_rate_ex": 0.485
+    "n": 452,
+    "n_days": 7,
+    "mean_ret": -0.0072,
+    "mean_ex": -0.01669,
+    "n_ex": 452,
+    "win_rate_ex": 0.482
    },
    "h20": {
     "n": 0,
@@ -158,20 +158,20 @@
   },
   "other": {
    "h1": {
-    "n": 6472,
-    "n_days": 9,
+    "n": 7239,
+    "n_days": 10,
     "mean_ret": 0.00174,
-    "mean_ex": -0.0003,
-    "n_ex": 6472,
+    "mean_ex": 4e-05,
+    "n_ex": 7239,
     "win_rate_ex": 0.499
    },
    "h5": {
-    "n": 4342,
-    "n_days": 6,
-    "mean_ret": -0.00069,
-    "mean_ex": -0.01102,
-    "n_ex": 4342,
-    "win_rate_ex": 0.504
+    "n": 4986,
+    "n_days": 7,
+    "mean_ret": 0.00031,
+    "mean_ex": -0.01044,
+    "n_ex": 4986,
+    "win_rate_ex": 0.505
    },
    "h20": {
     "n": 0,
