@@ -1,0 +1,55 @@
+name: TMP Yahoo 1m probe
+
+# 一時的な調査用 (PR を出す前に削除する)。1分足が取れない銘柄を Yahoo の別の取り方・
+# Yahoo!ファイナンス日本版・JPX の一覧で調べ、鮮度点検 (freshness_check.py) をランナー上で試す。
+# 何もコミットしない。フィーチャーブランチ上は workflow_dispatch が使えないので push で起動する。
+
+on:
+  push:
+    paths:
+      - '.github/scripts/tmp_yahoo_probe.py'
+      - '.github/workflows/tmp-yahoo-probe.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tmp-yahoo-probe-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: |
+            .github/scripts
+            universe_refresh.py
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install xlrd (JPX の旧xls形式に備える)
+        run: pip install -q xlrd || true
+      - name: Probe Yahoo / Yahoo JP / JPX
+        run: python .github/scripts/tmp_yahoo_probe.py
+
+  freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Freshness check (jp / us) — 結果と通知文を表示するだけ
+        run: |
+          for m in jp us; do
+            : > "${RUNNER_TEMP}/failure_notes.txt"
+            echo "===== freshness_check.py ${m} ====="
+            python .github/scripts/freshness_check.py "${m}" && echo "→ exit 0 (緑)" || echo "→ exit $? (赤)"
+            echo "----- failure_notes.txt (Discord の失敗通知に載る文) -----"
+            cat "${RUNNER_TEMP}/failure_notes.txt"
+          done
