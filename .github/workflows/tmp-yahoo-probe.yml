@@ -1,7 +1,7 @@
 name: TMP Yahoo 1m probe
 
-# 一時的な調査用 (PR を出す前に削除する)。1分足が取れない銘柄を Yahoo の別の取り方・
-# Yahoo!ファイナンス日本版・JPX の一覧で調べ、鮮度点検 (freshness_check.py) をランナー上で試す。
+# 一時的な調査用 (PR を出す前に削除する)。1分足が取れない銘柄を Yahoo・JPX・Wikipedia で調べ、
+# 鮮度点検 (freshness_check.py) をこのブランチの版で main の最新のデータに対してランナー上で試す。
 # 何もコミットしない。フィーチャーブランチ上は workflow_dispatch が使えないので push で起動する。
 
 on:
@@ -33,14 +33,23 @@ jobs:
           python-version: '3.12'
       - name: Install xlrd (JPX の旧xls形式に備える)
         run: pip install -q xlrd || true
-      - name: Probe Yahoo / Yahoo JP / JPX
+      - name: Probe JPX / Yahoo / Wikipedia
         run: python .github/scripts/tmp_yahoo_probe.py
 
   freshness:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # データは main の最新、点検のスクリプトだけこのブランチの版にする
       - uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Overlay freshness_check.py from this branch
+        run: |
+          git fetch -q --depth=1 origin "${GITHUB_SHA}"
+          git checkout FETCH_HEAD -- .github/scripts/freshness_check.py
+          git log -1 --format='main: %h %s'
+          echo "点検のスクリプト: ${GITHUB_SHA::8} の版"
       - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
