@@ -1,805 +1,805 @@
 code,name,bucket,sector,group,surge_ratio,zscore,recent_turnover_usd,baseline_median_usd,share_recent_pct,share_base_pct,share_delta_pp,last_close,pct_window
-INTC,Intel,leader,Semiconductors,半導体,45.292,15.39,18955480645,418513083,20.295,1.583,+18.712,65.7,-29.86
-WBD,Warner Bros. Discovery,leader,Broadcasting,コミュニケーション・サービス,22.076,10.06,1353396425,61305648,1.449,0.225,+1.224,31.0,+0.52
-REGN,Regeneron Pharmaceuticals,leader,Biotechnology,ヘルスケア,13.183,4.80,318252971,24140537,0.341,0.077,+0.264,915.5,+13.71
-CDNA,"CareDx, Inc.",hot,,不明,11.463,5.05,40745486,3554548,0.044,0.012,+0.032,87.2,+26.12
-COO,Cooper Companies (The),core,Health Care Supplies,ヘルスケア,11.387,6.28,62267999,5468407,0.067,0.019,+0.047,60.2,+2.34
-SNDK,Sandisk,leader,"Technology Hardware, Storage & Peripherals",情報技術,11.329,9.00,6046400806,533721619,6.474,1.624,+4.849,1205.1,-14.81
-LLY,Lilly (Eli),core,Pharmaceuticals,ヘルスケア,11.031,2.88,1571300328,142439238,1.682,0.574,+1.108,1427.2,+12.60
-AVGO,Broadcom,leader,Semiconductors,半導体,10.794,4.17,3339813501,309407954,3.576,1.137,+2.439,328.5,-2.57
-AGIO,"Agios Pharmaceuticals, Inc.",hot,,不明,9.794,4.51,13257247,1353592,0.014,0.004,+0.010,31.0,-15.34
-ERIE,Erie Indemnity,core,Insurance Brokers,金融,9.794,5.28,18179885,1856236,0.019,0.005,+0.014,259.8,+6.04
-GOOGL,Alphabet Inc. (Class A),leader,Interactive Media & Services,コミュニケーション・サービス,9.469,0.61,5481959714,578948992,5.869,4.395,+1.474,279.9,-15.61
-IONQ,"IonQ, Inc.",hot,,不明,8.759,2.97,211407542,24134788,0.226,0.083,+0.143,29.3,-8.24
-DVA,DaVita,core,Health Care Services,ヘルスケア,8.681,2.00,54962612,6331019,0.059,0.029,+0.030,179.6,+3.49
-IBKR,Interactive Brokers,core,Investment Banking & Brokerage,金融,8.242,7.59,152752769,18534325,0.164,0.051,+0.113,77.0,-8.55
-KDP,Keurig Dr Pepper,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,7.898,3.16,150991038,19116746,0.162,0.068,+0.094,35.9,+3.92
-RMD,ResMed,core,Health Care Equipment,ヘルスケア,7.662,4.22,90100968,11759592,0.096,0.037,+0.060,238.7,-2.85
-RBLX,Roblox Corporation,hot,,不明,7.615,2.82,138127703,18138683,0.148,0.069,+0.079,43.7,-16.35
-BALL,Ball Corporation,core,"Metal, Glass & Plastic Containers",素材,7.422,6.03,33469355,4509185,0.036,0.013,+0.022,65.5,+2.24
-MSFT,Microsoft,leader,Systems Software,情報技術,7.386,1.03,3529348094,477869147,3.779,2.441,+1.338,521.6,-0.70
-CAI,"Caris Life Sciences, Inc.",hot,,不明,7.354,4.87,31866895,4333379,0.034,0.014,+0.020,34.2,+9.31
-RDDT,"Reddit, Inc.",hot,,コミュニケーション・サービス,7.318,2.60,266621442,36432341,0.285,0.134,+0.151,95.9,-38.29
-DASH,DoorDash,leader,Specialized Consumer Services,一般消費財,6.942,2.55,262710018,37845141,0.281,0.136,+0.145,182.3,-3.42
-AMZN,Amazon,leader,Broadline Retail,一般消費財,6.826,2.55,3082573658,451569892,3.300,1.518,+1.783,237.3,-8.78
-SYK,Stryker Corporation,core,Health Care Equipment,ヘルスケア,6.428,3.35,216574931,33694525,0.232,0.100,+0.132,297.1,-1.08
-TWLO,Twilio Inc.,hot,,不明,6.158,1.38,168380982,27342611,0.180,0.105,+0.076,198.9,-23.79
-TFX,Teleflex Incorporated,hot,,不明,5.581,1.98,19319301,3461323,0.021,0.013,+0.008,142.3,+8.93
-VSXY,Victorias Secret & Co.,hot,,不明,5.382,2.78,31397941,5833623,0.034,0.019,+0.015,93.3,+5.11
-FDXF,FedEx Freight,core,Cargo Ground Transportation,資本財,5.333,3.51,30929314,5799775,0.033,0.017,+0.016,125.1,+14.02
-ILMN,"Illumina, Inc.",core,Life Sciences Tools & Services,ヘルスケア,5.194,3.95,144608443,27843993,0.155,0.075,+0.080,251.4,-6.20
-PURR,Hyperliquid Strategies Inc,hot,,不明,5.187,1.23,32197340,6206872,0.034,0.026,+0.009,11.1,+17.98
-FER,Ferrovial N.V. Ordinary Shares,leader,,不明,5.183,2.26,26843005,5179329,0.029,0.017,+0.012,56.6,+13.56
-FCX,Freeport-McMoRan,core,Copper,素材,5.181,2.74,185155132,35739106,0.198,0.104,+0.094,63.4,-7.26
-CTVA,Corteva,core,Fertilizers & Agricultural Chemicals,素材,5.144,2.07,40546946,7882430,0.043,0.027,+0.016,11.6,-9.63
-QCOM,Qualcomm,leader,Semiconductors,半導体,5.074,3.48,315350078,62155817,0.338,0.177,+0.161,167.7,-3.87
-RITM,Rithm Capital Corp.,hot,,不明,5.058,3.32,20670041,4086609,0.022,0.012,+0.011,9.4,+8.61
-COIN,Coinbase,core,Financial Exchanges & Data,金融,4.898,4.05,269761165,55071774,0.289,0.148,+0.141,139.3,-19.73
-IAG,Iamgold Corporation,hot,,不明,4.886,2.36,17268125,3534336,0.018,0.012,+0.007,15.4,-13.96
-LIN,Linde plc,leader,Industrial Gases,素材,4.885,4.29,219593988,44956675,0.235,0.115,+0.120,512.5,+2.96
-HTFL,"Heartflow, Inc.",hot,,不明,4.874,2.40,17386417,3566944,0.019,0.011,+0.008,57.3,+2.95
-META,Meta Platforms,leader,Interactive Media & Services,コミュニケーション・サービス,4.861,1.41,5238420687,1077686460,5.609,3.631,+1.977,617.7,-11.37
-BAX,Baxter International,core,Health Care Equipment,ヘルスケア,4.772,1.73,33908527,7105550,0.036,0.026,+0.010,23.2,-5.00
-HPQ,HP Inc.,core,"Technology Hardware, Storage & Peripherals",情報技術,4.733,1.56,81608393,17240617,0.087,0.056,+0.032,28.8,-7.55
-TTWO,Take-Two Interactive,leader,Interactive Home Entertainment,コミュニケーション・サービス,4.646,1.14,84135370,18111110,0.090,0.066,+0.025,193.2,-5.96
-MDLZ,Mondelez International,leader,Packaged Foods & Meats,生活必需品,4.571,1.42,85872152,18787719,0.092,0.058,+0.034,64.8,+1.73
-DDOG,Datadog,leader,Application Software,情報技術,4.551,3.32,164108782,36057539,0.176,0.102,+0.074,243.6,-7.37
-HLN,Haleon plc,hot,,不明,4.540,2.25,57423076,12648661,0.061,0.036,+0.026,8.8,-13.35
-MPWR,Monolithic Power Systems,leader,Semiconductors,半導体,4.526,2.31,177850723,39299649,0.190,0.112,+0.078,1227.3,-3.03
-BSX,Boston Scientific,core,Health Care Equipment,ヘルスケア,4.449,0.30,173660177,39034731,0.186,0.205,-0.019,43.1,-4.73
-CDW,CDW Corporation,core,Technology Distributors,情報技術,4.445,2.23,42828892,9635975,0.046,0.029,+0.017,149.3,-4.25
-INVH,Invitation Homes,core,Single-Family Residential REITs,不動産,4.389,1.09,26658160,6074273,0.029,0.023,+0.005,26.6,-1.84
-ARM,Arm Holdings plc American Depositary Shares,leader,,不明,4.389,2.75,186457273,42486436,0.200,0.125,+0.075,205.3,-9.37
-GRAL,"GRAIL, Inc.",hot,,不明,4.163,3.70,23443044,5631623,0.025,0.015,+0.010,144.2,+15.80
-PTCT,"PTC Therapeutics, Inc.",hot,,不明,4.143,1.51,8639067,2085374,0.009,0.007,+0.002,62.9,+0.33
-CL,Colgate-Palmolive,core,Household Products,生活必需品,4.141,1.66,75995909,18351883,0.081,0.057,+0.024,95.6,+1.64
-DXC,DXC Technology Company,hot,,不明,4.080,0.64,10948558,2683544,0.012,0.012,-0.000,13.9,-4.83
-VRTX,Vertex Pharmaceuticals,leader,Biotechnology,ヘルスケア,4.080,2.80,119096866,29192693,0.128,0.079,+0.049,554.3,+8.44
-C,Citigroup,core,Diversified Banks,金融,4.060,2.61,150732879,37123178,0.161,0.107,+0.054,121.9,-1.23
-SEI,"Solaris Energy Infrastructure,",hot,,不明,4.027,1.84,29903789,7425076,0.032,0.024,+0.008,71.0,+3.80
-IOVA,"Iovance Biotherapeutics, Inc.",hot,,不明,3.958,1.33,30881889,7802753,0.033,0.027,+0.006,8.5,-44.32
-ECO,Okeanis Eco Tankers Corp.,hot,,不明,3.884,2.92,14222661,3661549,0.015,0.010,+0.005,99.4,+12.82
-SBUX,Starbucks,leader,Restaurants,一般消費財,3.880,2.38,127298060,32807908,0.136,0.093,+0.044,103.2,+4.55
-PDD,PDD Holdings Inc. American Depositary Shares,leader,,不明,3.841,1.36,52861629,13763719,0.057,0.051,+0.006,79.8,-0.77
-VRSN,Verisign,core,Internet Services & Infrastructure,情報技術,3.831,2.23,50807861,13262059,0.054,0.039,+0.015,309.2,+1.40
-SNOW,Snowflake Inc.,hot,,不明,3.808,1.74,201628898,52955689,0.216,0.151,+0.065,303.7,-5.84
-MRVL,Marvell Technology,leader,Semiconductors,半導体,3.770,1.84,793423793,210450733,0.849,0.611,+0.239,200.6,-19.38
-TWST,Twist Bioscience Corporation,hot,,不明,3.769,1.92,60869771,16148795,0.065,0.050,+0.015,158.3,+11.47
-BBY,Best Buy,core,Computer & Electronics Retail,一般消費財,3.752,1.33,40258628,10729083,0.043,0.034,+0.009,94.6,+0.62
-EXC,Exelon,leader,Electric Utilities,公益事業,3.699,1.24,44220587,11956212,0.047,0.040,+0.008,46.5,+7.86
-LITE,Lumentum,leader,Communications Equipment,情報技術,3.668,1.73,904852001,246663986,0.969,0.705,+0.264,817.0,-5.56
-ETN,Eaton Corporation,core,Electrical Components & Equipment,資本財,3.664,2.84,166477414,45439589,0.178,0.127,+0.052,376.8,-3.47
-FANG,Diamondback Energy,leader,Oil & Gas Exploration & Production,エネルギー,3.646,2.25,47757813,13097660,0.051,0.037,+0.015,210.8,+4.64
-CHD,Church & Dwight,core,Household Products,生活必需品,3.593,1.08,31200201,8682606,0.033,0.028,+0.005,107.2,+1.73
-INTU,Intuit,leader,Application Software,情報技術,3.592,1.02,136602013,38027819,0.146,0.124,+0.022,341.1,+2.02
-DXCM,Dexcom,leader,Health Care Equipment,ヘルスケア,3.586,2.17,84803433,23646956,0.091,0.066,+0.024,83.1,-2.10
-AMD,Advanced Micro Devices,leader,Semiconductors,半導体,3.564,1.12,1795348253,503721215,1.922,1.582,+0.340,513.4,-7.18
-ALNY,"Alnylam Pharmaceuticals, Inc.",leader,,不明,3.496,0.52,71180555,20360008,0.076,0.087,-0.010,174.6,-23.94
-ALAB,"Astera Labs, Inc. Common Stock",leader,,不明,3.484,1.74,139755212,40111743,0.150,0.117,+0.033,262.0,-10.01
-ISRG,Intuitive Surgical,leader,Health Care Equipment,ヘルスケア,3.476,2.44,191352593,55055099,0.205,0.148,+0.057,443.5,+6.98
-ZBRA,Zebra Technologies,core,Electronic Equipment & Instruments,情報技術,3.412,2.01,28849059,8455650,0.031,0.024,+0.007,352.4,-8.54
-PSKY,Paramount Skydance Corporation,core,Movies & Entertainment,コミュニケーション・サービス,3.367,2.43,52811931,15685882,0.057,0.039,+0.017,9.8,-4.03
-QUBT,Quantum Computing Inc.,hot,,不明,3.362,2.53,5464060,1625196,0.006,0.004,+0.001,6.6,-1.36
-TEAM,Atlassian Corporation,hot,,不明,3.351,1.62,78757907,23499716,0.084,0.072,+0.012,194.6,-12.12
-FORM,"FormFactor, Inc.",hot,,不明,3.331,1.55,24577934,7378930,0.026,0.022,+0.004,89.5,-19.87
-NEE,NextEra Energy,core,Multi-Utilities,公益事業,3.324,2.35,148385986,44642845,0.159,0.118,+0.041,83.4,+5.01
-XEL,Xcel Energy,leader,Multi-Utilities,公益事業,3.296,1.67,54255479,16459840,0.058,0.047,+0.011,79.9,+3.73
-DELL,Dell Technologies,core,"Technology Hardware, Storage & Peripherals",情報技術,3.283,0.93,383062007,116665564,0.410,0.385,+0.025,431.7,-13.40
-COHR,Coherent Corp.,core,Electronic Components,情報技術,3.275,0.96,301564021,92086478,0.323,0.271,+0.051,210.4,-12.33
-TXG,"10x Genomics, Inc.",hot,,不明,3.264,1.20,29924572,9167281,0.032,0.031,+0.001,72.0,-0.78
-GD,General Dynamics,core,Aerospace & Defense,資本財,3.243,1.14,53549442,16512003,0.057,0.052,+0.005,377.4,+8.95
-SDGR,"Schrodinger, Inc.",hot,,不明,3.231,1.07,5861781,1813955,0.006,0.006,+0.000,27.9,+18.88
-IR,Ingersoll Rand,core,Industrial Machinery & Supplies & Components,資本財,3.130,0.75,48511212,15499798,0.052,0.056,-0.004,80.2,+1.52
-STE,Steris,core,Health Care Equipment,ヘルスケア,3.123,0.77,21943633,7026695,0.023,0.023,+0.000,230.2,+3.09
-NVO,Novo Nordisk A/S,hot,,不明,3.117,1.48,55400489,17771931,0.059,0.050,+0.009,39.8,+1.21
-GILD,Gilead Sciences,leader,Biotechnology,ヘルスケア,3.116,1.29,122295231,39243752,0.131,0.117,+0.014,172.4,+11.96
-VTRS,Viatris,core,Pharmaceuticals,ヘルスケア,3.107,1.36,16593872,5340660,0.018,0.016,+0.002,19.2,+3.42
-FTNT,Fortinet,leader,Systems Software,情報技術,3.104,0.75,110283412,35531434,0.118,0.122,-0.004,135.1,-20.31
-MSTR,Strategy Inc Common Stock Class A,leader,,不明,3.096,2.28,387681317,125226895,0.415,0.313,+0.102,127.4,-12.42
-PG,Procter & Gamble,core,Personal Care Products,生活必需品,3.083,0.91,179541402,58235329,0.192,0.190,+0.002,163.3,+3.30
-APP,AppLovin,leader,Application Software,コミュニケーション・サービス,3.077,1.70,102100396,33183122,0.109,0.094,+0.015,238.5,-11.32
-HSIC,Henry Schein,core,Health Care Distributors,ヘルスケア,3.073,0.67,10242796,3333532,0.011,0.011,-0.000,85.1,+1.23
-IRM,Iron Mountain,core,Other Specialized REITs,不動産,3.068,0.71,16679507,5436901,0.018,0.018,+0.000,115.7,+0.34
-ORLY,O’Reilly Automotive,leader,Automotive Retail,一般消費財,3.061,0.89,57652870,18833216,0.062,0.065,-0.003,89.2,-0.08
-QNT,Quantinuum Inc.,hot,,不明,3.060,1.41,9559311,3123753,0.010,0.009,+0.001,34.2,-6.94
-GOOG,Alphabet Inc. (Class C),leader,Interactive Media & Services,コミュニケーション・サービス,3.024,0.19,908591358,300439442,0.973,1.378,-0.405,278.7,-15.07
-KVUE,Kenvue,core,Personal Care Products,生活必需品,3.000,2.09,40478386,13492518,0.043,0.035,+0.009,19.4,+1.17
-NEM,Newmont,core,Gold,素材,2.993,1.84,100523616,33581591,0.108,0.091,+0.016,106.8,-8.72
-LNT,Alliant Energy,core,Electric Utilities,公益事業,2.973,1.15,22111534,7438204,0.024,0.023,+0.001,71.4,+4.13
-AXTI,AXT Inc,hot,,不明,2.944,1.71,76600448,26021292,0.082,0.070,+0.012,54.9,-9.18
-PLD,Prologis,core,Industrial REITs,不動産,2.941,2.04,54589799,18564107,0.058,0.049,+0.010,127.9,-0.43
-AEO,"American Eagle Outfitters, Inc.",hot,,不明,2.916,0.64,10456201,3585546,0.011,0.012,-0.001,19.2,+8.47
-FSLR,First Solar,core,Semiconductors,半導体,2.893,1.58,45269358,15645706,0.048,0.044,+0.004,174.3,-0.68
-SCHW,Charles Schwab Corporation,core,Investment Banking & Brokerage,金融,2.867,2.35,87011646,30353442,0.093,0.076,+0.017,88.6,-2.67
-FIGR,"Figure Technology Solutions, In",hot,,不明,2.865,1.56,15157579,5290062,0.016,0.015,+0.001,22.3,-15.43
-LMND,"Lemonade, Inc.",hot,,不明,2.853,1.40,5054546,1771852,0.005,0.005,+0.000,43.8,-4.93
-OKTA,"Okta, Inc.",hot,,不明,2.842,2.33,97190225,34192129,0.104,0.089,+0.015,208.1,+6.82
-MCHP,Microchip Technology,leader,Semiconductors,半導体,2.842,0.99,78559052,27641457,0.084,0.085,-0.001,77.8,+2.31
-AUGO,Aura Minerals Inc.,hot,,不明,2.835,1.76,8126454,2866128,0.009,0.008,+0.001,69.2,-19.91
-ADBE,Adobe Inc.,leader,Application Software,情報技術,2.833,1.62,124302427,43883497,0.133,0.124,+0.009,254.7,+0.57
-TMUS,T-Mobile US,leader,Wireless Telecommunication Services,コミュニケーション・サービス,2.825,1.58,148480471,52556761,0.159,0.147,+0.012,155.8,+2.47
-RBRK,"Rubrik, Inc.",hot,,不明,2.824,1.88,60512831,21429082,0.065,0.057,+0.008,125.1,+6.22
-QLYS,"Qualys, Inc.",hot,,不明,2.806,1.49,26888586,9582227,0.029,0.027,+0.001,223.2,+17.54
-CART,Maplebear Inc.,hot,,不明,2.754,0.05,58335331,21178322,0.062,0.110,-0.048,56.9,+12.45
-BDORY,Banco Do Brasil SA,hot,,不明,2.753,-0.28,222548,80841,0.000,0.002,-0.001,3.1,-37.40
-FIX,Comfort Systems USA,core,Construction & Engineering,資本財,2.751,0.39,149620354,54386047,0.160,0.203,-0.043,1262.6,-12.24
-VLTO,Veralto,core,Environmental & Facilities Services,資本財,2.749,0.87,19472522,7082495,0.021,0.022,-0.001,113.4,+12.84
-GEN,Gen Digital,core,Systems Software,情報技術,2.734,0.69,16584595,6066023,0.018,0.021,-0.003,28.5,+18.76
-XOM,ExxonMobil,core,Integrated Oil & Gas,エネルギー,2.728,1.16,261344770,95807777,0.280,0.283,-0.003,188.0,+5.94
-CMS,CMS Energy,core,Multi-Utilities,公益事業,2.680,0.52,35723737,13329189,0.038,0.043,-0.005,70.2,+2.32
-AOS,A. O. Smith,core,Building Products,資本財,2.676,1.04,13581245,5075686,0.015,0.015,-0.000,63.0,+6.04
-LHX,L3Harris,core,Aerospace & Defense,資本財,2.673,0.67,45429547,16995997,0.049,0.059,-0.010,278.9,+11.70
-EMR,Emerson Electric,core,Electrical Components & Equipment,資本財,2.671,1.19,61585415,23056409,0.066,0.066,+0.000,167.6,+3.82
-DE,Deere & Company,core,Agricultural & Farm Machinery,資本財,2.665,1.61,73426206,27549083,0.079,0.073,+0.005,670.9,+6.06
-NCLH,Norwegian Cruise Line Holdings,core,"Hotels, Resorts & Cruise Lines",一般消費財,2.665,0.47,41079537,15416369,0.044,0.055,-0.011,17.5,+12.28
-GPN,Global Payments,core,Transaction & Payment Processing Services,金融,2.654,0.39,20178170,7602962,0.022,0.027,-0.006,84.9,+0.45
-QBTS,D-Wave Quantum Inc. Common Stock,hot,,不明,2.652,2.46,20857868,7864617,0.022,0.019,+0.003,10.7,-11.12
-CRWD,CrowdStrike,leader,Systems Software,情報技術,2.644,0.93,288851860,109234622,0.309,0.330,-0.021,253.4,+9.24
-TYL,Tyler Technologies,core,Application Software,情報技術,2.637,0.68,39758735,15078016,0.043,0.050,-0.008,391.9,+4.95
-DOCN,"DigitalOcean Holdings, Inc.",hot,,不明,2.636,1.30,31307759,11878285,0.034,0.034,-0.001,90.0,-13.50
-ABBV,AbbVie,core,Biotechnology,ヘルスケア,2.614,0.82,131235661,50201749,0.141,0.153,-0.012,294.9,+2.71
-CHA,Chagee Holdings Limited,hot,,不明,2.610,0.49,872292,334178,0.001,0.001,-0.000,12.2,-3.71
-CVNA,Carvana,core,Automotive Retail,一般消費財,2.607,0.59,72231920,27704212,0.077,0.093,-0.016,66.8,+9.50
-FTV,Fortive,core,Industrial Machinery & Supplies & Components,資本財,2.568,1.06,25743588,10026571,0.028,0.028,-0.001,66.0,+13.27
-ADI,Analog Devices,leader,Semiconductors,半導体,2.556,0.95,139779565,54676785,0.150,0.155,-0.005,417.2,+4.91
-CIFR,Cipher Digital Inc.,hot,,不明,2.554,2.25,51791113,20281027,0.055,0.050,+0.006,7.7,-17.56
-WST,West Pharmaceutical Services,core,Health Care Supplies,ヘルスケア,2.552,0.67,36602253,14342102,0.039,0.047,-0.008,411.5,+5.51
-VG,"Venture Global, Inc.",hot,,不明,2.531,0.54,29817820,11779546,0.032,0.036,-0.004,14.9,+17.65
-DHT,"DHT Holdings, Inc.",hot,,不明,2.530,0.40,14262950,5638254,0.015,0.019,-0.004,24.8,+5.92
-AJG,Arthur J. Gallagher & Co.,core,Insurance Brokers,金融,2.516,0.44,63091781,25072329,0.068,0.082,-0.014,272.7,+5.29
-GDDY,GoDaddy,core,Internet Services & Infrastructure,情報技術,2.510,0.88,20012917,7972678,0.021,0.024,-0.002,109.8,+0.41
-SIMO,Silicon Motion Technology Corpo,hot,,不明,2.508,0.94,33268515,13265873,0.036,0.037,-0.001,214.3,-2.58
-HOOD,Robinhood Markets,core,Investment Banking & Brokerage,金融,2.504,0.30,245066301,97857460,0.262,0.328,-0.065,83.9,-15.92
-KMB,Kimberly-Clark,core,Household Products,生活必需品,2.496,1.21,54785904,21950597,0.059,0.061,-0.002,109.0,+1.15
-A,Agilent Technologies,core,Life Sciences Tools & Services,ヘルスケア,2.496,1.08,40136325,16082080,0.043,0.046,-0.003,175.4,-0.04
-WY,Weyerhaeuser,core,Timber REITs,不動産,2.493,1.27,19177893,7693499,0.021,0.021,-0.001,20.3,+5.03
-PLTR,Palantir Technologies,leader,Application Software,情報技術,2.475,0.51,442092752,178595494,0.473,0.563,-0.089,187.2,-2.33
-VEON,VEON Ltd.,hot,,不明,2.473,0.57,2129519,861221,0.002,0.003,-0.000,86.7,+5.78
-U,Unity Software Inc.,hot,,不明,2.461,0.69,31513425,12807619,0.034,0.039,-0.005,38.0,-4.68
-BMNR,"BitMine Immersion Technologies,",hot,,不明,2.460,0.85,75594255,30732003,0.081,0.089,-0.008,20.3,-12.77
-IVZ,Invesco,core,Asset Management & Custody Banks,金融,2.456,0.94,20421567,8314034,0.022,0.024,-0.002,27.8,-4.44
-EG,Everest Group,core,Reinsurance,金融,2.455,0.14,17414622,7093325,0.019,0.030,-0.012,409.7,+4.23
-CRCL,"Circle Internet Group, Inc.",hot,,不明,2.453,1.12,91101491,37131362,0.098,0.104,-0.007,72.5,-16.54
-PPL,PPL Corporation,core,Electric Utilities,公益事業,2.452,1.00,21713819,8853914,0.023,0.027,-0.003,35.9,+3.38
-EXPE,Expedia Group,core,"Hotels, Resorts & Cruise Lines",一般消費財,2.452,1.14,35060448,14299581,0.038,0.039,-0.002,283.1,-4.86
-DECK,Deckers Brands,core,Footwear,一般消費財,2.448,0.57,37390299,15275123,0.040,0.050,-0.010,82.2,-4.72
-CAH,Cardinal Health,core,Health Care Distributors,ヘルスケア,2.447,0.76,34582926,14133877,0.037,0.042,-0.005,254.1,-0.81
-SJM,J.M. Smucker Company (The),core,Packaged Foods & Meats,生活必需品,2.445,0.88,12689159,5189629,0.014,0.015,-0.001,130.1,+0.76
-AAOI,"Applied Optoelectronics, Inc.",hot,,不明,2.437,1.80,102476140,42053957,0.110,0.104,+0.006,70.6,-11.71
-WMT,Walmart,leader,Consumer Staples Merchandise Retail,生活必需品,2.436,0.46,205872447,84510583,0.220,0.264,-0.043,123.2,+5.53
-BMY,Bristol Myers Squibb,core,Pharmaceuticals,ヘルスケア,2.434,0.80,57319595,23546061,0.061,0.070,-0.009,63.0,+2.83
-ZTS,Zoetis,core,Pharmaceuticals,ヘルスケア,2.431,0.85,27237536,11205125,0.029,0.033,-0.003,79.7,+0.48
-ZBH,Zimmer Biomet,core,Health Care Equipment,ヘルスケア,2.430,0.59,21110441,8687497,0.023,0.028,-0.005,96.9,+1.23
-RIG,Transocean Ltd (Switzerland),hot,,不明,2.425,1.76,38958576,16066711,0.042,0.040,+0.002,6.9,+17.40
-TRI,Thomson Reuters Corporation Common Shares,leader,,不明,2.410,0.80,22050996,9150287,0.024,0.027,-0.004,120.1,+7.49
-EBAY,eBay Inc.,core,Broadline Retail,一般消費財,2.408,0.71,51361581,21329912,0.055,0.067,-0.012,121.5,+1.78
-COST,Costco,leader,Consumer Staples Merchandise Retail,生活必需品,2.407,1.13,177656103,73819249,0.190,0.205,-0.015,1011.7,+2.24
-BWIN,"The Baldwin Insurance Group, In",hot,,不明,2.400,0.66,3654953,1523186,0.004,0.005,-0.001,31.9,-0.13
-RKT,"Rocket Companies, Inc.",hot,,不明,2.380,0.67,55096586,23152538,0.059,0.066,-0.007,12.4,+9.70
-BZ,KANZHUN LIMITED - American Depo,hot,,不明,2.379,0.58,6292462,2645500,0.007,0.009,-0.002,16.6,+2.81
-SKHY,SK hynix Inc. - American Depos,hot,,不明,2.372,0.16,364023438,153465562,0.390,0.583,-0.193,151.0,+4.24
-BAC,Bank of America,core,Diversified Banks,金融,2.365,1.41,160972741,68064264,0.172,0.175,-0.003,50.2,-1.14
-CSCO,Cisco,leader,Communications Equipment,情報技術,2.363,0.78,141691313,59971715,0.152,0.166,-0.015,104.1,-2.90
-FOXA,Fox Corporation (Class A),core,Broadcasting,コミュニケーション・サービス,2.362,0.54,40173020,17006312,0.043,0.055,-0.012,64.8,-2.78
-DLR,Digital Realty,core,Data Center REITs,不動産,2.352,0.77,48869118,20775465,0.052,0.058,-0.006,177.8,+0.27
-TIMB,TIM S.A.,hot,,不明,2.351,0.18,2246512,955491,0.002,0.004,-0.001,17.6,-7.31
-HONA,Honeywell Aerospace,leader,Aerospace & Defense,資本財,2.350,0.49,54875770,23350842,0.059,0.075,-0.017,155.2,-3.14
-RHI,Robert Half Inc.,hot,,不明,2.344,0.42,11841839,5051883,0.013,0.016,-0.004,43.8,+28.63
-CMCSA,Comcast,leader,Cable & Satellite,コミュニケーション・サービス,2.337,0.80,75290069,32213041,0.081,0.099,-0.018,23.0,+4.59
-ADSK,Autodesk,leader,Application Software,情報技術,2.329,0.85,33904915,14559008,0.036,0.041,-0.005,248.4,+2.26
-MO,Altria,core,Tobacco,生活必需品,2.293,0.30,45289148,19753825,0.048,0.068,-0.020,77.9,+5.14
-ABVX,Abivax SA,hot,,不明,2.289,0.94,6818930,2978350,0.007,0.008,-0.001,86.3,-8.56
-INVX,"Innovex International, Inc.",hot,,不明,2.288,0.57,1919386,838888,0.002,0.003,-0.001,27.5,-4.61
-CRH,CRH plc,core,Construction Materials,素材,2.287,0.64,43971608,19230078,0.047,0.060,-0.013,89.7,+4.85
-NTAP,NetApp,core,"Technology Hardware, Storage & Peripherals",情報技術,2.286,0.60,33124411,14487509,0.035,0.044,-0.009,200.4,-6.36
-BILL,"BILL Holdings, Inc.",hot,,不明,2.283,0.49,5739060,2513407,0.006,0.008,-0.002,48.4,-1.18
-CVS,CVS Health,core,Health Care Services,ヘルスケア,2.274,0.36,49683285,21845691,0.053,0.073,-0.020,90.5,-4.57
-LYB,LyondellBasell,core,Specialty Chemicals,素材,2.267,0.90,23068031,10177703,0.025,0.028,-0.003,65.3,+2.80
-MBX,"MBX Biosciences, Inc.",hot,,不明,2.265,0.31,2123588,937469,0.002,0.003,-0.001,54.5,-0.51
-ECL,Ecolab,core,Specialty Chemicals,素材,2.263,1.16,41486731,18331249,0.044,0.047,-0.003,302.7,+5.65
-TXN,Texas Instruments,leader,Semiconductors,半導体,2.258,0.80,195898206,86752378,0.210,0.248,-0.039,303.1,+8.32
-CNH,CNH Industrial N.V.,hot,,不明,2.253,-0.02,17988886,7983715,0.019,0.039,-0.020,11.7,+1.21
-LULU,Lululemon Athletica,core,"Apparel, Accessories & Luxury Goods",一般消費財,2.248,0.72,44360766,19735093,0.047,0.057,-0.010,108.2,+9.76
-HRL,Hormel Foods,core,Packaged Foods & Meats,生活必需品,2.242,0.66,6927447,3089772,0.007,0.009,-0.002,21.3,+4.23
-CCEP,Coca-Cola Europacific Partners plc Ordinary Shares,leader,,不明,2.240,0.95,17583879,7851677,0.019,0.021,-0.002,113.8,+1.09
-PSX,Phillips 66,core,Oil & Gas Refining & Marketing,エネルギー,2.233,0.96,90255735,40417616,0.097,0.104,-0.007,282.6,-2.44
-NTRA,"Natera, Inc.",hot,,不明,2.232,1.28,68934633,30879225,0.074,0.078,-0.004,422.7,+3.15
-CARR,Carrier Global,core,Building Products,資本財,2.231,0.17,33124145,14846343,0.035,0.055,-0.020,53.8,-4.35
-ES,Eversource Energy,core,Electric Utilities,公益事業,2.228,0.17,15324088,6876612,0.016,0.026,-0.009,68.4,+4.11
-NXPI,NXP Semiconductors,leader,Semiconductors,半導体,2.225,0.43,102052024,45867920,0.109,0.144,-0.035,258.9,+8.97
-GNRC,Generac,core,Heavy Electrical Equipment,資本財,2.201,0.70,28136575,12785795,0.030,0.036,-0.006,197.2,-1.48
-EW,Edwards Lifesciences,core,Health Care Equipment,ヘルスケア,2.200,0.66,25869624,11757040,0.028,0.034,-0.006,94.2,+7.51
-RXRX,"Recursion Pharmaceuticals, Inc.",hot,,不明,2.200,1.49,10181324,4627540,0.011,0.012,-0.001,3.9,+9.61
-JPM,JPMorgan Chase,core,Diversified Banks,金融,2.200,1.28,154430949,70196401,0.165,0.182,-0.016,337.8,+0.51
-AWK,American Water Works,core,Water Utilities,公益事業,2.194,0.90,29588555,13483183,0.032,0.037,-0.006,145.4,+6.99
-CSX,CSX Corporation,leader,Rail Transportation,資本財,2.193,0.46,59877040,27305571,0.064,0.087,-0.023,51.5,+7.02
-S,"SentinelOne, Inc.",hot,,不明,2.185,0.39,22327616,10217135,0.024,0.034,-0.010,25.0,+11.83
-MELI,"Mercado Libre, Inc",leader,,不明,2.174,0.13,90717565,41737777,0.097,0.164,-0.067,1626.4,-12.85
-FDX,FedEx,core,Air Freight & Logistics,資本財,2.172,0.58,37923350,17464066,0.041,0.053,-0.012,317.0,+5.31
-ALGN,Align Technology,core,Health Care Supplies,ヘルスケア,2.166,0.61,16034626,7401582,0.017,0.022,-0.005,149.3,-0.74
-SWKS,Skyworks Solutions,core,Semiconductors,半導体,2.163,0.56,25222901,11659889,0.027,0.034,-0.007,86.8,+6.31
-WELL,Welltower,core,Health Care REITs,不動産,2.162,0.36,64022813,29610828,0.069,0.099,-0.031,238.8,-0.00
-BHVN,Biohaven Ltd.,hot,,不明,2.162,-0.05,5159930,2386542,0.006,0.012,-0.006,15.3,+28.88
-NWS,News Corp (Class B),core,Publishing,コミュニケーション・サービス,2.158,0.56,2995700,1387884,0.003,0.004,-0.001,32.5,-2.49
-TER,Teradyne,leader,Semiconductor Materials & Equipment,半導体,2.154,0.46,102074488,47385297,0.109,0.147,-0.038,275.1,-20.97
-MCD,McDonald's,core,Restaurants,一般消費財,2.153,1.01,107786662,50063478,0.115,0.137,-0.021,259.1,+5.88
-OXY,Occidental Petroleum,core,Oil & Gas Exploration & Production,エネルギー,2.133,0.61,51865976,24319227,0.056,0.071,-0.015,63.7,+1.64
-AMGN,Amgen,leader,Biotechnology,ヘルスケア,2.131,0.84,84649017,39714183,0.091,0.112,-0.022,470.8,+7.91
-KLAC,KLA Corporation,leader,Semiconductor Materials & Equipment,半導体,2.117,0.86,176852651,83534798,0.189,0.219,-0.029,162.5,-0.47
-MU,Micron Technology,leader,Semiconductors,半導体,2.115,0.15,2331856533,1102528031,2.497,4.062,-1.565,892.8,-3.74
-HPE,Hewlett Packard Enterprise,core,"Technology Hardware, Storage & Peripherals",情報技術,2.113,1.03,69317114,32807863,0.074,0.089,-0.015,54.7,-6.94
-FUTU,Futu Holdings Limited,hot,,不明,2.110,0.49,7835436,3713678,0.008,0.011,-0.003,97.9,-7.26
-SUPN,"Supernus Pharmaceuticals, Inc.",hot,,不明,2.107,1.23,5687374,2698694,0.006,0.007,-0.001,42.8,+3.71
-ABCL,AbCellera Biologics Inc.,hot,,不明,2.105,1.05,4563708,2168325,0.005,0.006,-0.001,12.1,+3.08
-VIV,Telefonica Brasil S.A.,hot,,不明,2.091,0.27,2438226,1166228,0.003,0.004,-0.001,11.3,-12.19
-ADM,Archer Daniels Midland,core,Agricultural Products & Services,生活必需品,2.089,0.32,15496113,7419437,0.017,0.024,-0.007,77.0,-4.66
-ICE,Intercontinental Exchange,core,Financial Exchanges & Data,金融,2.080,0.51,53513239,25733120,0.057,0.076,-0.019,168.2,+6.73
-ORCL,Oracle Corporation,core,Application Software,情報技術,2.076,0.08,404942044,195038780,0.434,0.727,-0.294,133.5,+0.96
-INCY,Incyte,core,Biotechnology,ヘルスケア,2.076,0.49,19277469,9288008,0.021,0.029,-0.008,120.8,+4.20
-VIST,Vista Energy S.A.B. de C.V.,hot,,不明,2.068,0.28,7574171,3662992,0.008,0.011,-0.003,71.6,+0.18
-INFQ,"Infleqtion, Inc.",hot,,不明,2.068,1.06,5847988,2828336,0.006,0.007,-0.001,8.9,-0.28
-ACN,Accenture,core,IT Consulting & Other Services,情報技術,2.066,0.87,150997565,73104396,0.162,0.193,-0.031,252.6,+5.48
-NKE,"Nike, Inc.",core,"Apparel, Accessories & Luxury Goods",一般消費財,2.060,0.35,78279837,38001801,0.084,0.120,-0.036,38.9,+3.45
-NOW,ServiceNow,core,Systems Software,情報技術,2.060,0.28,290650134,141100434,0.311,0.476,-0.164,107.4,-28.22
-CVI,CVR Energy Inc.,hot,,不明,2.051,0.42,4382732,2136987,0.005,0.006,-0.002,58.3,-5.36
-CB,Chubb Limited,core,Property & Casualty Insurance,金融,2.026,0.40,54662229,26975022,0.059,0.082,-0.023,366.8,+3.29
-ON,ON Semiconductor,core,Semiconductors,半導体,2.025,0.70,57037369,28166495,0.061,0.078,-0.016,71.9,-4.82
-TXT,Textron,core,Aerospace & Defense,資本財,2.020,0.10,9429688,4667088,0.010,0.018,-0.008,87.2,+12.58
-PEP,PepsiCo,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,2.013,0.99,96743610,48063150,0.104,0.123,-0.019,136.5,+2.01
-KHC,Kraft Heinz,core,Packaged Foods & Meats,生活必需品,2.010,0.69,29250281,14554945,0.031,0.038,-0.006,24.6,+4.06
-TSEM,Tower Semiconductor Ltd.,hot,,不明,1.997,0.52,37408006,18731410,0.040,0.054,-0.014,166.4,-12.79
-FTAI,FTAI Aviation Ltd.,hot,,不明,1.997,0.69,38817302,19440187,0.042,0.052,-0.010,188.6,+15.95
-EL,Estée Lauder Companies (The),core,Personal Care Products,生活必需品,1.995,0.20,28789004,14434193,0.031,0.049,-0.018,107.7,+2.56
-CSGP,CoStar Group,core,Real Estate Services,不動産,1.990,0.23,19576013,9838856,0.021,0.033,-0.012,29.7,-9.85
-LOW,Lowe's,core,Home Improvement Retail,一般消費財,1.988,0.18,50446856,25381972,0.054,0.082,-0.028,208.4,+5.93
-ADP,Automatic Data Processing,leader,Human Resource & Employment Services,資本財,1.986,0.88,58458430,29438513,0.063,0.075,-0.012,295.9,+1.84
-WIX,Wix.com Ltd.,hot,,不明,1.979,0.35,4455007,2251550,0.005,0.007,-0.002,77.9,+0.16
-KSS,Kohl's Corporation,hot,,不明,1.979,0.46,10188316,5149210,0.011,0.015,-0.004,23.5,+7.80
-ACGL,Arch Capital Group,core,Property & Casualty Insurance,金融,1.978,0.38,18045734,9125005,0.019,0.028,-0.009,106.1,+4.88
-DHR,Danaher Corporation,core,Life Sciences Tools & Services,ヘルスケア,1.976,0.00,76051053,38482540,0.081,0.157,-0.076,233.4,+1.84
-FCFS,"FirstCash Holdings, Inc.",hot,,不明,1.974,0.60,19970924,10117310,0.021,0.028,-0.006,185.5,-14.69
-CVX,Chevron Corporation,core,Integrated Oil & Gas,エネルギー,1.966,0.90,138866460,70632435,0.149,0.186,-0.037,236.1,+4.63
-DIOD,Diodes Incorporated,hot,,不明,1.947,0.44,3436912,1765319,0.004,0.005,-0.002,82.4,-5.72
-AEP,American Electric Power,leader,Electric Utilities,公益事業,1.942,0.35,34541292,17784809,0.037,0.055,-0.018,131.0,+2.47
-NBIS,Nebius Group N.V. Class A Ordinary Shares,leader,,不明,1.940,0.01,314142468,161959739,0.336,0.643,-0.307,158.2,-10.98
-TT,Trane Technologies,core,Building Products,資本財,1.939,0.19,65605189,33830737,0.070,0.107,-0.037,418.9,-9.96
-SMG,Scotts Miracle-Gro Company (The,hot,,不明,1.936,0.38,4610054,2381752,0.005,0.007,-0.002,62.4,+11.72
-BG,Bunge Global,core,Agricultural Products & Services,生活必需品,1.933,0.09,10357603,5358077,0.011,0.019,-0.008,96.9,-6.22
-CMG,Chipotle Mexican Grill,core,Restaurants,一般消費財,1.930,0.47,69085191,35786891,0.074,0.105,-0.031,32.0,+11.13
-SNPS,Synopsys,leader,Application Software,情報技術,1.919,0.54,85445141,44525268,0.091,0.126,-0.034,467.5,+2.86
-KO,Coca-Cola Company (The),core,Soft Drinks & Non-alcoholic Beverages,生活必需品,1.906,0.68,130500161,68469058,0.140,0.191,-0.051,94.5,+1.38
-FRT,Federal Realty Investment Trust,core,Retail REITs,不動産,1.905,0.13,7605116,3993092,0.008,0.013,-0.005,110.4,+3.78
-MAR,Marriott International,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.904,0.66,55125073,28958181,0.059,0.078,-0.019,401.4,+0.80
-AZO,AutoZone,core,Automotive Retail,一般消費財,1.903,0.26,52847662,27769874,0.057,0.083,-0.026,3177.5,+0.85
-DVN,Devon Energy,core,Oil & Gas Exploration & Production,エネルギー,1.903,0.91,46626104,24502513,0.050,0.062,-0.012,51.9,+3.84
-WFC,Wells Fargo,core,Diversified Banks,金融,1.888,0.45,69758727,36955704,0.075,0.104,-0.029,83.7,+1.33
-FIS,Fidelity National Information Services,core,Transaction & Payment Processing Services,金融,1.886,0.30,14396206,7631215,0.015,0.023,-0.008,37.7,+3.92
-COR,Cencora,core,Health Care Distributors,ヘルスケア,1.878,0.38,31183214,16606340,0.033,0.048,-0.014,334.4,-2.79
-HST,Host Hotels & Resorts,core,Hotel & Resort REITs,不動産,1.875,0.52,16403756,8746966,0.018,0.024,-0.007,25.4,+1.84
-GPI,"Group 1 Automotive, Inc.",hot,,不明,1.875,0.41,5252456,2800975,0.006,0.008,-0.003,261.8,+4.92
-RF,Regions Financial Corporation,core,Regional Banks,金融,1.869,1.47,29384744,15726234,0.031,0.038,-0.006,28.6,+2.20
-MCK,McKesson Corporation,core,Health Care Distributors,ヘルスケア,1.858,0.79,56399502,30349567,0.060,0.079,-0.018,998.7,-2.45
-CEG,Constellation Energy,leader,Electric Utilities,公益事業,1.858,0.92,71239810,38344961,0.076,0.098,-0.021,265.4,+0.20
-MRK,Merck & Co.,core,Pharmaceuticals,ヘルスケア,1.854,0.43,134909783,72758061,0.144,0.207,-0.063,149.2,+1.07
-HIG,Hartford (The),core,Property & Casualty Insurance,金融,1.851,-0.00,17105580,9242225,0.018,0.036,-0.017,132.9,-2.86
-EIX,Edison International,core,Electric Utilities,公益事業,1.848,0.19,13231607,7159043,0.014,0.023,-0.009,59.7,+5.00
-NI,NiSource,core,Multi-Utilities,公益事業,1.843,0.30,19905898,10800415,0.021,0.033,-0.012,44.7,+4.03
-ROAD,"Construction Partners, Inc.",hot,,不明,1.840,0.65,3701450,2012031,0.004,0.005,-0.001,90.2,+4.94
-EQPT,EquipmentShare.com Inc,hot,,不明,1.839,0.37,3698459,2010984,0.004,0.006,-0.002,16.9,+4.94
-RSG,Republic Services,core,Environmental & Facilities Services,資本財,1.833,0.39,27047125,14753237,0.029,0.041,-0.012,243.7,+4.84
-ASND,Ascendis Pharma A/S,hot,,不明,1.816,0.41,12299462,6772494,0.013,0.019,-0.006,251.5,+6.57
-IREN,IREN LIMITED,hot,,不明,1.816,0.45,117184696,64527412,0.125,0.189,-0.064,24.6,-12.38
-DHI,D. R. Horton,core,Homebuilding,一般消費財,1.813,0.35,35580964,19622719,0.038,0.057,-0.019,145.5,+4.05
-ANET,Arista Networks,core,Communications Equipment,情報技術,1.812,0.46,87859383,48479243,0.094,0.135,-0.041,170.8,-8.88
-OTIS,Otis Worldwide,core,Industrial Machinery & Supplies & Components,資本財,1.808,0.70,31937486,17667944,0.034,0.046,-0.011,75.3,+4.60
-SW,Smurfit Westrock,core,Paper & Plastic Packaging Products & Materials,素材,1.803,0.30,17502979,9709615,0.019,0.029,-0.010,42.8,+4.31
-AXON,Axon Enterprise,leader,Aerospace & Defense,資本財,1.802,0.51,29938580,16614502,0.032,0.045,-0.013,428.0,+7.79
-AAPL,Apple Inc.,leader,"Technology Hardware, Storage & Peripherals",情報技術,1.802,-0.09,1004773656,557611578,1.076,2.366,-1.290,345.5,+1.73
-LVS,Las Vegas Sands,core,Casinos & Gaming,一般消費財,1.797,0.50,22862909,12722029,0.024,0.035,-0.011,36.8,-3.59
-DOV,Dover Corporation,core,Industrial Machinery & Supplies & Components,資本財,1.796,0.26,27294148,15198486,0.029,0.045,-0.016,209.9,+5.93
-CAT,Caterpillar Inc.,core,Construction Machinery & Heavy Transportation Equipment,資本財,1.793,0.13,184778489,103058149,0.198,0.335,-0.137,634.8,-13.67
-GEV,GE Vernova,core,Heavy Electrical Equipment,資本財,1.790,0.40,352906213,197114374,0.378,0.531,-0.153,864.4,-6.55
-AMC,"AMC Entertainment Holdings, Inc",hot,,不明,1.789,1.38,6283205,3512446,0.007,0.008,-0.001,3.0,-3.58
-SOFI,"SoFi Technologies, Inc.",hot,,不明,1.789,0.26,88386031,49417603,0.095,0.150,-0.055,16.9,+15.52
-MBLY,Mobileye Global Inc.,hot,,不明,1.782,0.29,3981026,2233400,0.004,0.007,-0.002,6.1,-12.97
-CBOE,Cboe Global Markets,core,Financial Exchanges & Data,金融,1.776,-0.05,33859220,19069494,0.036,0.075,-0.039,331.5,+5.34
-PNR,Pentair,core,Industrial Machinery & Supplies & Components,資本財,1.770,0.01,22780495,12869534,0.024,0.046,-0.022,66.2,+24.74
-FROG,JFrog Ltd.,hot,,不明,1.770,0.66,11291294,6379578,0.012,0.016,-0.004,91.9,-1.15
-ETR,Entergy,core,Electric Utilities,公益事業,1.765,0.13,14759256,8364177,0.016,0.027,-0.011,110.2,+3.91
-CELH,"Celsius Holdings, Inc.",hot,,不明,1.762,0.60,11530538,6543293,0.012,0.017,-0.005,28.8,-2.81
-LEN,Lennar,core,Homebuilding,一般消費財,1.762,0.23,21400525,12146728,0.023,0.037,-0.014,86.1,+10.17
-NTES,"NetEase, Inc.",hot,,不明,1.760,0.58,8471525,4813650,0.009,0.013,-0.004,113.1,-8.41
-CI,Cigna,core,Health Care Services,ヘルスケア,1.748,0.03,29485374,16871181,0.032,0.060,-0.028,299.4,-2.25
-WING,Wingstop Inc.,hot,,不明,1.747,0.00,15398947,8812989,0.016,0.032,-0.015,148.1,+13.69
-FFIV,"F5, Inc.",core,Communications Equipment,情報技術,1.744,-0.05,33327395,19110610,0.036,0.074,-0.038,346.6,-24.14
-BTG,B2Gold Corp,hot,,不明,1.742,1.28,13115789,7530484,0.014,0.018,-0.004,4.7,-11.17
-P,"Everpure, Inc.",hot,,情報技術,1.740,0.72,30014281,17250746,0.032,0.043,-0.011,126.4,-3.93
-BIIB,Biogen,core,Biotechnology,ヘルスケア,1.729,0.06,22920158,13258598,0.025,0.045,-0.020,254.1,+5.39
-RH,RH,hot,,不明,1.728,0.02,9807185,5677092,0.011,0.020,-0.009,148.9,+22.77
-NDAQ,"Nasdaq, Inc.",core,Financial Exchanges & Data,金融,1.718,0.30,31949748,18594606,0.034,0.053,-0.019,106.3,+12.53
-IDXX,Idexx Laboratories,leader,Health Care Equipment,ヘルスケア,1.714,0.72,19321979,11272695,0.021,0.028,-0.007,571.0,+3.18
-DLTR,Dollar Tree,core,Consumer Staples Merchandise Retail,生活必需品,1.712,0.24,16052883,9375018,0.017,0.027,-0.010,132.4,+6.88
-ROP,Roper Technologies,leader,Electronic Equipment & Instruments,情報技術,1.711,0.28,43265443,25287423,0.046,0.074,-0.028,463.5,+17.09
-APD,Air Products,core,Industrial Gases,素材,1.711,0.36,17725422,10360988,0.019,0.029,-0.010,312.8,+3.67
-COP,ConocoPhillips,core,Oil & Gas Exploration & Production,エネルギー,1.710,0.49,61514565,35970899,0.066,0.098,-0.032,152.3,+4.95
-PFE,Pfizer,core,Pharmaceuticals,ヘルスケア,1.709,0.57,57552765,33670125,0.062,0.089,-0.028,30.3,+1.39
-FITB,Fifth Third Bancorp,core,Regional Banks,金融,1.709,0.38,28160340,16479690,0.030,0.046,-0.016,53.8,+1.61
-GEHC,GE HealthCare,leader,Health Care Equipment,ヘルスケア,1.707,0.16,23512948,13773951,0.025,0.042,-0.017,77.5,+11.35
-WAT,Waters Corporation,core,Life Sciences Tools & Services,ヘルスケア,1.706,0.54,39092626,22914909,0.042,0.061,-0.019,468.4,+3.82
-MGM,MGM Resorts,core,Casinos & Gaming,一般消費財,1.701,0.05,13722995,8067665,0.015,0.027,-0.012,28.7,-0.54
-IP,International Paper,core,Paper & Plastic Packaging Products & Materials,素材,1.698,0.13,17422721,10259384,0.019,0.032,-0.014,36.4,+8.61
-OUST,"Ouster, Inc.",hot,,不明,1.686,0.42,5896790,3497367,0.006,0.009,-0.003,29.2,-4.71
-AFL,Aflac,core,Life & Health Insurance,金融,1.683,0.30,12124459,7203883,0.013,0.020,-0.007,124.7,+3.31
-HIMS,"Hims & Hers Health, Inc.",hot,,不明,1.676,0.66,22342452,13333609,0.024,0.033,-0.009,27.9,-5.10
-JNJ,Johnson & Johnson,core,Pharmaceuticals,ヘルスケア,1.671,0.25,114307231,68401593,0.122,0.200,-0.077,277.7,+8.09
-PBR-A,Petroleo Brasileiro S.A. Petrob,hot,,不明,1.669,0.19,27366504,16395028,0.029,0.048,-0.019,19.7,-15.14
-SRE,Sempra,core,Multi-Utilities,公益事業,1.668,0.17,13238493,7935001,0.014,0.024,-0.009,86.3,+3.80
-ARES,Ares Management,core,Asset Management & Custody Banks,金融,1.668,0.26,19605227,11756706,0.021,0.034,-0.013,126.0,+7.13
-NET,"Cloudflare, Inc.",hot,,不明,1.664,0.10,104881927,63014906,0.112,0.191,-0.079,283.6,-5.38
-TSLA,"Tesla, Inc.",leader,Automobile Manufacturers,一般消費財,1.662,-0.41,1576235902,948579859,1.688,8.055,-6.368,396.5,+3.62
-VTR,Ventas,core,Health Care REITs,不動産,1.660,0.03,19478697,11733386,0.021,0.039,-0.019,85.5,-1.07
-FAST,Fastenal,leader,Trading Companies & Distributors,資本財,1.658,0.58,25217437,15211341,0.027,0.038,-0.011,52.2,+0.94
-SHOP,Shopify Inc. Class A subordinate voting shares,leader,,不明,1.657,0.30,78028221,47099107,0.084,0.134,-0.050,158.9,-8.06
-TROW,T. Rowe Price,core,Asset Management & Custody Banks,金融,1.653,0.41,15791051,9550125,0.017,0.025,-0.008,105.1,+2.73
-JBHT,J.B. Hunt,core,Cargo Ground Transportation,資本財,1.653,0.49,14840757,8976955,0.016,0.024,-0.008,220.2,-3.03
-MP,MP Materials Corp.,hot,,不明,1.652,0.43,15975437,9670468,0.017,0.026,-0.009,39.9,+0.58
-TMO,Thermo Fisher Scientific,core,Life Sciences Tools & Services,ヘルスケア,1.649,-0.04,115852293,70257305,0.124,0.256,-0.132,701.7,+1.85
-MNST,Monster Beverage,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,1.648,0.17,23527519,14277568,0.025,0.042,-0.017,46.8,+0.42
-MANE,"Veradermics, Incorporated",hot,,不明,1.642,0.27,7200697,4384032,0.008,0.012,-0.004,142.4,+10.83
-WULF,TeraWulf Inc.,hot,,不明,1.637,0.25,54661146,33387878,0.059,0.089,-0.031,11.9,-6.61
-DPZ,Domino's,core,Restaurants,一般消費財,1.634,0.27,13868258,8487121,0.015,0.023,-0.008,312.7,+0.08
-ED,Consolidated Edison,core,Multi-Utilities,公益事業,1.630,0.25,16120137,9886820,0.017,0.028,-0.010,117.0,+4.41
-SMCI,Supermicro,core,"Technology Hardware, Storage & Peripherals",情報技術,1.630,0.19,101447699,62252446,0.109,0.179,-0.070,32.6,-11.87
-MARA,"MARA Holdings, Inc.",hot,,不明,1.627,1.06,27189914,16710965,0.029,0.038,-0.009,6.6,-14.98
-INFY,Infosys Limited,hot,,不明,1.610,0.05,24802235,15400996,0.027,0.049,-0.023,12.5,-0.12
-RVTY,Revvity,core,Health Care Equipment,ヘルスケア,1.608,0.09,19830297,12328765,0.021,0.038,-0.017,159.8,+1.73
-ABNB,Airbnb,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.608,0.31,35439679,22036952,0.038,0.060,-0.022,164.8,-5.77
-APLD,Applied Digital Corporation,hot,,不明,1.607,0.24,36447146,22677058,0.039,0.065,-0.026,17.9,-12.27
-O,Realty Income,core,Retail REITs,不動産,1.605,0.33,25450201,15855964,0.027,0.043,-0.016,57.2,+1.84
-MA,Mastercard,core,Transaction & Payment Processing Services,金融,1.605,0.32,150655044,93876369,0.161,0.258,-0.096,635.3,+2.67
-ASML,ASML Holding NV,leader,,不明,1.595,0.01,188101876,117906796,0.201,0.382,-0.181,1592.0,-5.14
-VMRK,Vivmark Residential,core,Multi-Family Residential REITs,不動産,1.590,0.09,14236879,8951233,0.015,0.027,-0.012,61.8,-1.38
-V,Visa Inc.,core,Transaction & Payment Processing Services,金融,1.588,-0.01,222445437,140058146,0.238,0.469,-0.231,412.0,+1.62
-BA,Boeing,core,Aerospace & Defense,資本財,1.584,-0.08,173266794,109369075,0.186,0.396,-0.210,173.1,-9.67
-VRT,Vertiv,core,Electrical Components & Equipment,資本財,1.584,0.10,158535823,100076979,0.170,0.298,-0.129,236.0,+8.55
-TSN,Tyson Foods,core,Packaged Foods & Meats,生活必需品,1.582,0.11,10390045,6567556,0.011,0.020,-0.009,57.4,+3.54
-XYZ,"Block, Inc.",core,Transaction & Payment Processing Services,金融,1.580,0.13,21701764,13731775,0.023,0.040,-0.017,75.3,-4.22
-VICI,Vici Properties,core,Hotel & Resort REITs,不動産,1.579,0.19,15964044,10108863,0.017,0.029,-0.012,24.4,+4.56
-AUR,"Aurora Innovation, Inc.",hot,,不明,1.579,0.13,6844901,4334827,0.007,0.013,-0.006,4.2,-17.40
-CLX,Clorox,core,Household Products,生活必需品,1.578,0.23,15932492,10094432,0.017,0.028,-0.011,89.4,+3.03
-SHW,Sherwin-Williams,core,Specialty Chemicals,素材,1.577,-0.01,48139001,30525801,0.052,0.102,-0.051,330.7,-1.40
-SOUN,"SoundHound AI, Inc.",hot,,不明,1.567,0.49,4777965,3048590,0.005,0.008,-0.003,4.2,-12.13
-BSY,"Bentley Systems, Incorporated",hot,,不明,1.567,0.00,5591269,3568764,0.006,0.012,-0.006,39.9,+5.46
-FSLY,"Fastly, Inc.",hot,,不明,1.566,0.34,9406945,6007664,0.010,0.016,-0.006,23.3,+2.85
-BB,BlackBerry Limited,hot,,不明,1.564,0.01,10015276,6402320,0.011,0.021,-0.010,8.6,-5.01
-EME,Emcor,core,Construction & Engineering,資本財,1.563,0.16,30423112,19458859,0.033,0.054,-0.021,684.5,-4.65
-FRO,Frontline Plc,hot,,不明,1.560,-0.04,14243181,9132898,0.015,0.032,-0.016,55.7,+11.20
-MRSH,Marsh McLennan,core,Insurance Brokers,金融,1.558,0.20,27122135,17403389,0.029,0.049,-0.020,200.4,+4.99
-CFG,Citizens Financial Group,core,Regional Banks,金融,1.555,0.08,15471169,9950775,0.017,0.029,-0.013,64.0,-1.43
-PBR,Petroleo Brasileiro S.A. Petrob,hot,,不明,1.553,0.03,59287529,38175542,0.063,0.121,-0.057,22.3,-13.87
-DOC,Healthpeak Properties,core,Health Care REITs,不動産,1.552,0.11,7795745,5023861,0.008,0.015,-0.006,19.0,+0.80
-VERA,"Vera Therapeutics, Inc.",hot,,不明,1.550,0.08,3327544,2147024,0.004,0.006,-0.003,29.8,-0.83
-AMCR,Amcor,core,Paper & Plastic Packaging Products & Materials,素材,1.550,0.15,9026444,5824318,0.010,0.017,-0.007,47.1,+5.54
-GRAB,Grab Holdings Limited,hot,,不明,1.543,0.49,11944480,7740231,0.013,0.018,-0.006,2.7,-6.49
-VMC,Vulcan Materials Company,core,Construction Materials,素材,1.538,0.01,23790723,15473296,0.025,0.049,-0.023,280.2,+6.72
-ROST,Ross Stores,leader,Apparel Retail,一般消費財,1.536,0.27,25959722,16897430,0.028,0.045,-0.018,230.8,-1.62
-GIL,"Gildan Activewear, Inc.",hot,,不明,1.531,-0.01,2901981,1894922,0.003,0.006,-0.003,40.1,-1.86
-VRDN,"Viridian Therapeutics, Inc.",hot,,不明,1.531,0.03,2648320,1729780,0.003,0.005,-0.003,24.5,+8.12
-CRWV,"CoreWeave, Inc. Class A Common Stock",leader,,不明,1.530,0.24,307106973,200685078,0.329,0.533,-0.204,55.9,-12.39
-BRK-B,Berkshire Hathaway,core,Multi-Sector Holdings,金融,1.529,0.19,140737919,92025995,0.151,0.260,-0.109,546.0,+0.95
-PRU,Prudential Financial,core,Life & Health Insurance,金融,1.519,0.22,12622219,8308587,0.014,0.023,-0.009,116.4,+0.41
-UCTT,"Ultra Clean Holdings, Inc.",hot,,不明,1.518,-0.12,5344377,3520735,0.006,0.013,-0.007,50.5,-4.95
-MMM,3M,core,Industrial Conglomerates,資本財,1.517,-0.04,37728944,24874284,0.040,0.082,-0.042,176.2,+3.70
-BE,Bloom Energy Corporation,hot,,資本財,1.516,0.02,300012625,197939853,0.321,0.614,-0.293,206.2,-13.08
-AEHR,Aehr Test Systems,hot,,不明,1.515,0.12,8173525,5396334,0.009,0.016,-0.007,55.2,-15.20
-ITW,Illinois Tool Works,core,Industrial Machinery & Supplies & Components,資本財,1.513,0.10,27051164,17874302,0.029,0.052,-0.023,281.3,+2.27
-SAP,SAP  SE,hot,,不明,1.512,-0.14,49098570,32466596,0.053,0.123,-0.070,236.8,+2.78
-ULTA,Ulta Beauty,core,Other Specialty Retail,一般消費財,1.511,0.13,20187661,13358460,0.022,0.038,-0.016,643.4,+7.14
-FERG,Ferguson Enterprises Inc.,hot,,資本財,1.510,0.03,18370402,12165511,0.020,0.037,-0.018,240.5,+5.98
-PAYX,Paychex,leader,Human Resource & Employment Services,資本財,1.510,0.09,19588653,12975211,0.021,0.038,-0.017,112.3,+0.47
-VLO,Valero Energy,core,Oil & Gas Refining & Marketing,エネルギー,1.509,0.43,100067190,66297448,0.107,0.168,-0.061,393.7,-8.85
-IBM,IBM,core,IT Consulting & Other Services,情報技術,1.509,-0.01,83153542,55097537,0.089,0.176,-0.087,256.6,+6.46
-TENB,"Tenable Holdings, Inc.",hot,,不明,1.508,0.15,16911348,11211815,0.018,0.031,-0.013,50.3,+28.78
-RL,Ralph Lauren Corporation,core,"Apparel, Accessories & Luxury Goods",一般消費財,1.508,0.20,13368024,8866068,0.014,0.024,-0.010,397.0,+4.48
-AON,Aon plc,core,Insurance Brokers,金融,1.504,-0.02,33745950,22443730,0.036,0.072,-0.036,326.8,+10.44
-ACMR,"ACM Research, Inc.",hot,,不明,1.502,0.11,3552144,2365579,0.004,0.007,-0.003,46.1,-18.02
-GS,Goldman Sachs,core,Investment Banking & Brokerage,金融,1.495,0.46,118175863,79031958,0.127,0.196,-0.069,896.6,-0.15
-NVR,"NVR, Inc.",core,Homebuilding,一般消費財,1.493,0.24,22321053,14947615,0.024,0.039,-0.015,5990.7,+0.29
-GME,GameStop Corporation,hot,,不明,1.492,0.22,14065612,9425319,0.015,0.025,-0.010,23.5,-11.27
-FDS,FactSet,core,Financial Exchanges & Data,金融,1.491,0.07,12718433,8530214,0.014,0.025,-0.011,325.6,+5.65
-RKLB,Rocket Lab Corporation Common Stock,leader,,不明,1.487,0.42,69199703,46551016,0.074,0.117,-0.043,56.0,+6.45
-APO,Apollo Global Management,core,Asset Management & Custody Banks,金融,1.484,0.14,23725777,15992055,0.025,0.044,-0.018,116.5,+4.02
-HII,Huntington Ingalls Industries,core,Aerospace & Defense,資本財,1.478,-0.11,11571567,7826701,0.012,0.029,-0.016,316.8,+14.84
-W,Wayfair Inc.,hot,,不明,1.472,-0.08,12387571,8415267,0.013,0.028,-0.015,117.0,+3.76
-NWSA,News Corp (Class A),core,Publishing,コミュニケーション・サービス,1.470,0.08,5996888,4078772,0.006,0.012,-0.005,29.6,-2.39
-COHU,"Cohu, Inc.",hot,,不明,1.470,-0.05,4016752,2732444,0.004,0.009,-0.004,51.5,-5.98
-ODFL,Old Dominion,leader,Cargo Ground Transportation,資本財,1.469,0.03,28266314,19235329,0.030,0.058,-0.027,173.5,-8.16
-ICHR,Ichor Holdings,hot,,不明,1.468,0.05,2575623,1755023,0.003,0.005,-0.002,39.6,-9.15
-WEC,WEC Energy Group,core,Electric Utilities,公益事業,1.466,-0.13,18192069,12409412,0.019,0.043,-0.024,116.5,+6.91
-SMTC,Semtech Corporation,hot,,不明,1.465,0.19,26522604,18105842,0.028,0.048,-0.020,126.5,-10.98
-TRGP,Targa Resources,core,Oil & Gas Storage & Transportation,エネルギー,1.455,0.22,22891292,15727731,0.025,0.042,-0.017,314.9,+6.97
-ATO,Atmos Energy,core,Gas Utilities,公益事業,1.451,0.05,8524083,5874236,0.009,0.017,-0.008,172.5,+2.81
-KRMN,Karman Holdings Inc.,hot,,不明,1.451,0.20,7356417,5069568,0.008,0.013,-0.006,40.0,+11.27
-VFC,V.F. Corporation,hot,,不明,1.450,-0.10,13250320,9138358,0.014,0.031,-0.017,18.3,+6.05
-KR,Kroger,core,Food Retail,生活必需品,1.450,-0.08,26523001,18295513,0.028,0.060,-0.032,66.8,+6.07
-AMAT,Applied Materials,leader,Semiconductor Materials & Equipment,半導体,1.441,0.17,196496801,136325208,0.210,0.363,-0.153,398.3,-3.22
-GM,General Motors,core,Automobile Manufacturers,一般消費財,1.437,0.25,52036709,36201124,0.056,0.092,-0.036,85.7,+11.23
-PARR,"Par Pacific Holdings, Inc. Comm",hot,,不明,1.432,-0.05,4111691,2871018,0.004,0.009,-0.005,76.0,-11.01
-CCL,Carnival Corporation,core,"Hotels, Resorts & Cruise Lines",一般消費財,1.429,0.12,38741985,27106447,0.041,0.075,-0.033,28.3,+5.07
-MDT,Medtronic,core,Health Care Equipment,ヘルスケア,1.428,0.23,45785442,32071579,0.049,0.083,-0.034,97.1,+3.30
-MS,Morgan Stanley,core,Investment Banking & Brokerage,金融,1.423,0.23,76732934,53935213,0.082,0.139,-0.057,184.5,+1.17
-AME,Ametek,core,Electrical Components & Equipment,資本財,1.421,-0.06,17985247,12658032,0.019,0.040,-0.020,247.0,-0.88
-CRM,Salesforce,core,Application Software,情報技術,1.419,0.09,100762700,71009389,0.108,0.197,-0.089,230.3,-3.24
-KIM,Kimco Realty,core,Retail REITs,不動産,1.419,-0.00,7176349,5058929,0.008,0.015,-0.007,24.5,+6.70
-GMAB,Genmab A/S,hot,,不明,1.411,-0.22,24695199,17500448,0.026,0.073,-0.047,57.6,+47.05
-CCC,CCC Intelligent Solutions Holdi,hot,,不明,1.409,-0.20,9837259,6979480,0.011,0.029,-0.019,7.7,+0.52
-CME,CME Group,core,Financial Exchanges & Data,金融,1.405,0.15,37830486,26929478,0.041,0.072,-0.031,304.5,+3.95
-NTRS,Northern Trust,core,Asset Management & Custody Banks,金融,1.405,-0.03,11971970,8523053,0.013,0.026,-0.013,169.1,+1.48
-WRBY,Warby Parker Inc.,hot,,不明,1.404,-0.04,3196563,2276071,0.003,0.007,-0.004,24.6,-2.90
-NVDA,Nvidia,leader,Semiconductors,半導体,1.396,-0.40,1797020358,1287205465,1.924,9.205,-7.281,207.1,-6.33
-GIS,General Mills,core,Packaged Foods & Meats,生活必需品,1.395,0.17,18217457,13054629,0.020,0.034,-0.014,34.4,+3.71
-UNH,UnitedHealth Group,core,Managed Health Care,ヘルスケア,1.394,0.16,115263509,82699022,0.123,0.219,-0.096,409.8,-2.52
-OSCR,"Oscar Health, Inc.",hot,,不明,1.386,-0.07,6769303,4883441,0.007,0.015,-0.008,30.0,-11.59
-YUM,Yum! Brands,core,Restaurants,一般消費財,1.375,-0.14,18156551,13206080,0.019,0.047,-0.028,155.3,+2.97
-AKAM,Akamai Technologies,core,Internet Services & Infrastructure,情報技術,1.374,-0.01,26661295,19403505,0.029,0.056,-0.027,94.6,+4.15
-STZ,Constellation Brands,core,Distillers & Vintners,生活必需品,1.373,0.05,15434294,11239311,0.017,0.031,-0.014,133.1,+0.45
-BF-B,Brown–Forman,core,Distillers & Vintners,生活必需品,1.373,-0.11,3698980,2694787,0.004,0.009,-0.005,28.7,+2.01
-OMC,Omnicom Group,core,Advertising,コミュニケーション・サービス,1.372,-0.05,15910508,11596309,0.017,0.035,-0.018,81.8,+1.58
-KOD,Kodiak Sciences Inc,hot,,不明,1.365,-0.09,4798632,3516765,0.005,0.011,-0.006,98.1,+7.24
-ECHO,EchoStar,core,Wireless Telecommunication Services,コミュニケーション・サービス,1.360,-0.10,25175099,18514931,0.027,0.058,-0.031,96.1,+5.52
-Q,Qnity Electronics,core,Semiconductor Materials & Equipment,半導体,1.354,-0.11,14550763,10748568,0.016,0.034,-0.019,117.3,-2.91
-ERO,Ero Copper Corp.,hot,,不明,1.353,-0.21,2657175,1963731,0.003,0.008,-0.006,29.0,-12.17
-SO,Southern Company,core,Electric Utilities,公益事業,1.352,-0.07,27889781,20635258,0.030,0.062,-0.032,93.9,+3.35
-FIG,"Figma, Inc.",hot,,不明,1.350,0.09,15960236,11824646,0.017,0.032,-0.015,21.7,-3.85
-SYF,Synchrony Financial,core,Consumer Finance,金融,1.348,0.01,17466570,12958284,0.019,0.036,-0.017,75.4,+3.12
-AXP,American Express,core,Consumer Finance,金融,1.343,0.07,54524473,40604166,0.058,0.109,-0.050,319.5,+0.05
-VALE,VALE S.A.,hot,,不明,1.343,-0.07,40235140,29968397,0.043,0.089,-0.046,11.5,-11.00
-CF,CF Industries,core,Fertilizers & Agricultural Chemicals,素材,1.340,-0.08,13789586,10290644,0.015,0.032,-0.017,121.3,+3.22
-ITUB,Itau Unibanco Banco Holding SA,hot,,不明,1.339,-0.16,30582477,22831932,0.033,0.093,-0.061,7.2,-26.03
-AGCO,AGCO Corporation,hot,,不明,1.336,-0.21,4816647,3604780,0.005,0.013,-0.008,110.2,+5.40
-OKLO,Oklo Inc.,hot,,不明,1.335,0.17,13192618,9881952,0.014,0.025,-0.011,24.9,-11.33
-PANW,Palo Alto Networks,leader,Systems Software,情報技術,1.328,-0.05,137899801,103877051,0.148,0.310,-0.163,372.8,+8.45
-NIO,NIO Inc.,hot,,不明,1.327,0.11,5908069,4452930,0.006,0.011,-0.005,3.2,-3.74
-GAP,"Gap, Inc. (The)",hot,,不明,1.326,-0.09,6489327,4892539,0.007,0.015,-0.008,22.4,-4.08
-HD,Home Depot (The),core,Home Improvement Retail,一般消費財,1.326,0.14,73961518,55777529,0.079,0.142,-0.063,328.7,+4.68
-PYPL,PayPal,leader,Transaction & Payment Processing Services,金融,1.323,-0.11,34022477,25720191,0.036,0.079,-0.043,56.6,-0.49
-KSPI,Joint Stock Company Kaspi.kz -,hot,,不明,1.316,-0.05,3185928,2421551,0.003,0.007,-0.004,93.3,+1.02
-FE,FirstEnergy,core,Electric Utilities,公益事業,1.314,-0.11,12349557,9399781,0.013,0.028,-0.015,47.0,+2.64
-USB,U.S. Bancorp,core,Diversified Banks,金融,1.314,0.03,19223609,14634630,0.021,0.039,-0.019,59.8,+0.57
-RTX,RTX Corporation,core,Aerospace & Defense,資本財,1.312,-0.07,73291116,55846260,0.078,0.166,-0.088,200.4,+3.88
-VZ,Verizon,core,Integrated Telecommunication Services,コミュニケーション・サービス,1.308,-0.10,75674385,57849558,0.081,0.173,-0.092,44.9,+3.37
-CMI,Cummins,core,Construction Machinery & Heavy Transportation Equipment,資本財,1.307,-0.05,30120527,23042479,0.032,0.065,-0.033,509.5,-5.96
-BKR,Baker Hughes,leader,Oil & Gas Equipment & Services,エネルギー,1.300,-0.08,28100497,21622203,0.030,0.064,-0.033,55.4,-0.41
-FLY,Firefly Aerospace Inc.,hot,,不明,1.299,0.01,2953604,2273590,0.003,0.006,-0.003,18.7,+11.43
-ADPT,Adaptive Biotechnologies Corpor,hot,,不明,1.299,-0.18,2331482,1794724,0.002,0.006,-0.004,27.4,+11.51
-BLSH,Bullish,hot,,不明,1.296,-0.07,1765612,1362222,0.002,0.004,-0.002,25.8,-11.66
-BURL,"Burlington Stores, Inc.",hot,,不明,1.294,0.05,23000614,17779597,0.025,0.046,-0.021,240.9,-6.16
-GGAL,Grupo Financiero Galicia S.A.,hot,,不明,1.293,0.11,3672473,2839218,0.004,0.007,-0.003,33.0,-8.11
-BBWI,"Bath & Body Works, Inc.",hot,,不明,1.291,-0.16,6482174,5020270,0.007,0.017,-0.010,22.6,+9.56
-BTDR,Bitdeer Technologies Group,hot,,不明,1.288,-0.13,4504902,3497752,0.005,0.010,-0.006,7.0,-15.01
-JCI,Johnson Controls,core,Building Products,資本財,1.287,-0.00,38765321,30111112,0.042,0.081,-0.039,152.6,+1.89
-HSY,Hershey Company (The),core,Packaged Foods & Meats,生活必需品,1.287,0.11,21755151,16908250,0.023,0.042,-0.019,164.4,-2.45
-JKHY,Jack Henry & Associates,core,Transaction & Payment Processing Services,金融,1.286,-0.14,6590410,5123246,0.007,0.016,-0.009,162.2,+6.10
-ASAN,"Asana, Inc.",hot,,不明,1.285,-0.01,3517150,2736325,0.004,0.007,-0.004,11.2,+5.63
-PM,Philip Morris International,core,Tobacco,生活必需品,1.284,-0.06,43579076,33950989,0.047,0.095,-0.048,210.2,+9.68
-UEC,Uranium Energy Corp.,hot,,不明,1.276,-0.16,4422585,3466425,0.005,0.011,-0.007,7.7,-4.04
-FISV,Fiserv,core,Transaction & Payment Processing Services,金融,1.267,0.03,14875722,11744172,0.016,0.030,-0.014,48.3,+0.62
-CRGY,Crescent Energy Company,hot,,不明,1.261,-0.04,5870643,4655024,0.006,0.013,-0.007,14.0,+3.74
-BNY,BNY Mellon,core,Asset Management & Custody Banks,金融,1.260,-0.01,19469305,15454953,0.021,0.041,-0.020,147.3,+1.09
-GLW,Corning Inc.,core,Electronic Components,情報技術,1.258,0.03,91301837,72565152,0.098,0.187,-0.089,123.8,-8.47
-PLUG,"Plug Power, Inc.",hot,,不明,1.256,0.44,5223635,4157662,0.006,0.009,-0.003,1.4,-2.48
-CPRT,Copart,leader,Diversified Support Services,資本財,1.256,0.15,22680845,18053146,0.024,0.043,-0.019,30.3,+9.80
-UBER,Uber,core,Passenger Ground Transportation,資本財,1.256,-0.11,75888405,60427748,0.081,0.172,-0.091,65.1,-4.76
-MLM,Martin Marietta Materials,core,Construction Materials,素材,1.250,-0.19,22122402,17694681,0.024,0.075,-0.051,535.2,+5.61
-DD,DuPont,core,Specialty Chemicals,資本財,1.250,-0.14,4950163,3959458,0.005,0.012,-0.007,139.2,+3.89
-CLSK,"CleanSpark, Inc.",hot,,不明,1.250,0.12,9803978,7842120,0.010,0.019,-0.009,7.7,-11.82
-TECH,Bio-Techne,core,Life Sciences Tools & Services,ヘルスケア,1.248,0.13,14563599,11668960,0.016,0.028,-0.012,72.7,+0.19
-FIGS,"FIGS, Inc.",hot,,不明,1.248,-0.14,3662258,2934741,0.004,0.009,-0.005,21.2,+7.84
-WDAY,"Workday, Inc.",leader,Application Software,情報技術,1.248,-0.06,24846342,19911806,0.027,0.054,-0.027,197.6,-2.84
-LMT,Lockheed Martin,core,Aerospace & Defense,資本財,1.247,-0.12,77006554,61743400,0.082,0.181,-0.099,642.6,+17.26
-OKE,Oneok,core,Oil & Gas Storage & Transportation,エネルギー,1.241,-0.11,15704595,12649711,0.017,0.037,-0.020,97.4,+4.41
-EVRG,Evergy,core,Electric Utilities,公益事業,1.240,-0.20,7173131,5782654,0.008,0.020,-0.012,86.1,+3.45
-BKNG,Booking Holdings,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.238,0.07,66776380,53956492,0.071,0.134,-0.063,149.2,-6.52
-COF,Capital One,core,Consumer Finance,金融,1.236,-0.14,45313529,36672681,0.049,0.114,-0.066,204.9,-1.20
-INSW,"International Seaways, Inc.",hot,,不明,1.235,-0.16,5599962,4534157,0.006,0.014,-0.008,112.4,+5.46
-STLA,Stellantis N.V.,hot,,不明,1.235,-0.21,12740444,10319872,0.014,0.046,-0.033,4.6,+6.15
-ZS,"Zscaler, Inc.",hot,,不明,1.233,0.06,50340364,40819520,0.054,0.102,-0.048,238.5,+9.63
-AMP,Ameriprise Financial,core,Asset Management & Custody Banks,金融,1.229,-0.14,16792528,13658120,0.018,0.039,-0.022,493.0,+0.35
-KEY,KeyCorp,core,Regional Banks,金融,1.229,-0.04,26075024,21211134,0.028,0.057,-0.029,21.1,+0.69
-SITM,SiTime Corporation,hot,,不明,1.227,-0.12,12104623,9867403,0.013,0.028,-0.015,453.9,-11.81
-ALL,Allstate,core,Property & Casualty Insurance,金融,1.225,-0.03,21213582,17322261,0.023,0.045,-0.022,261.1,+3.87
-SLS,"SELLAS Life Sciences Group, Inc",hot,,不明,1.221,-0.10,5435014,4451406,0.006,0.013,-0.007,9.6,-20.07
-CHRW,C.H. Robinson,core,Air Freight & Logistics,資本財,1.220,-0.18,15044643,12336381,0.016,0.038,-0.022,127.3,-10.24
-FIVN,"Five9, Inc.",hot,,不明,1.219,-0.18,2510262,2058673,0.003,0.006,-0.004,36.3,+6.60
-DG,Dollar General,core,Consumer Staples Merchandise Retail,生活必需品,1.219,-0.21,14641337,12014686,0.016,0.039,-0.023,132.0,-0.53
-DAL,Delta Air Lines,core,Passenger Airlines,資本財,1.214,-0.17,25146020,20714611,0.027,0.060,-0.033,79.2,+3.46
-BLK,BlackRock,core,Asset Management & Custody Banks,金融,1.213,-0.10,39340229,32418880,0.042,0.087,-0.045,1153.4,+2.28
-CIEN,Ciena,core,Communications Equipment,情報技術,1.208,-0.00,65790013,54456829,0.070,0.137,-0.067,321.0,-9.80
-GWW,W. W. Grainger,core,Industrial Machinery & Supplies & Components,資本財,1.208,-0.14,13486395,11168760,0.014,0.032,-0.017,1364.2,+1.85
-UDR,"UDR, Inc.",core,Multi-Family Residential REITs,不動産,1.207,-0.23,10562037,8750806,0.011,0.028,-0.017,35.6,+0.98
-RDW,Redwire Corporation,hot,,不明,1.202,-0.00,5992472,4984475,0.006,0.013,-0.006,8.6,+0.58
-REG,Regency Centers,core,Retail REITs,不動産,1.200,-0.16,3456703,2880036,0.004,0.008,-0.005,75.0,+2.46
-DOCS,"Doximity, Inc.",hot,,不明,1.198,-0.27,3906896,3262457,0.004,0.012,-0.008,33.1,-0.89
-PH,Parker Hannifin,core,Industrial Machinery & Supplies & Components,資本財,1.195,-0.05,37857281,31671612,0.041,0.081,-0.041,920.1,-3.10
-RJF,Raymond James Financial,core,Investment Banking & Brokerage,金融,1.195,-0.20,9946891,8322134,0.011,0.025,-0.015,158.3,+1.48
-BOOT,"Boot Barn Holdings, Inc.",hot,,不明,1.194,-0.21,6558365,5494743,0.007,0.017,-0.010,129.9,+15.42
-ALM,Almonty Industries Inc.,hot,,不明,1.192,-0.12,4073315,3416444,0.004,0.009,-0.005,8.8,-5.13
-TRMB,Trimble Inc.,core,Application Software,情報技術,1.192,-0.15,4867163,4083153,0.005,0.012,-0.006,65.4,+6.13
-NOK,Nokia Corporation Sponsored,hot,,不明,1.191,-0.00,56596757,47539427,0.061,0.118,-0.058,8.6,-7.02
-CNC,Centene Corporation,core,Managed Health Care,ヘルスケア,1.189,-0.23,19131470,16095398,0.020,0.066,-0.045,67.8,-5.19
-VOYG,"Voyager Technologies, Inc.",hot,,不明,1.188,-0.25,1705042,1435586,0.002,0.005,-0.003,26.7,+8.18
-HOS,"Hornbeck Offshore Services, Inc",hot,,不明,1.179,-0.17,906837,769193,0.001,0.002,-0.001,7.1,+6.25
-CBRS,Cerebras Systems Inc.,hot,,不明,1.178,-0.12,83813496,71149822,0.090,0.196,-0.106,106.3,-11.58
-TJX,TJX Companies,core,Apparel Retail,一般消費財,1.178,-0.17,32811883,27863052,0.035,0.080,-0.045,142.2,-2.92
-UHS,Universal Health Services,core,Health Care Facilities,ヘルスケア,1.178,-0.21,7302421,6201299,0.008,0.019,-0.011,176.6,-4.99
-DRI,Darden Restaurants,core,Restaurants,一般消費財,1.172,-0.19,9638966,8224734,0.010,0.024,-0.014,219.4,+1.13
-HAL,Halliburton,core,Oil & Gas Equipment & Services,エネルギー,1.171,-0.04,21268469,18155952,0.023,0.045,-0.023,36.4,+8.21
-TPL,Texas Pacific Land Corporation,core,Oil & Gas Exploration & Production,エネルギー,1.161,-0.20,5309061,4571728,0.006,0.014,-0.008,329.5,-4.12
-GE,GE Aerospace,core,Aerospace & Defense,資本財,1.161,-0.16,99304458,85531291,0.106,0.227,-0.120,306.1,+1.45
-WTW,Willis Towers Watson,core,Insurance Brokers,金融,1.158,-0.11,10599154,9151905,0.011,0.024,-0.013,323.9,+1.35
-CHTR,Charter Communications,core,Cable & Satellite,コミュニケーション・サービス,1.157,-0.23,13045708,11276332,0.014,0.034,-0.020,110.6,+3.06
-MANH,"Manhattan Associates, Inc.",hot,,不明,1.156,-0.26,12579837,10879316,0.013,0.037,-0.024,248.7,+7.62
-AVY,Avery Dennison,core,Paper & Plastic Packaging Products & Materials,素材,1.154,-0.22,6264100,5429366,0.007,0.016,-0.010,180.9,+1.63
-VEEV,Veeva Systems,core,Health Care Technology,ヘルスケア,1.151,-0.21,23651044,20543926,0.025,0.059,-0.034,311.0,-1.89
-LII,Lennox International,core,Building Products,資本財,1.148,-0.25,16854162,14675594,0.018,0.048,-0.030,352.2,-3.35
-ABT,Abbott Laboratories,core,Health Care Equipment,ヘルスケア,1.146,-0.18,50024215,43641468,0.054,0.132,-0.078,106.3,+3.19
-KEEL,Keel Infrastructure Corp.,hot,,不明,1.143,-0.13,3421170,2994165,0.004,0.008,-0.005,2.1,-12.53
-DGX,Quest Diagnostics,core,Health Care Services,ヘルスケア,1.138,-0.23,13703814,12039060,0.015,0.038,-0.024,253.1,+6.70
-DK,"Delek US Holdings, Inc.",hot,,不明,1.136,-0.17,5702512,5021920,0.006,0.014,-0.008,73.4,-3.76
-HCA,HCA Healthcare,core,Health Care Facilities,ヘルスケア,1.129,-0.20,38023871,33669564,0.041,0.095,-0.055,479.0,+2.84
-Z,"Zillow Group, Inc.",hot,,不明,1.129,-0.24,5657541,5010035,0.006,0.015,-0.008,30.9,-3.15
-RXO,"RXO, Inc.",hot,,不明,1.126,-0.23,5944102,5276837,0.006,0.015,-0.009,27.7,-3.66
-LW,"Lamb Weston Holdings, Inc.",hot,,不明,1.125,-0.27,3313729,2944805,0.004,0.012,-0.008,54.1,+0.58
-IOT,Samsara Inc.,hot,,不明,1.124,-0.26,7653901,6808686,0.008,0.021,-0.013,41.5,-1.74
-NTSK,"Netskope, Inc.",hot,,不明,1.124,-0.11,10663380,9490201,0.011,0.024,-0.013,24.7,+22.94
-LRCX,Lam Research,leader,Semiconductor Materials & Equipment,半導体,1.122,-0.11,165042636,147118373,0.177,0.373,-0.196,241.5,-10.22
-SNAP,Snap Inc.,hot,,不明,1.120,-0.28,12728745,11362562,0.014,0.032,-0.019,5.3,-16.73
-EOG,EOG Resources,core,Oil & Gas Exploration & Production,エネルギー,1.120,-0.22,17034021,15210423,0.018,0.045,-0.027,164.7,+5.07
-SMMT,Summit Therapeutics Inc.,hot,,不明,1.118,-0.20,3931212,3517757,0.004,0.009,-0.005,15.8,-2.10
-STX,Seagate Technology,leader,"Technology Hardware, Storage & Peripherals",情報技術,1.113,-0.06,269746192,242305959,0.289,0.580,-0.292,662.7,-6.75
-ASTS,"AST SpaceMobile, Inc.",hot,,不明,1.112,-0.23,30365202,27303482,0.033,0.074,-0.041,41.3,-1.38
-BDX,Becton Dickinson,core,Health Care Equipment,ヘルスケア,1.111,-0.26,14126926,12712555,0.015,0.037,-0.022,198.4,+2.83
-AMRX,"Amneal Pharmaceuticals, Inc.",hot,,不明,1.110,-0.20,1764530,1589872,0.002,0.004,-0.002,21.4,+7.51
-TDG,TransDigm Group,core,Aerospace & Defense,資本財,1.106,-0.26,23962975,21673721,0.026,0.075,-0.049,1163.7,+1.61
-PEG,Public Service Enterprise Group,core,Electric Utilities,公益事業,1.105,-0.15,8705625,7875513,0.009,0.021,-0.011,74.1,+3.88
-XP,XP Inc.,hot,,不明,1.103,-0.34,28521738,25857764,0.031,0.096,-0.066,14.3,-54.01
-PWR,Quanta Services,core,Construction & Engineering,資本財,1.101,-0.16,56488595,51283960,0.060,0.140,-0.079,626.7,+2.53
-SPGI,S&P Global,core,Financial Exchanges & Data,金融,1.101,-0.21,50636516,46007678,0.054,0.122,-0.068,466.6,+8.18
-CASY,Casey's,core,Food Retail,生活必需品,1.099,-0.22,17462842,15884429,0.019,0.043,-0.024,688.1,+1.04
-GWRE,"Guidewire Software, Inc.",hot,,不明,1.098,-0.18,11096468,10101721,0.012,0.030,-0.018,162.5,-10.73
-GRMN,Garmin,core,Consumer Electronics,一般消費財,1.097,-0.36,11975456,10916950,0.013,0.034,-0.021,276.5,-4.71
-STNE,StoneCo Ltd.,hot,,不明,1.097,-0.24,4305275,3926064,0.005,0.012,-0.007,7.9,-33.88
-WSM,"Williams-Sonoma, Inc.",core,Homefurnishing Retail,一般消費財,1.096,-0.22,11373202,10381492,0.012,0.029,-0.017,254.4,+0.88
-ELF,"e.l.f. Beauty, Inc.",hot,,不明,1.086,-0.23,6796390,6256826,0.007,0.019,-0.012,112.6,-2.46
-SPCX,Space Exploration Technologies,hot,,不明,1.085,-0.27,1286914126,1186470233,1.378,4.512,-3.134,136.6,-15.82
-PL,Planet Labs PBC,hot,,不明,1.082,-0.24,5433173,5021550,0.006,0.014,-0.008,13.8,-0.59
-MKC,McCormick & Company,core,Packaged Foods & Meats,生活必需品,1.082,-0.24,7477969,6913755,0.008,0.021,-0.013,47.8,+0.52
-YPF,YPF Sociedad Anonima,hot,,不明,1.081,-0.19,3117422,2882740,0.003,0.011,-0.007,47.3,-7.88
-PNC,PNC Financial Services,core,Diversified Banks,金融,1.076,-0.25,20292083,18855807,0.022,0.060,-0.038,228.9,+2.81
-HBAN,Huntington Bancshares,core,Regional Banks,金融,1.073,-0.22,20372190,18988007,0.022,0.050,-0.028,15.7,+0.67
-VST,Vistra Corp.,core,Electric Utilities,公益事業,1.069,-0.25,45467178,42534971,0.049,0.173,-0.125,137.4,-9.95
-MSCI,MSCI Inc.,core,Financial Exchanges & Data,金融,1.067,-0.27,16313770,15283602,0.017,0.043,-0.026,620.7,+5.55
-NUE,Nucor,core,Steel,素材,1.065,-0.20,21299532,19995684,0.023,0.055,-0.032,273.4,+4.18
-ONDS,Ondas Inc,hot,,不明,1.060,0.10,19072725,17999693,0.020,0.038,-0.018,6.4,+3.87
-TKO,TKO Group Holdings,core,Movies & Entertainment,コミュニケーション・サービス,1.059,-0.28,7158720,6761476,0.008,0.020,-0.012,181.2,+1.29
-LUNR,"Intuitive Machines, Inc.",hot,,不明,1.052,-0.20,4024562,3826288,0.004,0.009,-0.005,11.0,-0.81
-VYLR,Vylor Inc.,hot,,不明,1.050,-0.35,8180824,7791730,0.009,0.027,-0.018,72.5,-1.87
-MRNA,Moderna,core,Biotechnology,ヘルスケア,1.049,-0.32,213283209,203287046,0.228,0.887,-0.659,218.7,-10.80
-PCAR,Paccar,leader,Construction Machinery & Heavy Transportation Equipment,資本財,1.048,-0.28,16203628,15455246,0.017,0.050,-0.032,102.4,-7.24
-J,Jacobs Solutions,core,Construction & Engineering,資本財,1.048,-0.30,5555760,5300409,0.006,0.015,-0.010,153.7,+10.29
-UUUU,Energy Fuels Inc,hot,,不明,1.045,-0.24,4098632,3922887,0.004,0.013,-0.009,7.6,-9.77
-HUBS,"HubSpot, Inc.",hot,,不明,1.045,-0.21,11834669,11327925,0.013,0.030,-0.017,239.3,-3.98
-TPR,"Tapestry, Inc.",core,"Apparel, Accessories & Luxury Goods",一般消費財,1.044,-0.24,13523151,12949644,0.014,0.035,-0.021,118.7,+1.42
-DOW,Dow Inc.,core,Commodity Chemicals,素材,1.043,-0.28,15049836,14427824,0.016,0.040,-0.024,33.9,+11.48
-JBL,Jabil,core,Electronic Manufacturing Services,情報技術,1.043,-0.31,12873250,12341897,0.014,0.037,-0.023,275.7,-2.34
-DUK,Duke Energy,core,Electric Utilities,公益事業,1.043,-0.24,20090479,19264092,0.022,0.053,-0.031,127.5,+5.05
-FOX,Fox Corporation (Class B),core,Broadcasting,コミュニケーション・サービス,1.040,-0.29,1572905,1511995,0.002,0.004,-0.003,57.5,-3.13
-ABEV,Ambev S.A.,hot,,不明,1.039,-0.14,5983274,5759074,0.006,0.018,-0.011,2.7,-20.05
-LYV,Live Nation Entertainment,core,Movies & Entertainment,コミュニケーション・サービス,1.035,-0.29,13526344,13074515,0.014,0.038,-0.024,178.1,+1.90
-AES,AES Corporation,core,Independent Power Producers & Energy Traders,公益事業,1.031,-0.26,7372531,7150294,0.008,0.029,-0.021,14.9,-0.60
-F,Ford Motor Company,core,Automobile Manufacturers,一般消費財,1.028,-0.15,29688894,28888895,0.032,0.085,-0.054,12.2,+0.83
-TGT,Target Corporation,core,Consumer Staples Merchandise Retail,生活必需品,1.026,-0.33,23047419,22462956,0.025,0.065,-0.041,152.5,-0.39
-TDW,Tidewater Inc.,hot,,不明,1.024,-0.26,2248826,2195121,0.002,0.006,-0.004,86.5,+7.95
-SCCO,Southern Copper Corporation,hot,,不明,1.024,-0.21,15444460,15084307,0.017,0.042,-0.026,181.9,-10.14
-CNP,CenterPoint Energy,core,Multi-Utilities,公益事業,1.022,-0.29,15488138,15158643,0.017,0.043,-0.027,42.5,+5.24
-PFG,Principal Financial Group,core,Life & Health Insurance,金融,1.020,-0.37,5884341,5768960,0.006,0.019,-0.013,112.6,+3.50
-CRL,Charles River Laboratories,core,Life Sciences Tools & Services,ヘルスケア,1.017,-0.27,22857216,22469139,0.024,0.090,-0.066,362.8,+13.71
-NFLX,Netflix,leader,Movies & Entertainment,コミュニケーション・サービス,1.017,-0.26,175503454,172631772,0.188,0.601,-0.413,62.7,-5.07
-PODD,Insulet Corporation,core,Health Care Equipment,ヘルスケア,1.011,-0.28,6304647,6233011,0.007,0.017,-0.011,152.8,+6.78
-ONTO,Onto Innovation Inc.,hot,,不明,1.011,-0.28,11724186,11600298,0.013,0.030,-0.017,206.1,-9.76
-SPG,Simon Property Group,core,Retail REITs,不動産,1.010,-0.30,8644617,8555740,0.009,0.023,-0.014,216.2,+4.33
-ALB,Albemarle Corporation,core,Specialty Chemicals,素材,1.006,-0.33,9673229,9615266,0.010,0.026,-0.016,91.2,-3.73
-XERS,"Xeris Biopharma Holdings, Inc.",hot,,不明,1.003,-0.28,927006,924381,0.001,0.002,-0.001,10.6,-4.31
-ALVO,Alvotech,hot,,不明,1.002,-0.41,139435,139155,0.000,0.000,-0.000,4.7,-9.38
-EFX,Equifax,core,Research & Consulting Services,資本財,1.001,-0.32,15925481,15913276,0.017,0.044,-0.027,183.6,+5.17
-WMB,Williams Companies,core,Oil & Gas Storage & Transportation,エネルギー,0.997,-0.32,25955297,26033961,0.028,0.071,-0.043,74.9,+5.16
-PTGX,"Protagonist Therapeutics, Inc.",hot,,不明,0.996,-0.28,2739386,2749282,0.003,0.007,-0.004,143.4,+3.74
-DAO,"Youdao, Inc.",hot,,不明,0.995,-0.44,24956,25075,0.000,0.000,-0.000,19.5,+4.78
-SAIC,Science Applications Internatio,hot,,不明,0.994,-0.36,2782940,2800570,0.003,0.008,-0.005,151.8,+11.46
-MTD,Mettler Toledo,core,Life Sciences Tools & Services,ヘルスケア,0.989,-0.32,12062967,12202919,0.013,0.040,-0.027,1696.1,+3.78
-OPEN,Opendoor Technologies Inc,hot,,不明,0.987,-0.28,3433765,3479896,0.004,0.009,-0.005,1.8,-10.82
-GPC,Genuine Parts Company,core,Distributors,一般消費財,0.983,-0.33,5525932,5620484,0.006,0.019,-0.013,121.9,-0.02
-DIS,Walt Disney Company (The),core,Movies & Entertainment,コミュニケーション・サービス,0.982,-0.27,33270134,33870211,0.036,0.107,-0.072,111.5,+0.46
-LQDA,Liquidia Corporation,hot,,不明,0.980,-0.37,6939392,7084164,0.007,0.020,-0.012,45.0,+21.77
-WDC,Western Digital,leader,"Technology Hardware, Storage & Peripherals",情報技術,0.978,-0.26,186289598,190548172,0.199,0.462,-0.262,370.6,-2.01
-APA,APA Corporation,core,Oil & Gas Exploration & Production,エネルギー,0.975,-0.40,13567623,13913569,0.015,0.039,-0.024,52.0,+4.45
-TFC,Truist Financial,core,Diversified Banks,金融,0.974,-0.31,16537117,16986280,0.018,0.047,-0.029,48.9,+3.05
-SAIL,"SailPoint, Inc.",hot,,不明,0.972,-0.42,3649004,3755940,0.004,0.011,-0.007,21.1,+9.14
-SMR,NuScale Power Corporation,hot,,不明,0.969,-0.09,9756355,10066005,0.010,0.021,-0.011,5.5,-2.48
-PTC,PTC Inc.,core,Application Software,情報技術,0.969,-0.29,16159193,16673625,0.017,0.042,-0.025,194.3,+0.56
-WM,Waste Management,core,Environmental & Facilities Services,資本財,0.969,-0.30,30561464,31540827,0.033,0.079,-0.046,234.8,+1.77
-UPS,United Parcel Service,core,Air Freight & Logistics,資本財,0.968,-0.40,26611043,27502380,0.028,0.081,-0.053,108.1,+9.41
-APH,Amphenol,core,Electronic Components,情報技術,0.967,-0.30,54403321,56246592,0.058,0.162,-0.104,78.5,-2.61
-INSP,"Inspire Medical Systems, Inc.",hot,,不明,0.966,-0.40,1215234,1258140,0.001,0.004,-0.002,70.3,-2.14
-MNDY,monday.com Ltd.,hot,,不明,0.964,-0.37,4200237,4356293,0.004,0.013,-0.009,95.9,-3.99
-HSAI,Hesai Group,hot,,不明,0.964,-0.41,1405704,1457983,0.002,0.005,-0.003,12.2,-6.23
-DFTX,"Definium Therapeutics, Inc.",hot,,不明,0.960,-0.26,3047472,3175865,0.003,0.009,-0.006,36.3,+3.48
-CGNX,Cognex Corporation,hot,,不明,0.959,-0.34,3625226,3781173,0.004,0.010,-0.006,56.1,-2.91
-ALMR,"Alamar Biosciences, Inc.",hot,,不明,0.958,-0.38,1042479,1088064,0.001,0.003,-0.002,31.0,+9.56
-NOC,Northrop Grumman,core,Aerospace & Defense,資本財,0.957,-0.31,21508766,22486131,0.023,0.072,-0.049,562.1,+4.10
-TRV,Travelers Companies (The),core,Property & Casualty Insurance,金融,0.956,-0.36,24376285,25491677,0.026,0.074,-0.048,401.2,+0.83
-VRSK,Verisk Analytics,core,Research & Consulting Services,資本財,0.954,-0.36,9540317,10000284,0.010,0.031,-0.021,197.4,+4.86
-ARQT,"Arcutis Biotherapeutics, Inc.",hot,,不明,0.954,-0.43,2212413,2319545,0.002,0.007,-0.005,31.8,-3.19
-MPC,Marathon Petroleum,core,Oil & Gas Refining & Marketing,エネルギー,0.952,-0.27,53457044,56153330,0.057,0.161,-0.104,440.2,-6.72
-CTSH,Cognizant,core,IT Consulting & Other Services,情報技術,0.952,-0.39,20271804,21298908,0.022,0.061,-0.039,64.6,-5.12
-BSP,Bending Spoons S.p.A.,hot,,不明,0.950,-0.24,4713048,4961722,0.005,0.012,-0.007,45.2,-0.53
-IFF,International Flavors & Fragrances,core,Specialty Chemicals,素材,0.945,-0.40,7183433,7598545,0.008,0.026,-0.018,90.5,-0.85
-ELV,Elevance Health,core,Managed Health Care,ヘルスケア,0.943,-0.34,25324222,26846469,0.027,0.084,-0.057,421.3,-5.82
-VIRT,"Virtu Financial, Inc.",hot,,不明,0.943,-0.40,1878860,1991913,0.002,0.006,-0.004,52.9,-8.11
-MCO,Moody's Corporation,core,Financial Exchanges & Data,金融,0.942,-0.29,22475763,23853837,0.024,0.077,-0.053,491.0,+6.69
-MET,MetLife,core,Life & Health Insurance,金融,0.936,-0.40,10076170,10763635,0.011,0.038,-0.027,100.0,-2.05
-AMT,American Tower,core,Telecom Tower REITs,不動産,0.934,-0.30,32191759,34470393,0.034,0.097,-0.063,187.7,+2.31
-RNG,"Ringcentral, Inc.",hot,,不明,0.932,-0.40,7838772,8406996,0.008,0.029,-0.020,82.0,-0.59
-T,AT&T,core,Integrated Telecommunication Services,コミュニケーション・サービス,0.932,-0.34,65440024,70223222,0.070,0.175,-0.105,21.5,-2.45
-XE,"X-Energy, Inc.",hot,,不明,0.930,-0.38,3139487,3377028,0.003,0.008,-0.005,11.0,-0.72
-SLB,Schlumberger,core,Oil & Gas Equipment & Services,エネルギー,0.929,-0.39,32271806,34736895,0.035,0.088,-0.053,53.9,+7.27
-TARS,"Tarsus Pharmaceuticals, Inc.",hot,,不明,0.928,-0.42,1451253,1563208,0.002,0.005,-0.003,74.7,+6.33
-LEU,Centrus Energy Corp.,hot,,不明,0.928,-0.35,4424320,4766135,0.005,0.014,-0.010,103.2,-8.08
-CPT,Camden Property Trust,core,Multi-Family Residential REITs,不動産,0.927,-0.34,3426821,3695901,0.004,0.010,-0.007,101.4,+0.34
-ACHR,Archer Aviation Inc.,hot,,不明,0.925,-0.33,4640929,5018778,0.005,0.011,-0.006,4.2,+3.46
-MXL,"MaxLinear, Inc",hot,,不明,0.924,-0.35,13327540,14417586,0.014,0.041,-0.027,66.3,-14.25
-UAL,United Airlines Holdings,core,Passenger Airlines,資本財,0.922,-0.44,25688437,27862322,0.028,0.077,-0.049,102.4,+5.69
-WYNN,Wynn Resorts,core,Casinos & Gaming,一般消費財,0.922,-0.43,7319823,7942244,0.008,0.023,-0.015,73.6,-4.70
-MAA,Mid-America Apartment Communities,core,Multi-Family Residential REITs,不動産,0.916,-0.38,4260887,4652912,0.005,0.013,-0.008,118.4,-0.24
-CDNS,Cadence Design Systems,leader,Application Software,情報技術,0.915,-0.40,45553836,49787169,0.049,0.134,-0.085,329.2,+1.60
-HUM,Humana,core,Managed Health Care,ヘルスケア,0.914,-0.37,14308101,15658683,0.015,0.057,-0.042,409.8,-5.00
-PSN,Parsons Corporation,hot,,不明,0.913,-0.39,2396118,2624242,0.003,0.008,-0.006,50.0,+10.53
-SYY,Sysco,core,Food Distributors,生活必需品,0.913,-0.39,8458331,9266262,0.009,0.027,-0.018,82.6,-0.02
-DTE,DTE Energy,core,Multi-Utilities,公益事業,0.903,-0.39,5350590,5923078,0.006,0.017,-0.011,135.2,+4.47
-BEN,Franklin Resources,core,Asset Management & Custody Banks,金融,0.900,-0.32,3603230,4001493,0.004,0.013,-0.009,31.5,+0.29
-VOD,Vodafone Group Plc,hot,,不明,0.900,-0.29,3021939,3357242,0.003,0.007,-0.004,15.8,-0.09
-D,Dominion Energy,core,Multi-Utilities,公益事業,0.897,-0.41,13136344,14639872,0.014,0.039,-0.025,66.2,+4.73
-KKR,KKR & Co.,core,Asset Management & Custody Banks,金融,0.889,-0.39,13883617,15609994,0.015,0.043,-0.028,94.8,+5.69
-TALO,"Talos Energy, Inc.",hot,,不明,0.888,-0.40,1716375,1933649,0.002,0.007,-0.006,17.9,-0.78
-FLR,Fluor Corporation,hot,,不明,0.886,-0.40,3875005,4371513,0.004,0.015,-0.010,46.8,+2.06
-ERAS,"Erasca, Inc.",hot,,不明,0.879,-0.38,2354185,2679081,0.003,0.008,-0.005,14.4,-1.51
-XYL,Xylem Inc.,core,Industrial Machinery & Supplies & Components,資本財,0.877,-0.45,19814867,22583755,0.021,0.068,-0.047,93.6,-11.16
-ESS,Essex Property Trust,core,Multi-Family Residential REITs,不動産,0.876,-0.36,7644727,8728257,0.008,0.024,-0.016,264.9,-3.47
-L,Loews Corporation,core,Multi-line Insurance,金融,0.870,-0.44,1791384,2058122,0.002,0.006,-0.004,111.8,+0.27
-SYRE,"Spyre Therapeutics, Inc.",hot,,不明,0.866,-0.51,2492941,2879107,0.003,0.008,-0.006,95.9,+2.80
-PGR,Progressive Corporation,core,Property & Casualty Insurance,金融,0.861,-0.39,16952761,19678701,0.018,0.055,-0.037,232.5,+4.49
-TEL,TE Connectivity,core,Electronic Manufacturing Services,情報技術,0.860,-0.38,19193599,22328238,0.021,0.070,-0.049,215.8,+0.54
-AGNC,AGNC Investment Corp.,hot,,不明,0.858,-0.45,10959009,12771267,0.012,0.030,-0.019,8.8,-0.17
-NU,Nu Holdings Ltd.,hot,,不明,0.853,-0.38,65935422,77341030,0.071,0.215,-0.145,11.7,-22.65
-NVAX,"Novavax, Inc.",hot,,不明,0.852,-0.45,2519606,2957914,0.003,0.009,-0.006,10.3,-9.41
-LH,Labcorp,core,Health Care Services,ヘルスケア,0.842,-0.46,10977240,13030844,0.012,0.043,-0.031,365.5,+12.62
-PENG,"Penguin Solutions, Inc.",hot,,不明,0.842,-0.38,7962011,9459671,0.009,0.023,-0.015,53.5,-8.97
-HALO,"Halozyme Therapeutics, Inc.",hot,,不明,0.840,-0.51,6949191,8272982,0.007,0.032,-0.025,131.3,+6.09
-JBLU,JetBlue Airways Corporation,hot,,不明,0.838,-0.51,4852758,5792758,0.005,0.018,-0.013,2.9,-0.52
-SBS,Companhia de saneamento Basico,hot,,不明,0.837,-0.33,4038170,4826714,0.004,0.021,-0.017,4.5,-30.06
-SWK,Stanley Black & Decker,core,Industrial Machinery & Supplies & Components,資本財,0.836,-0.43,5920620,7085531,0.006,0.021,-0.014,102.4,+7.88
-TDY,Teledyne Technologies,core,Electronic Equipment & Instruments,情報技術,0.834,-0.45,10869901,13033084,0.012,0.036,-0.025,664.5,+4.19
-EXPD,Expeditors International,core,Air Freight & Logistics,資本財,0.826,-0.37,8056247,9758689,0.009,0.028,-0.020,199.1,+0.29
-NDSN,Nordson Corporation,core,Industrial Machinery & Supplies & Components,資本財,0.820,-0.47,3561437,4343208,0.004,0.013,-0.009,323.5,-1.22
-IQV,IQVIA,core,Life Sciences Tools & Services,ヘルスケア,0.815,-0.40,17104756,20977410,0.018,0.068,-0.049,269.3,+0.41
-MAS,Masco,core,Building Products,資本財,0.815,-0.49,8006156,9826673,0.009,0.027,-0.019,80.7,+8.22
-CBRE,CBRE Group,core,Real Estate Services,不動産,0.815,-0.46,13323705,16353421,0.014,0.050,-0.035,129.6,-3.27
-RCL,Royal Caribbean Group,core,"Hotels, Resorts & Cruise Lines",一般消費財,0.813,-0.49,28966785,35638661,0.031,0.101,-0.070,304.8,+5.91
-MOS,Mosaic Company (The),core,Fertilizers & Agricultural Chemicals,素材,0.809,-0.50,8839471,10920795,0.009,0.028,-0.018,18.4,+2.17
-CCI,Crown Castle,core,Telecom Tower REITs,不動産,0.809,-0.50,22508269,27832701,0.024,0.086,-0.062,89.1,+9.34
-PATH,"UiPath, Inc.",hot,,不明,0.807,-0.38,17612785,21820935,0.019,0.059,-0.040,13.8,+3.11
-GGB,Gerdau S.A.,hot,,不明,0.805,-0.47,5346155,6643228,0.006,0.017,-0.011,4.7,-11.39
-EXR,Extra Space Storage,core,Self-Storage REITs,不動産,0.804,-0.46,5964099,7418249,0.006,0.022,-0.016,151.7,+7.61
-FLEX,Flex Ltd.,core,Electronic Manufacturing Services,情報技術,0.795,-0.53,26925670,33879905,0.029,0.101,-0.072,88.2,-1.30
-EQT,EQT Corporation,core,Oil & Gas Exploration & Production,エネルギー,0.788,-0.52,27766682,35257280,0.030,0.105,-0.075,55.6,+2.67
-HON,Honeywell Technologies,leader,Industrial Conglomerates,資本財,0.787,-0.53,21695629,27579156,0.023,0.076,-0.053,220.0,+2.93
-BRO,Brown & Brown,core,Insurance Brokers,金融,0.786,-0.50,7828731,9962899,0.008,0.030,-0.022,69.4,-2.02
-ORKA,"Oruka Therapeutics, Inc.",hot,,不明,0.782,-0.51,2949783,3773250,0.003,0.012,-0.008,95.6,+18.77
-DKNG,DraftKings Inc.,hot,,不明,0.781,-0.57,8021828,10274625,0.009,0.028,-0.019,20.2,-0.78
-WU,Western Union Company (The),hot,,不明,0.780,-0.55,1684149,2157951,0.002,0.006,-0.004,6.1,-1.13
-CAR,"Avis Budget Group, Inc.",hot,,不明,0.778,-0.46,987851,1270043,0.001,0.004,-0.003,108.9,+6.26
-PHM,PulteGroup,core,Homebuilding,一般消費財,0.775,-0.54,10756326,13882016,0.012,0.039,-0.027,124.4,+9.32
-INTR,Inter & Co. Inc.,hot,,不明,0.769,-0.64,3952696,5141386,0.004,0.017,-0.013,4.0,-44.74
-TSCO,Tractor Supply,core,Other Specialty Retail,一般消費財,0.767,-0.50,15039561,19617520,0.016,0.071,-0.055,33.8,+3.28
-PBLS,"Parabilis Medicines, Inc.",hot,,不明,0.764,-0.50,1314982,1722077,0.001,0.005,-0.004,28.0,+2.24
-BX,Blackstone Inc.,core,Asset Management & Custody Banks,金融,0.763,-0.52,25783850,33802182,0.028,0.096,-0.068,119.4,+7.90
-AAL,"American Airlines Group, Inc.",hot,,不明,0.760,-0.69,42523292,55964214,0.046,0.121,-0.076,12.3,+2.07
-AXGN,"AxoGen, Inc.",hot,,不明,0.755,-0.44,2661437,3525128,0.003,0.017,-0.014,48.6,+34.29
-IT,Gartner,core,IT Consulting & Other Services,情報技術,0.748,-0.53,7931055,10596021,0.008,0.028,-0.020,227.7,+4.75
-NRG,NRG Energy,core,Independent Power Producers & Energy Traders,公益事業,0.748,-0.47,9684467,12955594,0.010,0.038,-0.028,96.4,-3.17
-ALLE,Allegion,core,Building Products,資本財,0.744,-0.53,10105615,13586088,0.011,0.041,-0.030,187.3,+19.31
-HURN,Huron Consulting Group Inc.,hot,,不明,0.740,-0.60,3612772,4880343,0.004,0.012,-0.009,195.3,+9.15
-CTAS,Cintas,leader,Diversified Support Services,資本財,0.735,-0.41,15128914,20584766,0.016,0.066,-0.050,221.7,+2.91
-LDOS,Leidos,core,Diversified Support Services,資本財,0.733,-0.55,3316968,4523905,0.004,0.012,-0.009,142.1,+10.81
-STT,State Street Corporation,core,Asset Management & Custody Banks,金融,0.733,-0.62,7751418,10577580,0.008,0.029,-0.021,169.7,+0.81
-CDE,"Coeur Mining, Inc.",hot,,不明,0.733,-0.71,24911080,34004886,0.027,0.076,-0.049,13.0,-14.99
-HWM,Howmet Aerospace,core,Aerospace & Defense,資本財,0.731,-0.51,39057868,53457546,0.042,0.148,-0.106,204.9,-3.54
-CLF,Cleveland-Cliffs Inc.,hot,,不明,0.727,-0.35,13464089,18508560,0.014,0.060,-0.045,14.0,+0.75
-VAC,Marriott Vacations Worldwide Co,hot,,不明,0.720,-0.50,1032725,1433827,0.001,0.004,-0.003,115.2,+1.67
-KEYS,Keysight Technologies,core,Electronic Equipment & Instruments,情報技術,0.715,-0.65,11937441,16690195,0.013,0.049,-0.036,313.1,-8.16
-PSA,Public Storage,core,Self-Storage REITs,不動産,0.707,-0.39,8089262,11437675,0.009,0.039,-0.030,322.8,+6.78
-KMI,Kinder Morgan,core,Oil & Gas Storage & Transportation,エネルギー,0.706,-0.62,20456826,28991460,0.022,0.084,-0.062,34.1,+0.92
-TTMI,"TTM Technologies, Inc.",hot,,不明,0.705,-0.59,20425369,28956097,0.022,0.086,-0.064,83.2,-16.75
-LUV,Southwest Airlines,core,Passenger Airlines,資本財,0.701,-0.64,9917729,14139472,0.011,0.040,-0.030,42.3,+6.59
-LCID,"Lucid Group, Inc.",hot,,不明,0.701,-0.69,1365615,1947152,0.001,0.005,-0.003,3.1,-9.97
-ELPC,Companhia Paranaense de Energia,hot,,不明,0.698,-0.29,376664,539294,0.000,0.003,-0.003,10.5,-24.77
-OII,"Oceaneering International, Inc.",hot,,不明,0.694,-0.64,1835052,2644844,0.002,0.008,-0.006,41.0,-8.10
-SNA,Snap-on,core,Industrial Machinery & Supplies & Components,資本財,0.689,-0.59,6528614,9474391,0.007,0.031,-0.024,357.9,-2.36
-ROK,Rockwell Automation,core,Electrical Components & Equipment,資本財,0.689,-0.59,9787751,14210361,0.010,0.045,-0.034,443.8,+2.70
-AIG,American International Group,core,Multi-line Insurance,金融,0.688,-0.66,7925223,11511582,0.008,0.037,-0.028,81.9,-0.01
-PRAX,"Praxis Precision Medicines, Inc",hot,,不明,0.687,-0.60,2946474,4289928,0.003,0.012,-0.009,281.0,+4.46
-CINF,Cincinnati Financial,core,Property & Casualty Insurance,金融,0.685,-0.59,3638483,5309335,0.004,0.016,-0.012,183.2,+6.20
-PNW,Pinnacle West Capital,core,Multi-Utilities,公益事業,0.685,-0.53,2875469,4198164,0.003,0.015,-0.012,106.8,+3.17
-SBAC,SBA Communications,core,Telecom Tower REITs,不動産,0.684,-0.53,7183205,10500314,0.008,0.034,-0.026,187.2,+3.68
-EQIX,Equinix,core,Data Center REITs,不動産,0.684,-0.66,24470539,35771151,0.026,0.087,-0.061,1012.6,+1.35
-MMYT,MakeMyTrip Limited,hot,,不明,0.681,-0.60,1219134,1789793,0.001,0.005,-0.004,41.9,-7.10
-DNTH,"Dianthus Therapeutics, Inc.",hot,,不明,0.680,-0.50,1146618,1685231,0.001,0.006,-0.005,81.9,+2.34
-HAS,Hasbro,core,Leisure Products,一般消費財,0.679,-0.51,10498944,15471531,0.011,0.044,-0.032,118.6,+7.81
-URI,United Rentals,core,Trading Companies & Distributors,資本財,0.679,-0.64,23028435,33937146,0.025,0.088,-0.064,1172.8,+11.97
-STEP,StepStone Group Inc.,hot,,不明,0.674,-0.55,722131,1072011,0.001,0.003,-0.002,43.2,+0.85
-CLDX,"Celldex Therapeutics, Inc.",hot,,不明,0.673,-0.60,677579,1007539,0.001,0.003,-0.002,29.3,-3.76
-MTB,M&T Bank,core,Regional Banks,金融,0.672,-0.64,5279237,7859090,0.006,0.021,-0.016,221.6,+1.09
-APTV,Aptiv,core,Automotive Parts & Equipment,一般消費財,0.672,-0.73,3340182,4973695,0.004,0.014,-0.010,44.2,-1.77
-AIZ,Assurant,core,Multi-line Insurance,金融,0.656,-0.41,2236081,3409445,0.002,0.012,-0.010,293.4,+2.81
-MSI,Motorola Solutions,core,Communications Equipment,情報技術,0.651,-0.59,12628403,19407536,0.014,0.055,-0.041,490.5,+4.65
-WRB,W. R. Berkley Corporation,core,Property & Casualty Insurance,金融,0.647,-0.60,4001889,6185663,0.004,0.018,-0.013,74.0,+0.85
-FCNCA,"First Citizens BancShares, Inc.",hot,,不明,0.641,-0.61,8015262,12498578,0.009,0.041,-0.033,2356.7,+10.10
-ZLAB,Zai Lab Limited,hot,,不明,0.639,-0.57,1056647,1654046,0.001,0.005,-0.004,21.9,-14.04
-BR,Broadridge Financial Solutions,core,Data Processing & Outsourced Services,資本財,0.631,-0.64,4019406,6368927,0.004,0.017,-0.013,179.7,+0.51
-SOLV,Solventum,core,Health Care Technology,ヘルスケア,0.624,-0.54,2467954,3956799,0.003,0.012,-0.009,82.1,-4.27
-MOH,Molina Healthcare Inc,hot,,不明,0.619,-0.65,5540832,8949549,0.006,0.026,-0.020,200.0,-9.59
-ROL,"Rollins, Inc.",core,Environmental & Facilities Services,資本財,0.617,-0.39,8042993,13028771,0.009,0.044,-0.035,35.0,+5.23
-WAB,Wabtec,core,Construction Machinery & Heavy Transportation Equipment,資本財,0.616,-0.62,8751990,14214191,0.009,0.048,-0.038,283.9,+1.63
-BBD,Banco Bradesco Sa,hot,,不明,0.609,-0.65,9967985,16370599,0.011,0.041,-0.030,2.6,-37.41
-SLGN,Silgan Holdings Inc.,hot,,不明,0.607,-0.63,1216977,2004352,0.001,0.006,-0.005,40.0,+0.74
-UNP,Union Pacific Corporation,core,Rail Transportation,資本財,0.597,-0.54,20692937,34678644,0.022,0.112,-0.090,301.9,+4.84
-AMR,"Alpha Metallurgical Resources,",hot,,不明,0.596,-0.70,1057475,1775426,0.001,0.005,-0.004,160.3,+0.69
-HL,Hecla Mining Company,hot,,不明,0.585,-0.59,16160820,27614517,0.017,0.075,-0.057,13.5,-10.94
-AEE,Ameren,core,Multi-Utilities,公益事業,0.585,-0.38,3526562,6033130,0.004,0.020,-0.016,110.7,+3.76
-PPG,PPG Industries,core,Specialty Chemicals,素材,0.577,-0.59,4917480,8521346,0.005,0.032,-0.027,119.7,+10.21
-WAY,Waystar Holding Corp.,hot,,不明,0.575,-0.66,1088861,1894047,0.001,0.005,-0.004,28.1,-2.33
-FRVO,Fervo Energy Company,hot,,不明,0.571,-0.84,1862737,3261317,0.002,0.008,-0.006,8.6,-9.87
-HLT,Hilton Worldwide,core,"Hotels, Resorts & Cruise Lines",一般消費財,0.567,-0.83,24140093,42548397,0.026,0.109,-0.083,356.1,-0.65
-PKG,Packaging Corporation of America,core,Paper & Plastic Packaging Products & Materials,素材,0.553,-0.67,5241561,9482179,0.006,0.028,-0.023,254.8,+6.32
-CPAY,Corpay,core,Transaction & Payment Processing Services,金融,0.551,-0.68,3831006,6950848,0.004,0.021,-0.017,398.0,-2.69
-STLD,Steel Dynamics,core,Steel,素材,0.546,-0.63,6399552,11714080,0.007,0.033,-0.026,250.9,+2.94
-RELY,"Remitly Global, Inc.",hot,,不明,0.534,-0.69,1197651,2242103,0.001,0.006,-0.005,23.9,-1.34
-NE,Noble Corporation plc A,hot,,不明,0.519,-0.68,2010363,3874753,0.002,0.011,-0.009,48.8,+13.77
-CUBI,"Customers Bancorp, Inc",hot,,不明,0.516,-0.61,678984,1315605,0.001,0.004,-0.003,85.3,+11.59
-YMM,Full Truck Alliance Co. Ltd.,hot,,不明,0.516,-0.62,1942120,3765171,0.002,0.011,-0.009,8.2,-4.79
-EXE,Expand Energy,core,Oil & Gas Exploration & Production,エネルギー,0.513,-0.75,8103078,15798804,0.009,0.042,-0.033,91.2,-0.40
-PCG,PG&E Corporation,core,Multi-Utilities,公益事業,0.511,-0.71,11676876,22840531,0.013,0.062,-0.049,13.2,-0.34
-JBS,JBS N.V.,hot,,不明,0.510,-0.72,2656842,5209675,0.003,0.014,-0.011,12.5,-1.19
-APPN,Appian Corporation,hot,,不明,0.509,-0.57,1898043,3728671,0.002,0.010,-0.008,49.1,+10.18
-DPC,DPC Holdings PLC,hot,,不明,0.489,-0.48,1152072,2358355,0.001,0.007,-0.006,27.2,-9.14
-FICO,Fair Isaac,core,Application Software,情報技術,0.484,-0.58,15185945,31352470,0.016,0.112,-0.096,710.8,-10.61
-RMBS,"Rambus, Inc.",hot,,不明,0.478,-0.69,4617450,9651116,0.005,0.027,-0.022,86.3,-8.65
-COMP,"Compass, Inc.",hot,,不明,0.477,-0.66,3083773,6459420,0.003,0.020,-0.017,9.3,-5.40
-HUBB,Hubbell Incorporated,core,Industrial Machinery & Supplies & Components,資本財,0.473,-0.65,9348008,19745179,0.010,0.058,-0.048,431.0,-7.52
-PAGS,PagSeguro Digital Ltd.,hot,,不明,0.462,-0.63,1183832,2562501,0.001,0.009,-0.008,7.9,-31.65
-IEX,IDEX Corporation,core,Industrial Machinery & Supplies & Components,資本財,0.461,-0.72,4869813,10570715,0.005,0.032,-0.027,237.0,+1.41
-NSC,Norfolk Southern,core,Rail Transportation,資本財,0.443,-0.73,5111860,11537640,0.005,0.034,-0.029,341.1,+4.50
-IONS,"Ionis Pharmaceuticals, Inc.",hot,,不明,0.430,-0.67,1751309,4074722,0.002,0.014,-0.012,43.7,-4.25
-MMED,"MiniMed Group, Inc.",hot,,不明,0.427,-0.74,3213907,7534835,0.003,0.021,-0.017,19.1,+10.40
-ARE,Alexandria Real Estate Equities,core,Office REITs,不動産,0.419,-0.77,2494705,5955180,0.003,0.018,-0.015,40.0,-6.63
-RAPP,"Rapport Therapeutics, Inc.",hot,,不明,0.411,-0.65,804395,1958669,0.001,0.007,-0.006,24.1,-18.18
-REXR,"Rexford Industrial Realty, Inc.",hot,,不明,0.404,-0.75,2212572,5472871,0.002,0.017,-0.014,38.4,+2.99
-GL,Globe Life,core,Life & Health Insurance,金融,0.397,-0.64,1962908,4945609,0.002,0.017,-0.015,160.3,-5.57
-PCVX,"Vaxcyte, Inc.",hot,,不明,0.346,-0.92,2494560,7200296,0.003,0.019,-0.017,61.4,-8.25
-BXP,"BXP, Inc.",core,Office REITs,不動産,0.309,-0.85,1447694,4681909,0.002,0.013,-0.012,62.9,+6.07
-FIZZ,National Beverage Corp.,hot,,不明,0.305,-0.97,142563,467171,0.000,0.001,-0.001,35.7,+2.54
-NICE,NICE Ltd,hot,,不明,0.304,-0.92,880003,2890061,0.001,0.009,-0.008,115.1,+1.03
-TDS,"Telephone and Data Systems, Inc",hot,,不明,0.248,-0.75,920975,3710792,0.001,0.011,-0.010,34.3,+0.22
-IRON,"Disc Medicine, Inc.",hot,,不明,0.172,-0.50,708809,4127234,0.001,0.015,-0.014,80.8,+5.14
-WFRD,Weatherford International plc,hot,,不明,0.163,-1.03,1019343,6242540,0.001,0.017,-0.016,89.7,+7.51
+WBD,Warner Bros. Discovery,leader,Broadcasting,コミュニケーション・サービス,22.076,10.06,1353396425,61305648,1.618,0.223,+1.395,31.0,+0.52
+NVDA,Nvidia,leader,Semiconductors,半導体,15.463,2.37,19903628533,1287205465,23.802,9.561,+14.240,206.1,-6.78
+COO,Cooper Companies (The),core,Health Care Supplies,ヘルスケア,12.706,7.12,69480189,5468407,0.083,0.019,+0.064,60.0,+2.03
+LLY,Lilly (Eli),core,Pharmaceuticals,ヘルスケア,11.756,3.01,1710393328,145492873,2.045,0.602,+1.443,1421.9,+12.19
+REGN,Regeneron Pharmaceuticals,leader,Biotechnology,ヘルスケア,10.802,3.82,260762439,24140537,0.312,0.079,+0.232,912.4,+13.33
+GOOGL,Alphabet Inc. (Class A),leader,Interactive Media & Services,コミュニケーション・サービス,10.798,0.74,6251518438,578948992,7.476,4.396,+3.080,280.1,-15.54
+ERIE,Erie Indemnity,core,Insurance Brokers,金融,10.227,5.56,18983005,1856236,0.023,0.005,+0.017,260.6,+6.33
+CTVA,Corteva,core,Fertilizers & Agricultural Chemicals,素材,7.949,3.45,63298183,7963310,0.076,0.028,+0.048,11.7,-9.12
+CDNA,"CareDx, Inc.",hot,,不明,7.930,3.00,28259787,3563866,0.034,0.012,+0.022,87.9,+27.13
+RMD,ResMed,core,Health Care Equipment,ヘルスケア,7.422,3.75,87631653,11807385,0.105,0.038,+0.067,233.9,-4.80
+BALL,Ball Corporation,core,"Metal, Glass & Plastic Containers",素材,7.286,5.89,32853512,4509185,0.039,0.013,+0.026,65.5,+2.22
+RDDT,"Reddit, Inc.",hot,,コミュニケーション・サービス,6.934,2.34,253626031,36578319,0.303,0.136,+0.167,96.2,-38.07
+AVGO,Broadcom,leader,Semiconductors,半導体,6.689,2.29,2069538391,309407954,2.475,1.134,+1.341,327.4,-2.90
+KDP,Keurig Dr Pepper,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,6.350,2.38,121393534,19116746,0.145,0.068,+0.077,35.9,+3.81
+CAI,"Caris Life Sciences, Inc.",hot,,不明,6.301,3.69,27355006,4341268,0.033,0.014,+0.019,34.1,+8.91
+INTC,Intel,leader,Semiconductors,半導体,6.194,1.63,2592191564,418513083,3.100,1.388,+1.712,65.9,-29.67
+QCOM,Qualcomm,leader,Semiconductors,半導体,6.032,4.38,374903094,62155817,0.448,0.179,+0.269,167.4,-4.01
+TSLA,"Tesla, Inc.",leader,Automobile Manufacturers,一般消費財,5.835,0.29,5534638619,948579859,6.619,8.100,-1.482,397.6,+3.91
+SYK,Stryker Corporation,core,Health Care Equipment,ヘルスケア,5.497,2.65,186950512,34006829,0.224,0.101,+0.122,294.5,-1.95
+TFX,Teleflex Incorporated,hot,,不明,5.242,1.81,18436018,3516833,0.022,0.013,+0.009,141.2,+8.06
+COIN,Coinbase,core,Financial Exchanges & Data,金融,5.241,4.01,288850428,55112701,0.345,0.150,+0.195,138.5,-20.18
+ZBRA,Zebra Technologies,core,Electronic Equipment & Instruments,情報技術,5.075,3.42,43278438,8527724,0.052,0.025,+0.027,346.3,-10.13
+RBLX,Roblox Corporation,hot,,不明,5.028,1.53,91454900,18189065,0.109,0.070,+0.040,43.9,-16.00
+ES,Eversource Energy,core,Electric Utilities,公益事業,5.008,1.22,34504991,6890189,0.041,0.026,+0.015,68.2,+3.88
+MDLZ,Mondelez International,leader,Packaged Foods & Meats,生活必需品,4.923,1.59,92497211,18787719,0.111,0.059,+0.052,64.5,+1.33
+IAG,Iamgold Corporation,hot,,不明,4.889,2.28,17300420,3538476,0.021,0.012,+0.009,15.5,-13.57
+ILMN,"Illumina, Inc.",core,Life Sciences Tools & Services,ヘルスケア,4.655,3.10,129689860,27862801,0.155,0.076,+0.079,248.8,-7.17
+PTCT,"PTC Therapeutics, Inc.",hot,,不明,4.642,1.78,9746794,2099486,0.012,0.007,+0.004,63.8,+1.66
+AMZN,Amazon,leader,Broadline Retail,一般消費財,4.638,1.48,2094537169,451569892,2.505,1.528,+0.976,237.9,-8.54
+DDOG,Datadog,leader,Application Software,情報技術,4.590,3.36,165488276,36057539,0.198,0.103,+0.095,238.7,-9.23
+HTFL,"Heartflow, Inc.",hot,,不明,4.494,2.09,16203382,3605445,0.019,0.011,+0.008,57.6,+3.39
+HLN,Haleon plc,hot,,不明,4.432,2.13,56274253,12697484,0.067,0.036,+0.032,8.8,-13.40
+FDXF,FedEx Freight,core,Cargo Ground Transportation,資本財,4.386,2.56,25874946,5898832,0.031,0.017,+0.014,124.3,+13.28
+PURR,Hyperliquid Strategies Inc,hot,,不明,4.359,0.93,27584585,6327793,0.033,0.026,+0.007,11.2,+18.62
+VSXY,Victorias Secret & Co.,hot,,不明,4.282,1.94,25082046,5857144,0.030,0.019,+0.011,94.0,+5.87
+FDX,FedEx,core,Air Freight & Logistics,資本財,4.213,2.15,73699966,17494102,0.088,0.054,+0.034,315.7,+4.88
+SBUX,Starbucks,leader,Restaurants,一般消費財,4.162,2.65,136556792,32807908,0.163,0.094,+0.070,103.0,+4.34
+A,Agilent Technologies,core,Life Sciences Tools & Services,ヘルスケア,4.093,2.61,65831081,16082080,0.079,0.047,+0.032,175.4,-0.03
+LNT,Alliant Energy,core,Electric Utilities,公益事業,4.080,1.96,30631299,7507153,0.037,0.023,+0.014,71.6,+4.47
+CDW,CDW Corporation,core,Technology Distributors,情報技術,4.070,1.95,39215846,9635975,0.047,0.029,+0.018,146.0,-6.32
+SJM,J.M. Smucker Company (The),core,Packaged Foods & Meats,生活必需品,4.043,2.11,21100111,5219552,0.025,0.015,+0.010,130.8,+1.32
+DXC,DXC Technology Company,hot,,不明,4.016,0.62,10793394,2687604,0.013,0.012,+0.001,13.8,-5.14
+TTWO,Take-Two Interactive,leader,Interactive Home Entertainment,コミュニケーション・サービス,4.010,0.89,72616575,18111110,0.087,0.066,+0.021,192.7,-6.23
+VRTX,Vertex Pharmaceuticals,leader,Biotechnology,ヘルスケア,3.834,2.56,111928920,29192693,0.134,0.079,+0.055,554.1,+8.40
+NTAP,NetApp,core,"Technology Hardware, Storage & Peripherals",情報技術,3.787,1.66,55526211,14661807,0.066,0.044,+0.022,199.8,-6.64
+HPQ,HP Inc.,core,"Technology Hardware, Storage & Peripherals",情報技術,3.770,1.09,65472486,17367531,0.078,0.056,+0.022,29.0,-7.10
+HONA,Honeywell Aerospace,leader,Aerospace & Defense,資本財,3.747,1.33,87497453,23350842,0.105,0.076,+0.029,156.4,-2.36
+FER,Ferrovial N.V. Ordinary Shares,leader,,不明,3.742,1.36,19383139,5179329,0.023,0.017,+0.006,56.8,+13.86
+DVA,DaVita,core,Health Care Services,ヘルスケア,3.699,0.52,24623376,6656651,0.029,0.029,+0.000,180.4,+3.97
+ABVX,Abivax SA,hot,,不明,3.640,2.24,10842693,2978683,0.013,0.009,+0.004,87.8,-6.91
+MPWR,Monolithic Power Systems,leader,Semiconductors,半導体,3.567,1.61,140188396,39299649,0.168,0.113,+0.055,1220.6,-3.56
+LITE,Lumentum,leader,Communications Equipment,情報技術,3.519,1.62,867904857,246663986,1.038,0.708,+0.330,813.1,-6.01
+ARM,Arm Holdings plc American Depositary Shares,leader,,不明,3.507,1.94,149019520,42486436,0.178,0.125,+0.053,205.1,-9.47
+TWST,Twist Bioscience Corporation,hot,,不明,3.491,1.66,56403510,16156072,0.067,0.050,+0.017,156.7,+10.35
+GRAL,"GRAIL, Inc.",hot,,不明,3.480,2.75,19826801,5697993,0.024,0.015,+0.008,143.5,+15.23
+AGIO,"Agios Pharmaceuticals, Inc.",hot,,不明,3.464,1.03,4694859,1355191,0.006,0.004,+0.001,30.7,-16.09
+BAX,Baxter International,core,Health Care Equipment,ヘルスケア,3.431,0.99,24847280,7241600,0.030,0.026,+0.004,23.1,-5.41
+MRVL,Marvell Technology,leader,Semiconductors,半導体,3.416,1.57,718923004,210450733,0.860,0.612,+0.247,201.0,-19.22
+CL,Colgate-Palmolive,core,Household Products,生活必需品,3.396,1.20,62969925,18541643,0.075,0.057,+0.018,95.6,+1.69
+COHR,Coherent Corp.,core,Electronic Components,情報技術,3.369,1.00,310463302,92160804,0.371,0.273,+0.098,207.5,-13.54
+PSKY,Paramount Skydance Corporation,core,Movies & Entertainment,コミュニケーション・サービス,3.367,2.43,52811931,15685882,0.063,0.039,+0.024,9.8,-4.03
+SNOW,Snowflake Inc.,hot,,不明,3.289,1.37,175202919,53265746,0.210,0.152,+0.058,303.3,-5.99
+IOVA,"Iovance Biotherapeutics, Inc.",hot,,不明,3.286,0.96,25897975,7880600,0.031,0.027,+0.004,8.6,-43.40
+EXC,Exelon,leader,Electric Utilities,公益事業,3.253,0.98,38888962,11956212,0.047,0.040,+0.007,46.4,+7.55
+CHD,Church & Dwight,core,Household Products,生活必需品,3.212,0.89,28137891,8760152,0.034,0.028,+0.005,107.6,+2.13
+DE,Deere & Company,core,Agricultural & Farm Machinery,資本財,3.205,2.17,88633614,27653378,0.106,0.073,+0.033,671.3,+6.11
+EG,Everest Group,core,Reinsurance,金融,3.201,0.41,22880715,7147174,0.027,0.030,-0.003,409.0,+4.04
+INCY,Incyte,core,Biotechnology,ヘルスケア,3.183,1.38,29813222,9367812,0.036,0.029,+0.007,120.4,+3.85
+META,Meta Platforms,leader,Interactive Media & Services,コミュニケーション・サービス,3.173,0.68,3419776538,1077686460,4.090,3.614,+0.476,619.1,-11.17
+SEI,"Solaris Energy Infrastructure,",hot,,不明,3.163,1.19,23689875,7490585,0.028,0.024,+0.004,70.8,+3.64
+DASH,DoorDash,leader,Specialized Consumer Services,一般消費財,3.142,0.70,118917621,37845141,0.142,0.136,+0.006,183.0,-3.02
+GILD,Gilead Sciences,leader,Biotechnology,ヘルスケア,3.126,1.30,122678705,39243752,0.147,0.118,+0.029,171.6,+11.42
+GD,General Dynamics,core,Aerospace & Defense,資本財,3.125,1.08,52384625,16765196,0.063,0.052,+0.011,374.3,+8.07
+BBY,Best Buy,core,Computer & Electronics Retail,一般消費財,3.104,0.94,33298668,10729083,0.040,0.034,+0.006,95.1,+1.16
+IR,Ingersoll Rand,core,Industrial Machinery & Supplies & Components,資本財,3.067,0.72,47707913,15554903,0.057,0.056,+0.001,79.7,+0.79
+TWLO,Twilio Inc.,hot,,不明,3.063,0.41,85500361,27909626,0.102,0.104,-0.002,200.6,-23.17
+TYL,Tyler Technologies,core,Application Software,情報技術,3.052,0.96,46337245,15184973,0.055,0.050,+0.005,392.4,+5.08
+DXCM,Dexcom,leader,Health Care Equipment,ヘルスケア,3.022,1.63,71461301,23646956,0.085,0.067,+0.019,83.7,-1.38
+AMD,Advanced Micro Devices,leader,Semiconductors,半導体,2.995,0.81,1508658599,503721215,1.804,1.586,+0.218,511.0,-7.62
+IDXX,Idexx Laboratories,leader,Health Care Equipment,ヘルスケア,2.981,2.45,33604194,11272695,0.040,0.028,+0.012,564.0,+1.92
+MBX,"MBX Biosciences, Inc.",hot,,不明,2.979,0.69,2792731,937469,0.003,0.003,+0.000,54.9,+0.33
+ADSK,Autodesk,leader,Application Software,情報技術,2.932,1.37,42688033,14559008,0.051,0.041,+0.010,249.2,+2.59
+LMND,"Lemonade, Inc.",hot,,不明,2.927,1.47,5216400,1782151,0.006,0.005,+0.001,43.9,-4.80
+AUGO,Aura Minerals Inc.,hot,,不明,2.923,1.84,8463685,2895158,0.010,0.008,+0.002,69.7,-19.36
+CNH,CNH Industrial N.V.,hot,,不明,2.902,0.14,23679490,8160739,0.028,0.039,-0.011,11.7,+1.30
+SNDK,Sandisk,leader,"Technology Hardware, Storage & Peripherals",情報技術,2.853,1.34,1522442098,533721619,1.821,1.532,+0.289,1191.2,-15.79
+FORM,"FormFactor, Inc.",hot,,不明,2.829,1.14,21052081,7442021,0.025,0.022,+0.003,88.6,-20.70
+QUBT,Quantum Computing Inc.,hot,,不明,2.808,1.80,4570400,1627611,0.005,0.005,+0.001,6.6,-1.55
+TSEM,Tower Semiconductor Ltd.,hot,,不明,2.796,1.19,52428665,18748612,0.063,0.055,+0.008,167.2,-12.40
+AXTI,AXT Inc,hot,,不明,2.796,1.53,72856652,26060775,0.087,0.071,+0.017,54.6,-9.74
+TEAM,Atlassian Corporation,hot,,不明,2.791,1.13,65854307,23598327,0.079,0.072,+0.007,196.8,-11.15
+ORLY,O’Reilly Automotive,leader,Automotive Retail,一般消費財,2.785,0.71,52446420,18833216,0.063,0.065,-0.002,89.4,+0.14
+TMUS,T-Mobile US,leader,Wireless Telecommunication Services,コミュニケーション・サービス,2.773,1.52,145735829,52556761,0.174,0.147,+0.027,155.1,+1.96
+APP,AppLovin,leader,Application Software,コミュニケーション・サービス,2.766,1.39,91800312,33183122,0.110,0.095,+0.015,236.0,-12.24
+MCHP,Microchip Technology,leader,Semiconductors,半導体,2.755,0.93,76146357,27641457,0.091,0.085,+0.006,77.8,+2.26
+FTNT,Fortinet,leader,Systems Software,情報技術,2.753,0.57,97828832,35531434,0.117,0.122,-0.005,135.1,-20.29
+ALNY,"Alnylam Pharmaceuticals, Inc.",leader,,不明,2.746,0.25,55916052,20360008,0.067,0.087,-0.020,172.6,-24.82
+AEO,"American Eagle Outfitters, Inc.",hot,,不明,2.731,0.57,10000710,3662585,0.012,0.012,-0.000,19.4,+9.37
+DELL,Dell Technologies,core,"Technology Hardware, Storage & Peripherals",情報技術,2.724,0.62,318061670,116778445,0.380,0.385,-0.005,432.4,-13.26
+ALAB,"Astera Labs, Inc. Common Stock",leader,,不明,2.713,1.10,108827431,40111743,0.130,0.117,+0.013,262.0,-10.03
+KLAC,KLA Corporation,leader,Semiconductor Materials & Equipment,半導体,2.708,1.45,226172397,83534798,0.270,0.220,+0.051,162.4,-0.56
+DHT,"DHT Holdings, Inc.",hot,,不明,2.683,0.46,15168629,5652790,0.018,0.019,-0.001,24.7,+5.60
+FCX,Freeport-McMoRan,core,Copper,素材,2.665,0.91,95400853,35796726,0.114,0.104,+0.010,63.5,-7.08
+TXT,Textron,core,Aerospace & Defense,資本財,2.655,0.43,12477876,4699443,0.015,0.018,-0.003,86.1,+11.17
+KVUE,Kenvue,core,Personal Care Products,生活必需品,2.655,1.64,35853423,13504269,0.043,0.035,+0.008,19.4,+0.91
+C,Citigroup,core,Diversified Banks,金融,2.639,1.22,98270782,37236563,0.118,0.107,+0.010,122.6,-0.67
+ALGN,Align Technology,core,Health Care Supplies,ヘルスケア,2.624,0.98,19424826,7401582,0.023,0.022,+0.001,149.2,-0.82
+GDDY,GoDaddy,core,Internet Services & Infrastructure,情報技術,2.577,0.94,20623045,8002387,0.025,0.024,+0.001,110.5,+1.05
+FRT,Federal Realty Investment Trust,core,Retail REITs,不動産,2.543,0.42,10162379,3996753,0.012,0.013,-0.001,109.8,+3.18
+PDD,PDD Holdings Inc. American Depositary Shares,leader,,不明,2.526,0.50,34771322,13763719,0.042,0.051,-0.009,79.4,-1.22
+AAOI,"Applied Optoelectronics, Inc.",hot,,不明,2.494,1.88,106034025,42515581,0.127,0.104,+0.023,69.6,-12.90
+CMCSA,Comcast,leader,Cable & Satellite,コミュニケーション・サービス,2.490,0.94,80225975,32213041,0.096,0.098,-0.002,23.0,+4.57
+OKTA,"Okta, Inc.",hot,,不明,2.488,1.77,85098093,34209108,0.102,0.089,+0.013,208.9,+7.21
+ZTS,Zoetis,core,Pharmaceuticals,ヘルスケア,2.486,0.89,27903543,11224809,0.033,0.033,+0.001,79.9,+0.73
+GOOG,Alphabet Inc. (Class C),leader,Interactive Media & Services,コミュニケーション・サービス,2.482,0.07,745755592,300439442,0.892,1.376,-0.484,278.9,-14.99
+MO,Altria,core,Tobacco,生活必需品,2.456,0.38,48557009,19772369,0.058,0.068,-0.010,77.8,+5.01
+KSPI,Joint Stock Company Kaspi.kz -,hot,,不明,2.454,0.81,5957937,2427566,0.007,0.007,+0.000,93.0,+0.77
+XOM,ExxonMobil,core,Integrated Oil & Gas,エネルギー,2.437,0.90,234141649,96068488,0.280,0.283,-0.003,186.4,+5.02
+WY,Weyerhaeuser,core,Timber REITs,不動産,2.436,1.21,18843193,7736548,0.023,0.021,+0.001,20.1,+3.91
+PLTR,Palantir Technologies,leader,Application Software,情報技術,2.435,0.49,434952217,178595494,0.520,0.564,-0.044,187.1,-2.42
+NET,"Cloudflare, Inc.",hot,,不明,2.419,0.48,152712540,63128210,0.183,0.192,-0.009,283.0,-5.61
+WU,Western Union Company (The),hot,,不明,2.408,1.06,5206825,2162377,0.006,0.006,+0.000,6.1,-1.53
+COST,Costco,leader,Consumer Staples Merchandise Retail,生活必需品,2.408,1.13,177741756,73819249,0.213,0.206,+0.007,1010.2,+2.10
+OKLO,Oklo Inc.,hot,,不明,2.398,1.75,23809176,9930573,0.028,0.025,+0.003,25.2,-10.21
+QNT,Quantinuum Inc.,hot,,不明,2.397,0.84,7500759,3129019,0.009,0.009,-0.000,34.3,-6.76
+NVO,Novo Nordisk A/S,hot,,不明,2.394,0.89,43163371,18028536,0.052,0.050,+0.001,39.8,+1.29
+INTU,Intuit,leader,Application Software,情報技術,2.391,0.42,90926979,38027819,0.109,0.124,-0.015,339.8,+1.62
+EW,Edwards Lifesciences,core,Health Care Equipment,ヘルスケア,2.389,0.83,28466937,11916946,0.034,0.034,-0.000,93.8,+7.06
+GEN,Gen Digital,core,Systems Software,情報技術,2.384,0.49,14597087,6123963,0.017,0.021,-0.003,28.5,+18.78
+ADI,Analog Devices,leader,Semiconductors,半導体,2.380,0.81,130148634,54676785,0.156,0.155,+0.001,415.2,+4.39
+CRWD,CrowdStrike,leader,Systems Software,情報技術,2.367,0.71,258563889,109234622,0.309,0.330,-0.021,253.4,+9.24
+MSTR,Strategy Inc Common Stock Class A,leader,,不明,2.367,1.41,296383828,125226895,0.354,0.313,+0.041,128.4,-11.72
+LHX,L3Harris,core,Aerospace & Defense,資本財,2.365,0.50,41268469,17451557,0.049,0.059,-0.010,277.2,+11.02
+WMT,Walmart,leader,Consumer Staples Merchandise Retail,生活必需品,2.364,0.42,199788592,84510583,0.239,0.264,-0.025,123.4,+5.67
+RBRK,"Rubrik, Inc.",hot,,不明,2.353,1.33,51015693,21676871,0.061,0.057,+0.004,126.2,+7.12
+RHI,Robert Half Inc.,hot,,不明,2.346,0.46,12236592,5215790,0.015,0.016,-0.002,43.7,+28.42
+LIN,Linde plc,leader,Industrial Gases,素材,2.334,1.30,104918626,44956675,0.125,0.116,+0.010,514.4,+3.34
+VIST,Vista Energy S.A.B. de C.V.,hot,,不明,2.309,0.39,8466163,3665887,0.010,0.011,-0.001,71.3,-0.29
+FFIV,"F5, Inc.",core,Communications Equipment,情報技術,2.294,0.26,45316324,19753927,0.054,0.074,-0.020,345.4,-24.41
+AMGN,Amgen,leader,Biotechnology,ヘルスケア,2.282,1.00,90639245,39714183,0.108,0.113,-0.004,468.8,+7.45
+BILL,"BILL Holdings, Inc.",hot,,不明,2.276,0.48,5738768,2521444,0.007,0.008,-0.001,48.5,-1.16
+PG,Procter & Gamble,core,Personal Care Products,生活必需品,2.272,0.47,136860225,60225378,0.164,0.190,-0.027,163.5,+3.43
+ADM,Archer Daniels Midland,core,Agricultural Products & Services,生活必需品,2.264,0.43,16801161,7419437,0.020,0.024,-0.004,77.2,-4.40
+ECO,Okeanis Eco Tankers Corp.,hot,,不明,2.262,1.04,8306315,3672295,0.010,0.010,-0.000,98.9,+12.19
+NI,NiSource,core,Multi-Utilities,公益事業,2.253,0.62,24333650,10801335,0.029,0.033,-0.004,44.7,+4.05
+NEE,NextEra Energy,core,Multi-Utilities,公益事業,2.252,1.14,101631098,45134643,0.122,0.118,+0.004,83.6,+5.21
+WELL,Welltower,core,Health Care REITs,不動産,2.250,0.42,66886459,29728963,0.080,0.099,-0.019,238.3,-0.23
+NXPI,NXP Semiconductors,leader,Semiconductors,半導体,2.245,0.44,102992710,45867920,0.123,0.144,-0.021,258.6,+8.86
+TIMB,TIM S.A.,hot,,不明,2.234,0.15,2172683,972356,0.003,0.004,-0.001,17.6,-7.36
+GNRC,Generac,core,Heavy Electrical Equipment,資本財,2.234,0.73,28667917,12830256,0.034,0.036,-0.002,195.6,-2.27
+TER,Teradyne,leader,Semiconductor Materials & Equipment,半導体,2.214,0.50,104924965,47385297,0.125,0.147,-0.021,274.1,-21.28
+FROG,JFrog Ltd.,hot,,不明,2.208,1.18,14087286,6381500,0.017,0.016,+0.000,91.8,-1.33
+CLX,Clorox,core,Household Products,生活必需品,2.201,0.78,22341082,10148188,0.027,0.028,-0.001,89.2,+2.81
+CAH,Cardinal Health,core,Health Care Distributors,ヘルスケア,2.197,0.57,31058197,14133877,0.037,0.042,-0.005,253.3,-1.15
+SDGR,"Schrodinger, Inc.",hot,,不明,2.190,0.40,4002792,1827962,0.005,0.006,-0.001,27.7,+17.99
+TXG,"10x Genomics, Inc.",hot,,不明,2.186,0.45,20542565,9397066,0.025,0.031,-0.006,71.3,-1.81
+BDORY,Banco Do Brasil SA,hot,,不明,2.169,-0.29,180096,83023,0.000,0.002,-0.001,3.0,-38.01
+S,"SentinelOne, Inc.",hot,,不明,2.165,0.39,22268254,10287359,0.027,0.033,-0.007,24.9,+11.56
+CSCO,Cisco,leader,Communications Equipment,情報技術,2.157,0.62,129331190,59971715,0.155,0.166,-0.012,104.5,-2.48
+BSY,"Bentley Systems, Incorporated",hot,,不明,2.156,0.37,7712157,3577427,0.009,0.012,-0.002,40.0,+5.80
+ZBH,Zimmer Biomet,core,Health Care Equipment,ヘルスケア,2.153,0.41,18787955,8724400,0.022,0.028,-0.006,96.7,+1.06
+QBTS,D-Wave Quantum Inc. Common Stock,hot,,不明,2.153,1.57,16986092,7887936,0.020,0.019,+0.001,10.7,-11.36
+FSLR,First Solar,core,Semiconductors,半導体,2.152,0.84,34008387,15802693,0.041,0.044,-0.003,174.6,-0.54
+FIX,Comfort Systems USA,core,Construction & Engineering,資本財,2.143,0.15,116799617,54493635,0.140,0.202,-0.063,1259.0,-12.49
+ABCL,AbCellera Biologics Inc.,hot,,不明,2.142,1.09,4660765,2175813,0.006,0.006,-0.000,12.1,+2.98
+MSFT,Microsoft,leader,Systems Software,情報技術,2.117,-0.07,1011549016,477869147,1.210,2.433,-1.224,522.5,-0.54
+CVNA,Carvana,core,Automotive Retail,一般消費財,2.115,0.31,59058797,27929940,0.071,0.093,-0.022,67.5,+10.77
+WIX,Wix.com Ltd.,hot,,不明,2.114,0.46,4790313,2265830,0.006,0.007,-0.001,78.6,+1.05
+DPZ,Domino's,core,Restaurants,一般消費財,2.103,0.67,18035896,8574326,0.022,0.023,-0.002,313.3,+0.27
+QLYS,"Qualys, Inc.",hot,,不明,2.100,0.75,20143183,9592537,0.024,0.027,-0.003,222.7,+17.32
+CRCL,"Circle Internet Group, Inc.",hot,,不明,2.097,0.85,81567503,38899770,0.098,0.105,-0.007,72.8,-16.27
+NWSA,News Corp (Class A),core,Publishing,コミュニケーション・サービス,2.082,0.57,8560239,4110938,0.010,0.012,-0.001,29.6,-2.24
+RVTY,Revvity,core,Health Care Equipment,ヘルスケア,2.081,0.43,25736000,12365479,0.031,0.038,-0.007,157.6,+0.34
+EMR,Emerson Electric,core,Electrical Components & Equipment,資本財,2.074,0.67,48565761,23410961,0.058,0.065,-0.007,167.6,+3.86
+NEM,Newmont,core,Gold,素材,2.074,0.84,70044187,33780427,0.084,0.091,-0.007,106.6,-8.87
+IOT,Samsara Inc.,hot,,不明,2.071,0.49,14148479,6830229,0.017,0.021,-0.004,41.4,-1.88
+ON,ON Semiconductor,core,Semiconductors,半導体,2.065,0.74,58407070,28282661,0.070,0.078,-0.008,71.8,-5.03
+ADBE,Adobe Inc.,leader,Application Software,情報技術,2.060,0.78,90394807,43883497,0.108,0.124,-0.016,253.7,+0.17
+P,"Everpure, Inc.",hot,,情報技術,2.058,1.15,36013918,17500205,0.043,0.043,-0.000,126.6,-3.76
+EQPT,EquipmentShare.com Inc,hot,,不明,2.056,0.58,4187979,2036799,0.005,0.006,-0.001,16.9,+5.25
+NCLH,Norwegian Cruise Line Holdings,core,"Hotels, Resorts & Cruise Lines",一般消費財,2.051,0.16,31621511,15420012,0.038,0.055,-0.017,17.5,+12.41
+IVZ,Invesco,core,Asset Management & Custody Banks,金融,2.039,0.58,16990804,8333430,0.020,0.023,-0.003,27.8,-4.44
+CVS,CVS Health,core,Health Care Services,ヘルスケア,2.038,0.24,44802047,21983301,0.054,0.073,-0.019,90.5,-4.59
+TRI,Thomson Reuters Corporation Common Shares,leader,,不明,2.036,0.49,18632290,9150287,0.022,0.027,-0.005,120.1,+7.56
+RXRX,"Recursion Pharmaceuticals, Inc.",hot,,不明,2.030,1.21,9394849,4628747,0.011,0.012,-0.001,3.9,+8.50
+WST,West Pharmaceutical Services,core,Health Care Supplies,ヘルスケア,2.027,0.32,29143711,14377579,0.035,0.047,-0.012,409.7,+5.06
+EL,Estée Lauder Companies (The),core,Personal Care Products,生活必需品,2.024,0.23,29632408,14640936,0.035,0.049,-0.013,107.6,+2.49
+SKHY,SK hynix Inc. - American Depos,hot,,不明,2.024,0.06,311433056,153902443,0.372,0.582,-0.209,150.5,+3.91
+BXP,"BXP, Inc.",core,Office REITs,不動産,2.010,0.50,9410251,4681909,0.011,0.014,-0.002,62.6,+5.55
+AJG,Arthur J. Gallagher & Co.,core,Insurance Brokers,金融,2.006,0.21,50290414,25072329,0.060,0.081,-0.021,271.7,+4.90
+OUST,"Ouster, Inc.",hot,,不明,2.001,0.81,7251125,3624326,0.009,0.010,-0.001,29.1,-5.20
+SNPS,Synopsys,leader,Application Software,情報技術,1.995,0.61,88829575,44525268,0.106,0.126,-0.020,468.8,+3.15
+PRAX,"Praxis Precision Medicines, Inc",hot,,不明,1.977,0.54,8494109,4296525,0.010,0.012,-0.002,283.5,+5.39
+APLD,Applied Digital Corporation,hot,,不明,1.977,0.63,45019459,22775162,0.054,0.065,-0.011,17.7,-13.35
+VICI,Vici Properties,core,Hotel & Resort REITs,不動産,1.976,0.55,20014726,10128126,0.024,0.029,-0.005,24.4,+4.56
+EXPE,Expedia Group,core,"Hotels, Resorts & Cruise Lines",一般消費財,1.972,0.66,28293464,14350213,0.034,0.039,-0.005,284.7,-4.33
+CCC,CCC Intelligent Solutions Holdi,hot,,不明,1.942,-0.00,13873458,7142550,0.017,0.029,-0.012,7.7,+0.50
+ABBV,AbbVie,core,Biotechnology,ヘルスケア,1.941,0.34,97449127,50201749,0.117,0.153,-0.036,293.8,+2.33
+BZ,KANZHUN LIMITED - American Depo,hot,,不明,1.932,0.29,5207460,2695094,0.006,0.009,-0.002,16.7,+3.31
+FUTU,Futu Holdings Limited,hot,,不明,1.930,0.40,7395353,3831482,0.009,0.011,-0.003,98.1,-7.02
+FAST,Fastenal,leader,Trading Companies & Distributors,資本財,1.926,0.92,29301669,15211341,0.035,0.038,-0.003,52.2,+1.01
+WRBY,Warby Parker Inc.,hot,,不明,1.922,0.27,4375377,2276997,0.005,0.007,-0.002,24.7,-2.72
+LULU,Lululemon Athletica,core,"Apparel, Accessories & Luxury Goods",一般消費財,1.921,0.46,38298288,19937781,0.046,0.057,-0.011,108.4,+10.01
+DLR,Digital Realty,core,Data Center REITs,不動産,1.920,0.46,40548988,21121978,0.048,0.058,-0.010,176.0,-0.76
+GRAB,Grab Holdings Limited,hot,,不明,1.914,0.99,15143962,7910604,0.018,0.019,-0.000,2.7,-6.57
+RF,Regions Financial Corporation,core,Regional Banks,金融,1.913,1.53,30110319,15736799,0.036,0.038,-0.002,28.7,+2.30
+COHU,"Cohu, Inc.",hot,,不明,1.913,0.27,5235891,2736799,0.006,0.009,-0.002,51.8,-5.54
+TDY,Teledyne Technologies,core,Electronic Equipment & Instruments,情報技術,1.912,0.54,25120434,13141577,0.030,0.036,-0.006,660.2,+3.50
+CIFR,Cipher Digital Inc.,hot,,不明,1.909,1.17,38778384,20312115,0.046,0.049,-0.003,7.6,-18.52
+CARR,Carrier Global,core,Building Products,資本財,1.893,0.05,28442157,15027087,0.034,0.055,-0.021,53.7,-4.62
+TXN,Texas Instruments,leader,Semiconductors,半導体,1.889,0.47,163889173,86752378,0.196,0.248,-0.052,302.7,+8.18
+INVX,"Innovex International, Inc.",hot,,不明,1.889,0.34,1640861,868797,0.002,0.003,-0.001,28.3,-1.90
+MELI,"Mercado Libre, Inc",leader,,不明,1.886,0.00,78696695,41737777,0.094,0.163,-0.069,1627.7,-12.78
+VTRS,Viatris,core,Pharmaceuticals,ヘルスケア,1.885,0.39,10157889,5388219,0.012,0.016,-0.004,19.1,+2.83
+BTG,B2Gold Corp,hot,,不明,1.880,1.54,14191300,7547781,0.017,0.018,-0.001,4.6,-11.46
+TKO,TKO Group Holdings,core,Movies & Entertainment,コミュニケーション・サービス,1.874,0.38,12743444,6798860,0.015,0.020,-0.005,181.5,+1.50
+VMRK,Vivmark Residential,core,Multi-Family Residential REITs,不動産,1.872,0.28,16825392,8988061,0.020,0.027,-0.007,61.7,-1.55
+BG,Bunge Global,core,Agricultural Products & Services,生活必需品,1.870,0.06,10017824,5358077,0.012,0.019,-0.007,96.9,-6.14
+BLSH,Bullish,hot,,不明,1.859,0.34,2535850,1363841,0.003,0.004,-0.001,25.5,-12.82
+ROP,Roper Technologies,leader,Electronic Equipment & Instruments,情報技術,1.857,0.42,46955185,25287423,0.056,0.074,-0.018,463.2,+17.01
+VLTO,Veralto,core,Environmental & Facilities Services,資本財,1.855,0.24,13142328,7085021,0.016,0.022,-0.007,113.5,+12.98
+MRSH,Marsh McLennan,core,Insurance Brokers,金融,1.854,0.46,32307959,17426021,0.039,0.049,-0.010,199.9,+4.75
+MNST,Monster Beverage,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,1.850,0.31,26420257,14277568,0.032,0.042,-0.010,46.9,+0.59
+PPL,PPL Corporation,core,Electric Utilities,公益事業,1.842,0.41,16382299,8893432,0.020,0.027,-0.007,35.9,+3.21
+VERA,"Vera Therapeutics, Inc.",hot,,不明,1.840,0.30,3985225,2165681,0.005,0.006,-0.002,30.1,+0.00
+CRH,CRH plc,core,Construction Materials,素材,1.839,0.28,35454611,19279826,0.042,0.060,-0.017,89.9,+5.05
+NTRA,"Natera, Inc.",hot,,不明,1.837,0.79,56923797,30986481,0.068,0.078,-0.010,420.7,+2.65
+ABNB,Airbnb,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.832,0.54,40378217,22036952,0.048,0.060,-0.012,165.4,-5.41
+MCD,McDonald's,core,Restaurants,一般消費財,1.830,0.62,91866771,50187203,0.110,0.136,-0.027,258.4,+5.62
+CBOE,Cboe Global Markets,core,Financial Exchanges & Data,金融,1.829,-0.02,34886056,19071835,0.042,0.075,-0.033,333.4,+5.95
+CSGP,CoStar Group,core,Real Estate Services,不動産,1.829,0.13,18022910,9855665,0.022,0.033,-0.012,29.7,-9.59
+V,Visa Inc.,core,Transaction & Payment Processing Services,金融,1.825,0.11,257064147,140895419,0.307,0.469,-0.162,413.6,+2.02
+NOW,ServiceNow,core,Systems Software,情報技術,1.822,0.16,265081212,145468293,0.317,0.475,-0.158,107.2,-28.33
+DOCN,"DigitalOcean Holdings, Inc.",hot,,不明,1.819,0.46,21618109,11881704,0.026,0.034,-0.008,89.5,-13.93
+ICE,Intercontinental Exchange,core,Financial Exchanges & Data,金融,1.816,0.32,47084824,25921983,0.056,0.076,-0.020,168.4,+6.85
+ORCL,Oracle Corporation,core,Application Software,情報技術,1.811,0.01,354194503,195570679,0.424,0.725,-0.302,132.8,+0.48
+CELH,"Celsius Holdings, Inc.",hot,,不明,1.811,0.67,11933164,6590877,0.014,0.017,-0.003,28.9,-2.73
+AXON,Axon Enterprise,leader,Aerospace & Defense,資本財,1.808,0.52,30042174,16614502,0.036,0.045,-0.009,429.2,+8.10
+CAT,Caterpillar Inc.,core,Construction Machinery & Heavy Transportation Equipment,資本財,1.808,0.15,188620420,104350479,0.226,0.335,-0.109,633.1,-13.90
+NBIS,Nebius Group N.V. Class A Ordinary Shares,leader,,不明,1.802,-0.03,291916249,161959739,0.349,0.641,-0.292,157.3,-11.46
+CART,Maplebear Inc.,hot,,不明,1.801,-0.12,38359356,21300114,0.046,0.109,-0.064,57.0,+12.69
+BMY,Bristol Myers Squibb,core,Pharmaceuticals,ヘルスケア,1.800,0.34,43612933,24222733,0.052,0.070,-0.018,62.4,+1.96
+BAC,Bank of America,core,Diversified Banks,金融,1.800,0.70,122508956,68079237,0.147,0.175,-0.029,50.2,-1.10
+OXY,Occidental Petroleum,core,Oil & Gas Exploration & Production,エネルギー,1.799,0.36,44491230,24725135,0.053,0.071,-0.017,63.5,+1.40
+KO,Coca-Cola Company (The),core,Soft Drinks & Non-alcoholic Beverages,生活必需品,1.796,0.54,123061433,68525017,0.147,0.191,-0.044,94.4,+1.27
+CSX,CSX Corporation,leader,Rail Transportation,資本財,1.788,0.18,48822010,27305571,0.058,0.087,-0.028,51.5,+7.21
+KMB,Kimberly-Clark,core,Household Products,生活必需品,1.785,0.47,39217751,21973640,0.047,0.061,-0.014,108.8,+0.94
+ACGL,Arch Capital Group,core,Property & Casualty Insurance,金融,1.784,0.23,16277963,9125005,0.019,0.028,-0.009,106.0,+4.76
+VG,"Venture Global, Inc.",hot,,不明,1.784,0.16,21194995,11881409,0.025,0.036,-0.011,14.7,+16.39
+VALE,VALE S.A.,hot,,不明,1.780,0.30,53415060,30002703,0.064,0.089,-0.025,11.5,-10.77
+SHOP,Shopify Inc. Class A subordinate voting shares,leader,,不明,1.774,0.42,83552576,47099107,0.100,0.134,-0.034,158.5,-8.25
+AKAM,Akamai Technologies,core,Internet Services & Infrastructure,情報技術,1.757,0.34,34084250,19403505,0.041,0.056,-0.015,94.3,+3.81
+JPM,JPMorgan Chase,core,Diversified Banks,金融,1.752,0.69,123362653,70395557,0.148,0.182,-0.034,338.7,+0.78
+MU,Micron Technology,leader,Semiconductors,半導体,1.746,-0.01,1925192256,1102528031,2.302,4.052,-1.750,890.3,-4.01
+HPE,Hewlett Packard Enterprise,core,"Technology Hardware, Storage & Peripherals",情報技術,1.746,0.57,57377060,32867388,0.069,0.089,-0.020,54.6,-7.23
+AVY,Avery Dennison,core,Paper & Plastic Packaging Products & Materials,素材,1.745,0.24,9471874,5429366,0.011,0.016,-0.005,180.7,+1.52
+ACMR,"ACM Research, Inc.",hot,,不明,1.739,0.32,4114397,2365850,0.005,0.007,-0.002,45.7,-18.70
+NWS,News Corp (Class B),core,Publishing,コミュニケーション・サービス,1.735,0.24,2430480,1400860,0.003,0.004,-0.001,32.5,-2.48
+KSS,Kohl's Corporation,hot,,不明,1.730,0.28,9018346,5213022,0.011,0.015,-0.004,23.4,+7.43
+VIV,Telefonica Brasil S.A.,hot,,不明,1.730,0.10,2078502,1201593,0.002,0.004,-0.001,11.3,-12.03
+AAPL,Apple Inc.,leader,"Technology Hardware, Storage & Peripherals",情報技術,1.721,-0.12,959596649,557611578,1.148,2.360,-1.212,346.3,+1.97
+ETR,Entergy,core,Electric Utilities,公益事業,1.721,0.11,14454292,8399780,0.017,0.027,-0.010,110.1,+3.77
+BHVN,Biohaven Ltd.,hot,,不明,1.719,-0.15,4182323,2433283,0.005,0.012,-0.007,15.3,+28.98
+EBAY,eBay Inc.,core,Broadline Retail,一般消費財,1.718,0.17,36749617,21396565,0.044,0.067,-0.023,122.2,+2.37
+NDAQ,"Nasdaq, Inc.",core,Financial Exchanges & Data,金融,1.715,0.32,32361771,18873302,0.039,0.053,-0.014,106.4,+12.71
+GPN,Global Payments,core,Transaction & Payment Processing Services,金融,1.711,0.00,13214386,7724124,0.016,0.027,-0.012,85.0,+0.55
+APD,Air Products,core,Industrial Gases,素材,1.709,0.36,17704584,10360988,0.021,0.029,-0.008,312.4,+3.53
+SMG,Scotts Miracle-Gro Company (The,hot,,不明,1.707,0.22,4089170,2395324,0.005,0.007,-0.002,62.3,+11.52
+AFL,Aflac,core,Life & Health Insurance,金融,1.705,0.32,12280470,7203883,0.015,0.020,-0.006,124.8,+3.42
+LYB,LyondellBasell,core,Specialty Chemicals,素材,1.702,0.38,17387024,10216379,0.021,0.028,-0.007,65.5,+3.10
+INVH,Invitation Homes,core,Single-Family Residential REITs,不動産,1.694,-0.05,10404652,6140322,0.012,0.023,-0.011,26.6,-1.99
+ECL,Ecolab,core,Specialty Chemicals,素材,1.687,0.52,31121853,18450068,0.037,0.047,-0.010,302.8,+5.68
+MA,Mastercard,core,Transaction & Payment Processing Services,金融,1.686,0.43,159473406,94607497,0.191,0.258,-0.067,636.3,+2.83
+TENB,"Tenable Holdings, Inc.",hot,,不明,1.684,0.30,18929795,11238716,0.023,0.031,-0.009,50.4,+28.98
+MBLY,Mobileye Global Inc.,hot,,不明,1.684,0.23,3815510,2266043,0.005,0.007,-0.002,6.0,-13.40
+NTES,"NetEase, Inc.",hot,,不明,1.679,0.49,8115884,4833795,0.010,0.013,-0.003,113.3,-8.19
+AME,Ametek,core,Electrical Components & Equipment,資本財,1.676,0.14,21212340,12658032,0.025,0.039,-0.014,246.9,-0.93
+VRSN,Verisign,core,Internet Services & Infrastructure,情報技術,1.672,0.26,22453107,13431790,0.027,0.039,-0.012,310.8,+1.93
+FSLY,"Fastly, Inc.",hot,,不明,1.667,0.47,10089025,6051311,0.012,0.016,-0.004,23.0,+1.92
+U,Unity Software Inc.,hot,,不明,1.665,0.15,21326781,12808203,0.026,0.039,-0.013,38.1,-4.41
+IONQ,"IonQ, Inc.",hot,,不明,1.664,0.02,40917910,24597410,0.049,0.083,-0.034,29.3,-8.27
+OSCR,"Oscar Health, Inc.",hot,,不明,1.661,0.11,8169373,4918566,0.010,0.015,-0.006,30.2,-11.27
+PEP,PepsiCo,leader,Soft Drinks & Non-alcoholic Beverages,生活必需品,1.659,0.54,79744022,48063150,0.095,0.123,-0.028,136.4,+1.91
+KHC,Kraft Heinz,core,Packaged Foods & Meats,生活必需品,1.649,0.37,24069389,14595808,0.029,0.038,-0.009,24.6,+4.05
+ADP,Automatic Data Processing,leader,Human Resource & Employment Services,資本財,1.649,0.50,48536199,29438513,0.058,0.074,-0.016,294.7,+1.41
+GGAL,Grupo Financiero Galicia S.A.,hot,,不明,1.648,0.56,4689429,2846068,0.006,0.007,-0.002,32.9,-8.32
+MGM,MGM Resorts,core,Casinos & Gaming,一般消費財,1.646,0.02,13289707,8071634,0.016,0.027,-0.011,28.8,-0.33
+GIS,General Mills,core,Packaged Foods & Meats,生活必需品,1.645,0.46,21633415,13154826,0.026,0.034,-0.008,34.4,+3.80
+CHA,Chagee Holdings Limited,hot,,不明,1.644,0.02,549414,334178,0.001,0.001,-0.000,12.2,-4.02
+MP,MP Materials Corp.,hot,,不明,1.644,0.42,15934547,9694351,0.019,0.026,-0.007,39.9,+0.61
+ISRG,Intuitive Surgical,leader,Health Care Equipment,ヘルスケア,1.643,0.42,90444330,55055099,0.108,0.145,-0.037,441.9,+6.59
+HRL,Hormel Foods,core,Packaged Foods & Meats,生活必需品,1.640,0.19,5068126,3089873,0.006,0.009,-0.003,21.4,+4.47
+HOOD,Robinhood Markets,core,Investment Banking & Brokerage,金融,1.639,0.02,162421979,99106712,0.194,0.327,-0.132,83.6,-16.21
+AUR,"Aurora Innovation, Inc.",hot,,不明,1.633,0.18,7122996,4361650,0.009,0.013,-0.004,4.2,-17.01
+FANG,Diamondback Energy,leader,Oil & Gas Exploration & Production,エネルギー,1.629,0.28,21332298,13097660,0.026,0.037,-0.011,210.7,+4.59
+BA,Boeing,core,Aerospace & Defense,資本財,1.620,-0.05,178515492,110165559,0.213,0.394,-0.180,173.0,-9.74
+FERG,Ferguson Enterprises Inc.,hot,,資本財,1.617,0.09,19718260,12190720,0.024,0.037,-0.014,239.2,+5.40
+COR,Cencora,core,Health Care Distributors,ヘルスケア,1.616,0.18,26869791,16626658,0.032,0.048,-0.016,333.2,-3.13
+TROW,T. Rowe Price,core,Asset Management & Custody Banks,金融,1.613,0.38,15536225,9631425,0.019,0.025,-0.006,104.4,+2.03
+NKE,"Nike, Inc.",core,"Apparel, Accessories & Luxury Goods",一般消費財,1.593,0.05,60618577,38060678,0.072,0.120,-0.047,38.8,+3.17
+DOV,Dover Corporation,core,Industrial Machinery & Supplies & Components,資本財,1.590,0.12,24166029,15198486,0.029,0.045,-0.016,209.9,+5.95
+BF-B,Brown–Forman,core,Distillers & Vintners,生活必需品,1.588,0.04,4298230,2706902,0.005,0.009,-0.003,28.8,+2.60
+MCK,McKesson Corporation,core,Health Care Distributors,ヘルスケア,1.587,0.44,48278650,30416697,0.058,0.079,-0.021,994.7,-2.85
+MDT,Medtronic,core,Health Care Equipment,ヘルスケア,1.586,0.44,51328253,32353489,0.061,0.083,-0.022,96.9,+3.06
+EME,Emcor,core,Construction & Engineering,資本財,1.577,0.17,30679254,19458859,0.037,0.054,-0.017,690.3,-3.83
+SOFI,"SoFi Technologies, Inc.",hot,,不明,1.576,0.10,78365382,49720905,0.094,0.149,-0.055,16.9,+15.17
+CVX,Chevron Corporation,core,Integrated Oil & Gas,エネルギー,1.575,0.43,113224266,71882402,0.135,0.186,-0.050,235.5,+4.37
+GM,General Motors,core,Automobile Manufacturers,一般消費財,1.575,0.42,57501783,36519768,0.069,0.092,-0.023,86.0,+11.70
+AMP,Ameriprise Financial,core,Asset Management & Custody Banks,金融,1.562,0.15,21331343,13658120,0.026,0.039,-0.014,491.9,+0.12
+CCEP,Coca-Cola Europacific Partners plc Ordinary Shares,leader,,不明,1.562,0.27,12261958,7851677,0.015,0.021,-0.006,113.9,+1.21
+DIOD,Diodes Incorporated,hot,,不明,1.560,0.18,2870641,1840229,0.003,0.005,-0.002,81.8,-6.37
+ANET,Arista Networks,core,Communications Equipment,情報技術,1.559,0.21,75600193,48479243,0.090,0.135,-0.045,170.8,-8.89
+STNE,StoneCo Ltd.,hot,,不明,1.558,0.06,6138147,3939617,0.007,0.012,-0.005,7.8,-34.09
+SIMO,Silicon Motion Technology Corpo,hot,,不明,1.555,0.19,20831878,13400396,0.025,0.037,-0.012,212.2,-3.55
+MRK,Merck & Co.,core,Pharmaceuticals,ヘルスケア,1.554,0.17,113227414,72872350,0.135,0.207,-0.071,147.9,+0.14
+BWIN,"The Baldwin Insurance Group, In",hot,,不明,1.552,0.07,2474454,1594776,0.003,0.005,-0.002,31.9,-0.11
+PRU,Prudential Financial,core,Life & Health Insurance,金融,1.551,0.25,12906248,8318750,0.015,0.023,-0.007,116.8,+0.69
+ULTA,Ulta Beauty,core,Other Specialty Retail,一般消費財,1.547,0.17,20767294,13425398,0.025,0.038,-0.013,638.0,+6.24
+FIS,Fidelity National Information Services,core,Transaction & Payment Processing Services,金融,1.545,0.07,11855179,7671780,0.014,0.023,-0.009,37.7,+4.07
+ODFL,Old Dominion,leader,Cargo Ground Transportation,資本財,1.545,0.09,29710320,19235329,0.036,0.057,-0.022,172.1,-8.91
+ETN,Eaton Corporation,core,Electrical Components & Equipment,資本財,1.539,0.28,71292278,46326709,0.085,0.126,-0.041,375.8,-3.73
+JNJ,Johnson & Johnson,core,Pharmaceuticals,ヘルスケア,1.533,0.13,105403383,68771168,0.126,0.199,-0.073,276.3,+7.55
+MANE,"Veradermics, Incorporated",hot,,不明,1.533,0.19,6751259,4405075,0.008,0.012,-0.004,142.9,+11.18
+XYZ,"Block, Inc.",core,Transaction & Payment Processing Services,金融,1.531,0.10,21148791,13810892,0.025,0.040,-0.015,75.7,-3.79
+TSN,Tyson Foods,core,Packaged Foods & Meats,生活必需品,1.526,0.08,10130243,6640148,0.012,0.020,-0.007,57.2,+3.27
+AEP,American Electric Power,leader,Electric Utilities,公益事業,1.524,0.04,27104445,17784809,0.032,0.055,-0.022,131.0,+2.51
+AZO,AutoZone,core,Automotive Retail,一般消費財,1.522,0.06,42828962,28140935,0.051,0.083,-0.032,3182.7,+1.02
+O,Realty Income,core,Retail REITs,不動産,1.520,0.24,24115383,15865912,0.029,0.043,-0.014,57.1,+1.64
+CFG,Citizens Financial Group,core,Regional Banks,金融,1.517,0.06,15105101,9957954,0.018,0.029,-0.011,64.1,-1.24
+OMC,Omnicom Group,core,Advertising,コミュニケーション・サービス,1.514,0.06,17584809,11613026,0.021,0.035,-0.014,81.6,+1.28
+ACN,Accenture,core,IT Consulting & Other Services,情報技術,1.508,0.27,110262653,73104396,0.132,0.192,-0.060,253.1,+5.68
+ROAD,"Construction Partners, Inc.",hot,,不明,1.502,0.29,3022319,2012031,0.004,0.005,-0.002,90.9,+5.69
+ARES,Ares Management,core,Asset Management & Custody Banks,金融,1.502,0.11,17654259,11756706,0.021,0.034,-0.013,126.9,+7.90
+SMMT,Summit Therapeutics Inc.,hot,,不明,1.500,0.26,5316307,3543514,0.006,0.009,-0.003,15.9,-1.92
+SOUN,"SoundHound AI, Inc.",hot,,不明,1.499,0.40,4594675,3065261,0.005,0.008,-0.002,4.2,-12.30
+RSG,Republic Services,core,Environmental & Facilities Services,資本財,1.497,0.14,22259980,14871717,0.027,0.041,-0.014,243.7,+4.84
+IREN,IREN LIMITED,hot,,不明,1.497,0.10,96927174,64760298,0.116,0.189,-0.073,24.3,-13.49
+GEHC,GE HealthCare,leader,Health Care Equipment,ヘルスケア,1.493,0.02,20571048,13773951,0.025,0.042,-0.017,77.3,+11.10
+AXP,American Express,core,Consumer Finance,金融,1.492,0.23,60573823,40604166,0.072,0.109,-0.036,320.1,+0.23
+CAR,"Avis Budget Group, Inc.",hot,,不明,1.492,0.07,1894460,1270043,0.002,0.004,-0.001,107.4,+4.71
+MMM,3M,core,Industrial Conglomerates,資本財,1.490,-0.04,37414949,25103542,0.045,0.082,-0.037,176.0,+3.59
+BBWI,"Bath & Body Works, Inc.",hot,,不明,1.490,-0.06,7495556,5031042,0.009,0.017,-0.008,22.6,+9.64
+HIMS,"Hims & Hers Health, Inc.",hot,,不明,1.489,0.44,20104087,13502087,0.024,0.033,-0.009,28.0,-5.00
+VRDN,"Viridian Therapeutics, Inc.",hot,,不明,1.486,-0.01,2572754,1731090,0.003,0.005,-0.002,24.6,+8.74
+CPRT,Copart,leader,Diversified Support Services,資本財,1.482,0.48,26754779,18053146,0.032,0.043,-0.011,30.2,+9.70
+PAYX,Paychex,leader,Human Resource & Employment Services,資本財,1.477,0.07,19164749,12975211,0.023,0.038,-0.015,112.0,+0.19
+WAT,Waters Corporation,core,Life Sciences Tools & Services,ヘルスケア,1.474,0.26,33945077,23024079,0.041,0.061,-0.020,466.5,+3.38
+SMCI,Supermicro,core,"Technology Hardware, Storage & Peripherals",情報技術,1.467,0.07,91493469,62363138,0.109,0.179,-0.069,32.5,-12.12
+COP,ConocoPhillips,core,Oil & Gas Exploration & Production,エネルギー,1.467,0.21,53227087,36283607,0.064,0.097,-0.034,152.5,+5.08
+CB,Chubb Limited,core,Property & Casualty Insurance,金融,1.466,0.02,40248939,27450453,0.048,0.082,-0.034,366.3,+3.14
+LOW,Lowe's,core,Home Improvement Retail,一般消費財,1.456,-0.04,37072309,25462510,0.044,0.082,-0.038,208.6,+6.05
+AWK,American Water Works,core,Water Utilities,公益事業,1.450,0.12,19570583,13497511,0.023,0.037,-0.014,144.6,+6.43
+DHR,Danaher Corporation,core,Life Sciences Tools & Services,ヘルスケア,1.450,-0.17,55852147,38527295,0.067,0.157,-0.090,233.0,+1.69
+CEG,Constellation Energy,leader,Electric Utilities,公益事業,1.447,0.33,55491471,38344961,0.066,0.097,-0.031,264.0,-0.34
+AEHR,Aehr Test Systems,hot,,不明,1.442,0.06,7864212,5454217,0.009,0.016,-0.006,54.8,-15.92
+KIM,Kimco Realty,core,Retail REITs,不動産,1.441,0.04,7416072,5145792,0.009,0.015,-0.006,24.5,+6.41
+PFE,Pfizer,core,Pharmaceuticals,ヘルスケア,1.441,0.22,48580044,33709973,0.058,0.089,-0.031,30.2,+0.87
+CHTR,Charter Communications,core,Cable & Satellite,コミュニケーション・サービス,1.441,-0.02,16247317,11276332,0.019,0.034,-0.015,110.7,+3.15
+JBHT,J.B. Hunt,core,Cargo Ground Transportation,資本財,1.441,0.22,12944700,8984445,0.015,0.024,-0.008,218.2,-3.90
+RKT,"Rocket Companies, Inc.",hot,,不明,1.439,0.07,34154684,23731376,0.041,0.066,-0.025,12.4,+9.65
+ADPT,Adaptive Biotechnologies Corpor,hot,,不明,1.439,-0.09,2634321,1831206,0.003,0.006,-0.003,27.2,+10.73
+WEC,WEC Energy Group,core,Electric Utilities,公益事業,1.435,-0.14,17993747,12535802,0.022,0.043,-0.022,116.4,+6.81
+AMCR,Amcor,core,Paper & Plastic Packaging Products & Materials,素材,1.433,0.05,8344910,5824318,0.010,0.017,-0.007,47.1,+5.61
+ED,Consolidated Edison,core,Multi-Utilities,公益事業,1.433,0.08,14198179,9910577,0.017,0.028,-0.011,117.0,+4.38
+FOXA,Fox Corporation (Class A),core,Broadcasting,コミュニケーション・サービス,1.427,-0.06,24951847,17486335,0.030,0.055,-0.025,64.8,-2.81
+HSAI,Hesai Group,hot,,不明,1.421,-0.08,2080401,1464306,0.002,0.005,-0.002,12.2,-6.19
+EIX,Edison International,core,Electric Utilities,公益事業,1.403,-0.07,10089462,7189365,0.012,0.023,-0.011,59.5,+4.76
+SHW,Sherwin-Williams,core,Specialty Chemicals,素材,1.402,-0.10,43018742,30676059,0.051,0.102,-0.050,330.8,-1.38
+DLTR,Dollar Tree,core,Consumer Staples Merchandise Retail,生活必需品,1.396,-0.00,13090367,9375018,0.016,0.027,-0.012,134.1,+8.21
+CRM,Salesforce,core,Application Software,情報技術,1.390,0.08,100155671,72036605,0.120,0.197,-0.077,231.9,-2.58
+NOK,Nokia Corporation Sponsored,hot,,不明,1.389,0.26,66326066,47764918,0.079,0.118,-0.039,8.6,-7.09
+UEC,Uranium Energy Corp.,hot,,不明,1.384,-0.10,4819297,3482648,0.006,0.011,-0.005,7.8,-3.54
+BE,Bloom Energy Corporation,hot,,資本財,1.381,-0.06,274005504,198482120,0.328,0.612,-0.285,205.2,-13.52
+HSIC,Henry Schein,core,Health Care Distributors,ヘルスケア,1.378,-0.11,4639536,3366591,0.006,0.011,-0.006,84.8,+0.93
+PFG,Principal Financial Group,core,Life & Health Insurance,金融,1.377,-0.15,7945565,5768960,0.010,0.019,-0.010,112.8,+3.71
+IP,International Paper,core,Paper & Plastic Packaging Products & Materials,素材,1.372,-0.09,14121291,10294349,0.017,0.032,-0.015,36.2,+8.00
+VLO,Valero Energy,core,Oil & Gas Refining & Marketing,エネルギー,1.371,0.28,93361314,68092970,0.112,0.168,-0.056,392.3,-9.18
+IBKR,Interactive Brokers,core,Investment Banking & Brokerage,金融,1.364,0.13,25377266,18609548,0.030,0.048,-0.018,76.8,-8.77
+TT,Trane Technologies,core,Building Products,資本財,1.361,-0.06,46724005,34322897,0.056,0.106,-0.050,418.0,-10.16
+JCI,Johnson Controls,core,Building Products,資本財,1.361,0.09,41107060,30208709,0.049,0.081,-0.032,151.9,+1.39
+AMC,"AMC Entertainment Holdings, Inc",hot,,不明,1.358,0.53,4831374,3556683,0.006,0.008,-0.002,3.0,-2.28
+JKHY,Jack Henry & Associates,core,Transaction & Payment Processing Services,金融,1.358,-0.10,6957883,5123246,0.008,0.016,-0.008,162.4,+6.24
+HII,Huntington Ingalls Industries,core,Aerospace & Defense,資本財,1.351,-0.15,10655550,7887855,0.013,0.029,-0.016,314.8,+14.10
+GAP,"Gap, Inc. (The)",hot,,不明,1.346,-0.07,6633930,4927321,0.008,0.015,-0.007,22.3,-4.14
+PSA,Public Storage,core,Self-Storage REITs,不動産,1.346,-0.12,15417348,11453914,0.018,0.039,-0.021,322.8,+6.76
+ALMR,"Alamar Biosciences, Inc.",hot,,不明,1.346,-0.11,1468064,1090779,0.002,0.003,-0.002,30.4,+7.37
+GIL,"Gildan Activewear, Inc.",hot,,不明,1.341,-0.13,2545703,1897959,0.003,0.006,-0.003,40.1,-1.96
+HSY,Hershey Company (The),core,Packaged Foods & Meats,生活必需品,1.340,0.17,22653416,16909477,0.027,0.042,-0.015,164.3,-2.53
+RH,RH,hot,,不明,1.339,-0.13,7618267,5687975,0.009,0.020,-0.011,149.2,+22.94
+NVAX,"Novavax, Inc.",hot,,不明,1.333,-0.02,4011422,3009474,0.005,0.009,-0.004,10.2,-10.11
+ZS,"Zscaler, Inc.",hot,,不明,1.332,0.23,55238319,41480335,0.066,0.102,-0.036,239.5,+10.07
+GME,GameStop Corporation,hot,,不明,1.331,0.05,12560092,9435375,0.015,0.025,-0.010,23.5,-11.46
+FIVN,"Five9, Inc.",hot,,不明,1.327,-0.10,2777622,2093510,0.003,0.006,-0.003,36.2,+6.31
+HST,Host Hotels & Resorts,core,Hotel & Resort REITs,不動産,1.321,0.00,11649713,8816499,0.014,0.024,-0.010,25.4,+1.74
+GEV,GE Vernova,core,Heavy Electrical Equipment,資本財,1.321,0.03,262634925,198860250,0.314,0.529,-0.215,862.1,-6.80
+AMAT,Applied Materials,leader,Semiconductor Materials & Equipment,半導体,1.317,0.04,179483232,136325208,0.215,0.363,-0.148,396.7,-3.63
+W,Wayfair Inc.,hot,,不明,1.308,-0.17,11128873,8508521,0.013,0.028,-0.015,117.5,+4.23
+KEY,KeyCorp,core,Regional Banks,金融,1.307,0.02,28060011,21463725,0.034,0.057,-0.023,21.2,+0.83
+MAR,Marriott International,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.306,0.02,37814060,28958181,0.045,0.078,-0.033,401.2,+0.74
+TMO,Thermo Fisher Scientific,core,Life Sciences Tools & Services,ヘルスケア,1.304,-0.16,91922810,70466729,0.110,0.256,-0.146,698.8,+1.43
+CCL,Carnival Corporation,core,"Hotels, Resorts & Cruise Lines",一般消費財,1.303,0.00,35773367,27452990,0.043,0.074,-0.032,28.3,+5.27
+EFX,Equifax,core,Research & Consulting Services,資本財,1.303,-0.03,20787816,15957139,0.025,0.044,-0.020,184.2,+5.52
+VTR,Ventas,core,Health Care REITs,不動産,1.301,-0.18,15479202,11896267,0.019,0.039,-0.021,85.2,-1.41
+IBM,IBM,core,IT Consulting & Other Services,情報技術,1.301,-0.14,71824618,55213785,0.086,0.175,-0.089,255.5,+5.99
+KR,Kroger,core,Food Retail,生活必需品,1.300,-0.16,23826775,18331832,0.028,0.060,-0.032,66.7,+5.88
+FISV,Fiserv,core,Transaction & Payment Processing Services,金融,1.294,0.07,15306040,11827162,0.018,0.030,-0.012,48.3,+0.47
+ITUB,Itau Unibanco Banco Holding SA,hot,,不明,1.290,-0.17,29473989,22855837,0.035,0.093,-0.058,7.2,-25.69
+NIO,NIO Inc.,hot,,不明,1.286,0.07,5731301,4455541,0.007,0.011,-0.004,3.2,-3.59
+SRE,Sempra,core,Multi-Utilities,公益事業,1.285,-0.10,10209121,7945999,0.012,0.024,-0.011,86.2,+3.72
+BRK-B,Berkshire Hathaway,core,Multi-Sector Holdings,金融,1.285,-0.07,118904587,92563027,0.142,0.259,-0.117,544.8,+0.74
+SMTC,Semtech Corporation,hot,,不明,1.277,0.01,23148339,18132214,0.028,0.048,-0.020,126.6,-10.91
+CI,Cigna,core,Health Care Services,ヘルスケア,1.274,-0.22,21656122,17001192,0.026,0.059,-0.034,298.1,-2.67
+ABEV,Ambev S.A.,hot,,不明,1.273,-0.06,7332345,5761466,0.009,0.018,-0.009,2.7,-19.48
+FIGR,"Figure Technology Solutions, In",hot,,不明,1.271,-0.12,6726842,5290721,0.008,0.015,-0.007,22.4,-14.86
+BMNR,"BitMine Immersion Technologies,",hot,,不明,1.271,-0.09,39108196,30781570,0.047,0.089,-0.042,20.2,-13.24
+HIG,Hartford (The),core,Property & Casualty Insurance,金融,1.265,-0.25,11690506,9245108,0.014,0.035,-0.021,132.7,-3.06
+SW,Smurfit Westrock,core,Paper & Plastic Packaging Products & Materials,素材,1.263,-0.13,12278483,9718156,0.015,0.029,-0.014,42.6,+3.83
+FTAI,FTAI Aviation Ltd.,hot,,不明,1.263,0.01,25011091,19806744,0.030,0.052,-0.022,188.4,+15.86
+WFC,Wells Fargo,core,Diversified Banks,金融,1.260,-0.07,46811890,37159676,0.056,0.103,-0.047,84.0,+1.68
+ERO,Ero Copper Corp.,hot,,不明,1.254,-0.23,2471218,1971052,0.003,0.008,-0.005,29.0,-11.92
+VRT,Vertiv,core,Electrical Components & Equipment,資本財,1.252,-0.11,126515133,101067708,0.151,0.297,-0.146,235.2,+8.21
+UBER,Uber,core,Passenger Ground Transportation,資本財,1.250,-0.11,75604712,60466688,0.090,0.172,-0.082,65.3,-4.48
+SAP,SAP  SE,hot,,不明,1.248,-0.25,41017067,32873705,0.049,0.122,-0.073,237.1,+2.94
+DK,"Delek US Holdings, Inc.",hot,,不明,1.247,-0.08,6316282,5064150,0.008,0.014,-0.007,73.5,-3.63
+PARR,"Par Pacific Holdings, Inc. Comm",hot,,不明,1.245,-0.17,3589650,2882617,0.004,0.009,-0.005,75.6,-11.49
+DVN,Devon Energy,core,Oil & Gas Exploration & Production,エネルギー,1.238,0.04,30442091,24581037,0.036,0.062,-0.025,51.9,+3.84
+CIEN,Ciena,core,Communications Equipment,情報技術,1.237,0.05,67558035,54636172,0.081,0.137,-0.056,320.5,-9.96
+FDS,FactSet,core,Financial Exchanges & Data,金融,1.236,-0.13,10675060,8634915,0.013,0.025,-0.012,326.8,+6.04
+ECHO,EchoStar,core,Wireless Telecommunication Services,コミュニケーション・サービス,1.235,-0.18,23097137,18699442,0.028,0.058,-0.030,97.0,+6.45
+CMG,Chipotle Mexican Grill,core,Restaurants,一般消費財,1.235,-0.15,44560142,36077705,0.053,0.105,-0.051,31.9,+10.92
+XERS,"Xeris Biopharma Holdings, Inc.",hot,,不明,1.233,0.01,1144454,927878,0.001,0.002,-0.001,10.7,-4.05
+INFY,Infosys Limited,hot,,不明,1.232,-0.22,19110168,15515341,0.023,0.049,-0.026,12.5,-0.60
+PANW,Palo Alto Networks,leader,Systems Software,情報技術,1.230,-0.09,127813736,103877051,0.153,0.309,-0.156,373.9,+8.77
+BSP,Bending Spoons S.p.A.,hot,,不明,1.228,0.15,6098186,4966712,0.007,0.012,-0.004,45.0,-0.90
+HCA,HCA Healthcare,core,Health Care Facilities,ヘルスケア,1.228,-0.08,42798738,34863113,0.051,0.095,-0.044,478.7,+2.77
+HD,Home Depot (The),core,Home Improvement Retail,一般消費財,1.223,0.01,68578303,56051611,0.082,0.142,-0.060,329.3,+4.88
+YUM,Yum! Brands,core,Restaurants,一般消費財,1.223,-0.20,16312846,13337333,0.020,0.047,-0.027,155.3,+2.95
+HBAN,Huntington Bancshares,core,Regional Banks,金融,1.222,-0.04,23210747,18992332,0.028,0.050,-0.022,15.8,+0.89
+TRGP,Targa Resources,core,Oil & Gas Storage & Transportation,エネルギー,1.221,-0.05,19256301,15766875,0.023,0.041,-0.018,315.4,+7.13
+BURL,"Burlington Stores, Inc.",hot,,不明,1.221,-0.01,21846289,17888744,0.026,0.046,-0.020,240.6,-6.31
+SNAP,Snap Inc.,hot,,不明,1.221,-0.13,14164134,11602259,0.017,0.032,-0.015,5.3,-15.79
+UCTT,"Ultra Clean Holdings, Inc.",hot,,不明,1.219,-0.27,4353993,3570541,0.005,0.013,-0.007,50.5,-5.06
+FLY,Firefly Aerospace Inc.,hot,,不明,1.216,-0.08,2768755,2276272,0.003,0.006,-0.003,18.7,+11.39
+UDR,"UDR, Inc.",core,Multi-Family Residential REITs,不動産,1.215,-0.22,10651686,8764650,0.013,0.028,-0.015,35.5,+0.78
+WTW,Willis Towers Watson,core,Insurance Brokers,金融,1.215,-0.04,11257094,9265445,0.013,0.024,-0.011,323.5,+1.23
+SITM,SiTime Corporation,hot,,不明,1.213,-0.12,12147074,10011097,0.015,0.028,-0.013,451.8,-12.21
+FRO,Frontline Plc,hot,,不明,1.213,-0.17,11112850,9163415,0.013,0.031,-0.018,55.5,+10.87
+BKNG,Booking Holdings,leader,"Hotels, Resorts & Cruise Lines",一般消費財,1.212,0.03,65388069,53956492,0.078,0.134,-0.056,149.4,-6.40
+LMT,Lockheed Martin,core,Aerospace & Defense,資本財,1.211,-0.13,75896450,62666995,0.091,0.181,-0.090,639.2,+16.65
+CRWV,"CoreWeave, Inc. Class A Common Stock",leader,,不明,1.209,-0.06,242689300,200685078,0.290,0.531,-0.241,55.1,-13.69
+BSX,Boston Scientific,core,Health Care Equipment,ヘルスケア,1.209,-0.20,47813811,39557510,0.057,0.204,-0.147,42.8,-5.23
+OKE,Oneok,core,Oil & Gas Storage & Transportation,エネルギー,1.206,-0.13,15333877,12715069,0.018,0.037,-0.018,97.5,+4.53
+LW,"Lamb Weston Holdings, Inc.",hot,,不明,1.192,-0.25,3515391,2949820,0.004,0.012,-0.007,54.0,+0.35
+INFQ,"Infleqtion, Inc.",hot,,不明,1.191,-0.03,3394130,2849501,0.004,0.007,-0.003,8.8,-0.67
+LEN,Lennar,core,Homebuilding,一般消費財,1.187,-0.19,14428453,12152590,0.017,0.037,-0.019,86.2,+10.35
+UPS,United Parcel Service,core,Air Freight & Logistics,資本財,1.185,-0.21,32624030,27530990,0.039,0.081,-0.042,107.8,+9.11
+DG,Dollar General,core,Consumer Staples Merchandise Retail,生活必需品,1.185,-0.23,14282370,12057043,0.017,0.039,-0.022,132.4,-0.21
+XE,"X-Energy, Inc.",hot,,不明,1.184,-0.01,4001659,3380393,0.005,0.008,-0.004,11.0,-0.90
+ONTO,Onto Innovation Inc.,hot,,不明,1.183,-0.05,13915810,11759816,0.017,0.030,-0.013,205.4,-10.06
+AMRX,"Amneal Pharmaceuticals, Inc.",hot,,不明,1.177,-0.13,1875572,1593661,0.002,0.004,-0.002,21.3,+7.08
+VMC,Vulcan Materials Company,core,Construction Materials,素材,1.168,-0.20,18268788,15642180,0.022,0.049,-0.027,279.4,+6.41
+WULF,TeraWulf Inc.,hot,,不明,1.167,-0.08,39070049,33491047,0.047,0.089,-0.042,12.0,-5.83
+KOD,Kodiak Sciences Inc,hot,,不明,1.165,-0.25,4122032,3539121,0.005,0.011,-0.006,97.7,+6.81
+NTRS,Northern Trust,core,Asset Management & Custody Banks,金融,1.163,-0.19,10066926,8653576,0.012,0.025,-0.013,168.8,+1.26
+NDSN,Nordson Corporation,core,Industrial Machinery & Supplies & Components,資本財,1.161,-0.20,5042405,4343208,0.006,0.013,-0.007,323.4,-1.28
+ASML,ASML Holding NV,leader,,不明,1.160,-0.14,136743507,117906796,0.164,0.381,-0.217,1594.2,-5.01
+ALL,Allstate,core,Property & Casualty Insurance,金融,1.159,-0.11,20079724,17322261,0.024,0.045,-0.021,260.7,+3.70
+FCFS,"FirstCash Holdings, Inc.",hot,,不明,1.157,-0.13,11867437,10260907,0.014,0.028,-0.013,185.0,-14.88
+VZ,Verizon,core,Integrated Telecommunication Services,コミュニケーション・サービス,1.156,-0.20,68351898,59111280,0.082,0.172,-0.090,44.8,+3.04
+TPL,Texas Pacific Land Corporation,core,Oil & Gas Exploration & Production,エネルギー,1.156,-0.20,5283135,4571728,0.006,0.014,-0.008,330.6,-3.80
+COF,Capital One,core,Consumer Finance,金融,1.156,-0.18,42385020,36677694,0.051,0.114,-0.063,205.1,-1.10
+ALB,Albemarle Corporation,core,Specialty Chemicals,素材,1.155,-0.16,11104110,9615266,0.013,0.026,-0.013,91.2,-3.77
+Q,Qnity Electronics,core,Semiconductor Materials & Equipment,半導体,1.153,-0.24,12406790,10760642,0.015,0.034,-0.019,116.7,-3.41
+DUK,Duke Energy,core,Electric Utilities,公益事業,1.152,-0.14,22226632,19290604,0.027,0.053,-0.026,127.6,+5.06
+ALM,Almonty Industries Inc.,hot,,不明,1.152,-0.15,3955738,3433871,0.005,0.009,-0.005,8.8,-4.70
+GLW,Corning Inc.,core,Electronic Components,情報技術,1.149,-0.10,83652119,72787110,0.100,0.186,-0.086,123.5,-8.70
+VFC,V.F. Corporation,hot,,不明,1.149,-0.24,10595018,9220028,0.013,0.031,-0.019,18.3,+6.13
+CME,CME Group,core,Financial Exchanges & Data,金融,1.147,-0.15,30940660,26977437,0.037,0.072,-0.035,303.4,+3.56
+LUNR,"Intuitive Machines, Inc.",hot,,不明,1.145,0.01,4538920,3965710,0.005,0.009,-0.004,10.9,-1.18
+FTV,Fortive,core,Industrial Machinery & Supplies & Components,資本財,1.139,-0.17,11556342,10145023,0.014,0.028,-0.014,66.0,+13.19
+GS,Goldman Sachs,core,Investment Banking & Brokerage,金融,1.138,-0.05,91489894,80378890,0.109,0.195,-0.086,899.1,+0.14
+SPCX,Space Exploration Technologies,hot,,不明,1.136,-0.24,1362996340,1200321267,1.630,4.491,-2.862,137.7,-15.14
+RKLB,Rocket Lab Corporation Common Stock,leader,,不明,1.135,-0.10,52844936,46551016,0.063,0.116,-0.053,56.1,+6.67
+UUUU,Energy Fuels Inc,hot,,不明,1.133,-0.20,4437049,3917143,0.005,0.013,-0.008,7.6,-9.41
+PYPL,PayPal,leader,Transaction & Payment Processing Services,金融,1.131,-0.24,29096261,25720191,0.035,0.079,-0.044,56.7,-0.30
+PBR-A,Petroleo Brasileiro S.A. Petrob,hot,,不明,1.130,-0.19,18787186,16632228,0.022,0.048,-0.025,19.6,-15.25
+BB,BlackBerry Limited,hot,,不明,1.128,-0.17,7484917,6635145,0.009,0.021,-0.012,8.6,-5.51
+ARQT,"Arcutis Biotherapeutics, Inc.",hot,,不明,1.128,-0.29,2624468,2326554,0.003,0.007,-0.004,32.0,-2.83
+YPF,YPF Sociedad Anonima,hot,,不明,1.126,-0.18,3237178,2876139,0.004,0.011,-0.007,47.2,-7.89
+GE,GE Aerospace,core,Aerospace & Defense,資本財,1.123,-0.21,96079953,85536399,0.115,0.226,-0.111,305.1,+1.11
+LH,Labcorp,core,Health Care Services,ヘルスケア,1.121,-0.27,14884123,13276402,0.018,0.043,-0.025,364.3,+12.27
+GRMN,Garmin,core,Consumer Electronics,一般消費財,1.120,-0.34,12223080,10916950,0.015,0.034,-0.019,277.0,-4.54
+VAC,Marriott Vacations Worldwide Co,hot,,不明,1.116,-0.25,1600432,1433827,0.002,0.004,-0.002,115.5,+1.98
+DOW,Dow Inc.,core,Commodity Chemicals,素材,1.114,-0.21,16073803,14435168,0.019,0.040,-0.020,34.0,+11.68
+FIG,"Figma, Inc.",hot,,不明,1.112,-0.20,13225884,11894946,0.016,0.032,-0.016,21.7,-4.07
+AOS,A. O. Smith,core,Building Products,資本財,1.111,-0.22,5640525,5075686,0.007,0.015,-0.008,63.0,+6.09
+MARA,"MARA Holdings, Inc.",hot,,不明,1.110,0.02,18588398,16752161,0.022,0.038,-0.016,6.6,-15.31
+CINF,Cincinnati Financial,core,Property & Casualty Insurance,金融,1.108,-0.25,5882160,5309335,0.007,0.016,-0.008,183.5,+6.37
+SCHW,Charles Schwab Corporation,core,Investment Banking & Brokerage,金融,1.106,-0.14,33591051,30377269,0.040,0.076,-0.036,88.5,-2.80
+ERAS,"Erasca, Inc.",hot,,不明,1.104,-0.21,2910076,2635115,0.003,0.008,-0.004,14.4,-1.03
+PBR,Petroleo Brasileiro S.A. Petrob,hot,,不明,1.104,-0.29,42281178,38293623,0.051,0.120,-0.070,22.2,-14.03
+SAIC,Science Applications Internatio,hot,,不明,1.104,-0.25,3091844,2800570,0.004,0.008,-0.004,151.2,+11.08
+CLSK,"CleanSpark, Inc.",hot,,不明,1.102,-0.12,8655495,7853808,0.010,0.019,-0.009,7.6,-11.87
+ASAN,"Asana, Inc.",hot,,不明,1.099,-0.21,3011965,2739463,0.004,0.007,-0.004,11.2,+5.63
+VEEV,Veeva Systems,core,Health Care Technology,ヘルスケア,1.098,-0.25,22719788,20687743,0.027,0.059,-0.031,311.7,-1.67
+GPC,Genuine Parts Company,core,Distributors,一般消費財,1.097,-0.27,6267072,5714487,0.007,0.019,-0.012,122.0,+0.07
+AON,Aon plc,core,Insurance Brokers,金融,1.096,-0.25,24603790,22443730,0.029,0.071,-0.042,325.8,+10.07
+STX,Seagate Technology,leader,"Technology Hardware, Storage & Peripherals",情報技術,1.094,-0.09,265083925,242305959,0.317,0.578,-0.262,656.3,-7.65
+MS,Morgan Stanley,core,Investment Banking & Brokerage,金融,1.094,-0.18,59024192,53959590,0.071,0.139,-0.068,184.9,+1.41
+SWKS,Skyworks Solutions,core,Semiconductors,半導体,1.093,-0.19,13190597,12065085,0.016,0.034,-0.018,86.5,+5.90
+WDAY,"Workday, Inc.",leader,Application Software,情報技術,1.089,-0.26,21682558,19911806,0.026,0.054,-0.028,197.0,-3.10
+PSX,Phillips 66,core,Oil & Gas Refining & Marketing,エネルギー,1.088,-0.13,44155204,40601063,0.053,0.103,-0.050,280.8,-3.07
+EQIX,Equinix,core,Data Center REITs,不動産,1.085,-0.12,38563109,35535116,0.046,0.087,-0.041,1007.4,+0.83
+AGCO,AGCO Corporation,hot,,不明,1.085,-0.33,4027387,3712266,0.005,0.013,-0.008,110.3,+5.51
+MNDY,monday.com Ltd.,hot,,不明,1.081,-0.27,4724973,4371055,0.006,0.013,-0.007,95.7,-4.16
+CRL,Charles River Laboratories,core,Life Sciences Tools & Services,ヘルスケア,1.080,-0.25,24326685,22534507,0.029,0.090,-0.061,362.1,+13.49
+DRI,Darden Restaurants,core,Restaurants,一般消費財,1.078,-0.27,8865487,8224734,0.011,0.024,-0.013,220.2,+1.49
+CMS,CMS Energy,core,Multi-Utilities,公益事業,1.078,-0.22,14552059,13500500,0.017,0.043,-0.026,70.3,+2.39
+DAL,Delta Air Lines,core,Passenger Airlines,資本財,1.078,-0.29,22479480,20858952,0.027,0.060,-0.033,79.3,+3.61
+BIIB,Biogen,core,Biotechnology,ヘルスケア,1.076,-0.33,14356685,13344225,0.017,0.045,-0.028,253.2,+5.02
+SWK,Stanley Black & Decker,core,Industrial Machinery & Supplies & Components,資本財,1.075,-0.24,7665058,7131815,0.009,0.021,-0.012,102.3,+7.77
+EOG,EOG Resources,core,Oil & Gas Exploration & Production,エネルギー,1.072,-0.25,16462416,15351241,0.020,0.045,-0.025,164.5,+4.95
+PEG,Public Service Enterprise Group,core,Electric Utilities,公益事業,1.068,-0.19,8419937,7880193,0.010,0.021,-0.010,74.1,+3.86
+TRMB,Trimble Inc.,core,Application Software,情報技術,1.066,-0.26,4361883,4090316,0.005,0.012,-0.006,65.3,+5.89
+REG,Regency Centers,core,Retail REITs,不動産,1.064,-0.27,3065696,2880036,0.004,0.008,-0.005,74.8,+2.16
+RDW,Redwire Corporation,hot,,不明,1.062,-0.19,5304748,4995432,0.006,0.012,-0.006,8.6,+0.41
+LII,Lennox International,core,Building Products,資本財,1.062,-0.29,15930899,15003588,0.019,0.048,-0.029,350.8,-3.75
+TRV,Travelers Companies (The),core,Property & Casualty Insurance,金融,1.061,-0.29,26371703,24847674,0.032,0.073,-0.042,400.6,+0.69
+GWW,W. W. Grainger,core,Industrial Machinery & Supplies & Components,資本財,1.061,-0.28,11860196,11178847,0.014,0.032,-0.017,1362.5,+1.72
+BNY,BNY Mellon,core,Asset Management & Custody Banks,金融,1.060,-0.24,16516663,15580111,0.020,0.041,-0.021,147.3,+1.07
+SPG,Simon Property Group,core,Retail REITs,不動産,1.060,-0.23,9166647,8648856,0.011,0.023,-0.012,216.5,+4.44
+WING,Wingstop Inc.,hot,,不明,1.059,-0.38,9547136,9016398,0.011,0.032,-0.020,144.3,+10.78
+USB,U.S. Bancorp,core,Diversified Banks,金融,1.059,-0.27,15538460,14678179,0.019,0.039,-0.021,59.9,+0.77
+FOX,Fox Corporation (Class B),core,Broadcasting,コミュニケーション・サービス,1.055,-0.27,1595185,1511995,0.002,0.004,-0.002,57.5,-3.12
+BTDR,Bitdeer Technologies Group,hot,,不明,1.054,-0.33,3705535,3515038,0.004,0.010,-0.006,6.9,-15.50
+PENG,"Penguin Solutions, Inc.",hot,,不明,1.051,-0.14,9863153,9386585,0.012,0.023,-0.011,53.1,-9.68
+ATO,Atmos Energy,core,Gas Utilities,公益事業,1.050,-0.27,6165443,5874236,0.007,0.017,-0.010,172.4,+2.74
+ROST,Ross Stores,leader,Apparel Retail,一般消費財,1.050,-0.27,17734777,16897430,0.021,0.045,-0.024,230.2,-1.85
+BKR,Baker Hughes,leader,Oil & Gas Equipment & Services,エネルギー,1.049,-0.26,22690981,21622203,0.027,0.063,-0.036,55.6,-0.18
+EVRG,Evergy,core,Electric Utilities,公益事業,1.048,-0.29,6075957,5795122,0.007,0.020,-0.012,86.0,+3.38
+UNH,UnitedHealth Group,core,Managed Health Care,ヘルスケア,1.047,-0.27,87351167,83466403,0.104,0.218,-0.114,408.0,-2.95
+F,Ford Motor Company,core,Automobile Manufacturers,一般消費財,1.045,-0.14,30461757,29144816,0.036,0.085,-0.049,12.2,+0.92
+INSW,"International Seaways, Inc.",hot,,不明,1.042,-0.27,4743617,4554361,0.006,0.014,-0.008,112.0,+5.12
+CBRE,CBRE Group,core,Real Estate Services,不動産,1.040,-0.30,17003199,16352885,0.020,0.050,-0.029,129.6,-3.24
+ELF,"e.l.f. Beauty, Inc.",hot,,不明,1.040,-0.26,6523943,6274990,0.008,0.019,-0.011,111.8,-3.10
+TARS,"Tarsus Pharmaceuticals, Inc.",hot,,不明,1.035,-0.34,1611835,1557300,0.002,0.005,-0.003,75.3,+7.14
+RIG,Transocean Ltd (Switzerland),hot,,不明,1.032,-0.21,16670134,16145711,0.020,0.040,-0.020,6.9,+16.38
+CHRW,C.H. Robinson,core,Air Freight & Logistics,資本財,1.029,-0.30,12801634,12434813,0.015,0.038,-0.023,126.2,-11.05
+ASTS,"AST SpaceMobile, Inc.",hot,,不明,1.029,-0.33,28128624,27326724,0.034,0.073,-0.040,41.4,-1.19
+WDC,Western Digital,leader,"Technology Hardware, Storage & Peripherals",情報技術,1.028,-0.19,195889399,190548172,0.234,0.461,-0.226,367.0,-2.97
+PM,Philip Morris International,core,Tobacco,生活必需品,1.027,-0.30,34961080,34034039,0.042,0.095,-0.053,209.7,+9.40
+MANH,"Manhattan Associates, Inc.",hot,,不明,1.027,-0.33,11222549,10929344,0.013,0.037,-0.023,247.9,+7.25
+HUBS,"HubSpot, Inc.",hot,,不明,1.027,-0.21,11756727,11453006,0.014,0.030,-0.016,238.9,-4.16
+SYF,Synchrony Financial,core,Consumer Finance,金融,1.022,-0.21,13376214,13092364,0.016,0.036,-0.020,75.4,+3.13
+UNP,Union Pacific Corporation,core,Rail Transportation,資本財,1.018,-0.29,35541849,34896329,0.043,0.111,-0.069,301.8,+4.82
+FITB,Fifth Third Bancorp,core,Regional Banks,金融,1.018,-0.34,16827902,16525275,0.020,0.046,-0.026,54.0,+1.88
+LVS,Las Vegas Sands,core,Casinos & Gaming,一般消費財,1.016,-0.33,12927269,12722495,0.015,0.035,-0.020,36.9,-3.38
+CRGY,Crescent Energy Company,hot,,不明,1.016,-0.19,4690199,4617916,0.006,0.013,-0.007,13.9,+3.19
+NVR,"NVR, Inc.",core,Homebuilding,一般消費財,1.012,-0.28,15123809,14947615,0.018,0.039,-0.021,5989.0,+0.26
+STE,Steris,core,Health Care Equipment,ヘルスケア,1.008,-0.30,7084231,7026695,0.008,0.023,-0.015,229.8,+2.92
+PLD,Prologis,core,Industrial REITs,不動産,1.004,-0.29,19007893,18935175,0.023,0.049,-0.026,127.4,-0.88
+HUM,Humana,core,Managed Health Care,ヘルスケア,0.997,-0.33,15586249,15639849,0.019,0.057,-0.038,410.7,-4.78
+ONDS,Ondas Inc,hot,,不明,0.994,-0.06,17887810,17997263,0.021,0.038,-0.017,6.5,+4.44
+RTX,RTX Corporation,core,Aerospace & Defense,資本財,0.993,-0.26,55760930,56141702,0.067,0.166,-0.099,200.0,+3.72
+KKR,KKR & Co.,core,Asset Management & Custody Banks,金融,0.989,-0.30,15384980,15552996,0.018,0.043,-0.024,95.2,+6.13
+MAA,Mid-America Apartment Communities,core,Multi-Family Residential REITs,不動産,0.987,-0.30,4605005,4664197,0.006,0.013,-0.007,118.3,-0.32
+PNR,Pentair,core,Industrial Machinery & Supplies & Components,資本財,0.986,-0.24,12354829,12536200,0.015,0.046,-0.031,66.2,+24.74
+RL,Ralph Lauren Corporation,core,"Apparel, Accessories & Luxury Goods",一般消費財,0.984,-0.35,8651770,8791668,0.010,0.024,-0.014,395.8,+4.17
+NTSK,"Netskope, Inc.",hot,,不明,0.980,-0.27,9364541,9555537,0.011,0.024,-0.013,24.7,+22.89
+APH,Amphenol,core,Electronic Components,情報技術,0.980,-0.29,55103762,56246592,0.066,0.161,-0.095,78.2,-3.00
+MRNA,Moderna,core,Biotechnology,ヘルスケア,0.976,-0.34,198295236,203199058,0.237,0.882,-0.645,219.1,-10.64
+SCCO,Southern Copper Corporation,hot,,不明,0.975,-0.24,14701325,15079885,0.018,0.042,-0.024,181.2,-10.49
+MTD,Mettler Toledo,core,Life Sciences Tools & Services,ヘルスケア,0.975,-0.33,11694375,11998631,0.014,0.039,-0.025,1686.1,+3.17
+PCAR,Paccar,leader,Construction Machinery & Heavy Transportation Equipment,資本財,0.974,-0.33,15050975,15455246,0.018,0.049,-0.031,102.2,-7.43
+ABT,Abbott Laboratories,core,Health Care Equipment,ヘルスケア,0.973,-0.28,42478540,43641468,0.051,0.131,-0.081,105.9,+2.87
+DD,DuPont,core,Specialty Chemicals,資本財,0.973,-0.31,3852032,3959458,0.005,0.012,-0.007,139.2,+3.88
+VOD,Vodafone Group Plc,hot,,不明,0.968,-0.16,3239985,3347617,0.004,0.007,-0.003,15.8,-0.13
+HALO,"Halozyme Therapeutics, Inc.",hot,,不明,0.967,-0.45,7982327,8251762,0.010,0.032,-0.022,130.4,+5.37
+PH,Parker Hannifin,core,Industrial Machinery & Supplies & Components,資本財,0.966,-0.35,30125370,31173506,0.036,0.081,-0.045,917.9,-3.32
+CMI,Cummins,core,Construction Machinery & Heavy Transportation Equipment,資本財,0.963,-0.38,22158491,23006962,0.026,0.065,-0.038,508.9,-6.08
+ALVO,Alvotech,hot,,不明,0.961,-0.44,133730,139155,0.000,0.000,-0.000,4.7,-9.19
+CNC,Centene Corporation,core,Managed Health Care,ヘルスケア,0.961,-0.29,15583836,16216142,0.019,0.065,-0.047,67.6,-5.46
+OPEN,Opendoor Technologies Inc,hot,,不明,0.960,-0.31,3358970,3497435,0.004,0.008,-0.004,1.8,-11.31
+TFC,Truist Financial,core,Diversified Banks,金融,0.957,-0.32,16269342,16994562,0.019,0.046,-0.027,49.0,+3.16
+DOC,Healthpeak Properties,core,Health Care REITs,不動産,0.956,-0.30,4784448,5005287,0.006,0.014,-0.009,19.0,+0.74
+SUPN,"Supernus Pharmaceuticals, Inc.",hot,,不明,0.956,-0.37,2585860,2705526,0.003,0.007,-0.004,42.9,+3.98
+SLB,Schlumberger,core,Oil & Gas Equipment & Services,エネルギー,0.954,-0.36,33064436,34652986,0.040,0.088,-0.048,53.9,+7.25
+CPT,Camden Property Trust,core,Multi-Family Residential REITs,不動産,0.951,-0.32,3515092,3695901,0.004,0.010,-0.006,101.3,+0.19
+CF,CF Industries,core,Fertilizers & Agricultural Chemicals,素材,0.947,-0.30,9742726,10290644,0.012,0.032,-0.020,121.3,+3.21
+UHS,Universal Health Services,core,Health Care Facilities,ヘルスケア,0.945,-0.36,5859784,6201299,0.007,0.019,-0.012,176.3,-5.15
+NUE,Nucor,core,Steel,素材,0.943,-0.29,19205377,20373382,0.023,0.055,-0.032,272.5,+3.84
+GWRE,"Guidewire Software, Inc.",hot,,不明,0.935,-0.28,9327961,9976842,0.011,0.030,-0.019,162.7,-10.59
+JBLU,JetBlue Airways Corporation,hot,,不明,0.935,-0.45,5237993,5604910,0.006,0.018,-0.012,2.9,-0.74
+TJX,TJX Companies,core,Apparel Retail,一般消費財,0.933,-0.39,25939558,27798443,0.031,0.080,-0.049,142.1,-3.03
+AGNC,AGNC Investment Corp.,hot,,不明,0.933,-0.33,11915195,12773623,0.014,0.030,-0.016,8.8,-0.11
+WYNN,Wynn Resorts,core,Casinos & Gaming,一般消費財,0.932,-0.43,7327094,7859435,0.009,0.023,-0.014,73.6,-4.69
+PLUG,"Plug Power, Inc.",hot,,不明,0.930,-0.15,3862295,4153477,0.005,0.009,-0.004,1.4,-3.18
+CCI,Crown Castle,core,Telecom Tower REITs,不動産,0.929,-0.42,25612432,27562671,0.031,0.086,-0.055,89.4,+9.73
+KEYS,Keysight Technologies,core,Electronic Equipment & Instruments,情報技術,0.929,-0.45,15469612,16650885,0.018,0.049,-0.030,311.3,-8.69
+AES,AES Corporation,core,Independent Power Producers & Energy Traders,公益事業,0.926,-0.29,6623580,7150294,0.008,0.029,-0.021,14.9,-0.60
+WSM,"Williams-Sonoma, Inc.",core,Homefurnishing Retail,一般消費財,0.926,-0.37,9615354,10381492,0.011,0.029,-0.017,255.5,+1.33
+BEN,Franklin Resources,core,Asset Management & Custody Banks,金融,0.926,-0.31,3705201,4001493,0.004,0.013,-0.008,31.7,+0.76
+ELPC,Companhia Paranaense de Energia,hot,,不明,0.926,-0.26,494309,533867,0.001,0.003,-0.002,10.6,-24.59
+STZ,Constellation Brands,core,Distillers & Vintners,生活必需品,0.926,-0.32,10420823,11255125,0.012,0.031,-0.018,133.0,+0.38
+DIS,Walt Disney Company (The),core,Movies & Entertainment,コミュニケーション・サービス,0.924,-0.30,31160391,33711425,0.037,0.107,-0.070,111.6,+0.59
+PODD,Insulet Corporation,core,Health Care Equipment,ヘルスケア,0.923,-0.35,5755419,6232358,0.007,0.017,-0.011,152.0,+6.22
+TALO,"Talos Energy, Inc.",hot,,不明,0.923,-0.39,1770993,1918476,0.002,0.007,-0.005,17.8,-1.16
+SPGI,S&P Global,core,Financial Exchanges & Data,金融,0.923,-0.44,41862543,45363890,0.050,0.122,-0.072,467.5,+8.38
+NFLX,Netflix,leader,Movies & Entertainment,コミュニケーション・サービス,0.922,-0.30,159136323,172631772,0.190,0.598,-0.408,62.7,-5.11
+CTAS,Cintas,leader,Diversified Support Services,資本財,0.918,-0.32,18892221,20584766,0.023,0.066,-0.043,221.3,+2.72
+MOS,Mosaic Company (The),core,Fertilizers & Agricultural Chemicals,素材,0.914,-0.39,9883624,10815517,0.012,0.028,-0.016,18.3,+1.75
+XP,XP Inc.,hot,,不明,0.914,-0.43,23900084,26162842,0.029,0.096,-0.067,14.3,-53.95
+MKC,McCormick & Company,core,Packaged Foods & Meats,生活必需品,0.913,-0.34,6266874,6866751,0.007,0.021,-0.014,47.8,+0.51
+HAL,Halliburton,core,Oil & Gas Equipment & Services,エネルギー,0.912,-0.40,16546087,18137634,0.020,0.045,-0.025,36.4,+8.15
+GMAB,Genmab A/S,hot,,不明,0.910,-0.40,15795921,17352742,0.019,0.073,-0.054,57.6,+47.03
+L,Loews Corporation,core,Multi-line Insurance,金融,0.908,-0.41,1869122,2058122,0.002,0.006,-0.004,112.0,+0.39
+XYL,Xylem Inc.,core,Industrial Machinery & Supplies & Components,資本財,0.906,-0.43,20240172,22337485,0.024,0.068,-0.044,93.6,-11.21
+TGT,Target Corporation,core,Consumer Staples Merchandise Retail,生活必需品,0.905,-0.46,19667558,21737031,0.024,0.065,-0.042,152.7,-0.29
+OTIS,Otis Worldwide,core,Industrial Machinery & Supplies & Components,資本財,0.905,-0.41,15980118,17662188,0.019,0.045,-0.026,75.2,+4.44
+FE,FirstEnergy,core,Electric Utilities,公益事業,0.905,-0.45,8464403,9357898,0.010,0.028,-0.018,47.1,+2.82
+SO,Southern Company,core,Electric Utilities,公益事業,0.903,-0.41,18552097,20548977,0.022,0.062,-0.039,94.0,+3.44
+IFF,International Flavors & Fragrances,core,Specialty Chemicals,素材,0.902,-0.42,6800644,7536134,0.008,0.025,-0.017,90.5,-0.78
+PL,Planet Labs PBC,hot,,不明,0.902,-0.46,4454454,4936423,0.005,0.013,-0.008,13.8,-0.65
+SBAC,SBA Communications,core,Telecom Tower REITs,不動産,0.900,-0.40,9411386,10456489,0.011,0.033,-0.022,187.5,+3.86
+NOC,Northrop Grumman,core,Aerospace & Defense,資本財,0.895,-0.34,19894854,22229287,0.024,0.072,-0.048,558.7,+3.46
+WM,Waste Management,core,Environmental & Facilities Services,資本財,0.895,-0.39,28197947,31514009,0.034,0.078,-0.045,234.5,+1.64
+URI,United Rentals,core,Trading Companies & Distributors,資本財,0.893,-0.40,30057990,33653813,0.036,0.088,-0.052,1177.1,+12.38
+NU,Nu Holdings Ltd.,hot,,不明,0.893,-0.35,68694593,76922560,0.082,0.214,-0.132,11.7,-22.22
+MSCI,MSCI Inc.,core,Financial Exchanges & Data,金融,0.887,-0.44,13562758,15283602,0.016,0.043,-0.027,622.0,+5.77
+T,AT&T,core,Integrated Telecommunication Services,コミュニケーション・サービス,0.887,-0.40,61903380,69828530,0.074,0.174,-0.100,21.4,-2.77
+MLM,Martin Marietta Materials,core,Construction Materials,素材,0.886,-0.27,15734958,17760400,0.019,0.075,-0.056,534.2,+5.40
+ITW,Illinois Tool Works,core,Industrial Machinery & Supplies & Components,資本財,0.884,-0.48,15736691,17792613,0.019,0.052,-0.033,280.5,+1.98
+JBL,Jabil,core,Electronic Manufacturing Services,情報技術,0.884,-0.44,10833729,12255765,0.013,0.036,-0.023,274.4,-2.80
+LRCX,Lam Research,leader,Semiconductor Materials & Equipment,半導体,0.884,-0.39,130015325,147118373,0.155,0.372,-0.216,241.3,-10.29
+XEL,Xcel Energy,leader,Multi-Utilities,公益事業,0.884,-0.43,14544881,16459840,0.017,0.047,-0.029,80.0,+3.88
+EQT,EQT Corporation,core,Oil & Gas Exploration & Production,エネルギー,0.883,-0.44,30983914,35088862,0.037,0.104,-0.067,55.7,+2.88
+STLA,Stellantis N.V.,hot,,不明,0.882,-0.29,9081059,10297454,0.011,0.046,-0.035,4.6,+6.26
+TSCO,Tractor Supply,core,Other Specialty Retail,一般消費財,0.876,-0.44,17064120,19474179,0.020,0.071,-0.050,33.6,+2.69
+MPC,Marathon Petroleum,core,Oil & Gas Refining & Marketing,エネルギー,0.874,-0.33,48389620,55381044,0.058,0.160,-0.103,440.2,-6.71
+VST,Vistra Corp.,core,Electric Utilities,公益事業,0.872,-0.31,36822718,42217665,0.044,0.172,-0.128,138.1,-9.50
+ELV,Elevance Health,core,Managed Health Care,ヘルスケア,0.868,-0.38,23251700,26779139,0.028,0.084,-0.056,419.9,-6.14
+HOS,"Hornbeck Offshore Services, Inc",hot,,不明,0.865,-0.33,664720,768653,0.001,0.002,-0.002,7.1,+5.80
+BOOT,"Boot Barn Holdings, Inc.",hot,,不明,0.864,-0.47,4697699,5436221,0.006,0.017,-0.011,130.0,+15.46
+IRM,Iron Mountain,core,Other Specialized REITs,不動産,0.864,-0.33,4690369,5430148,0.006,0.018,-0.012,115.4,+0.12
+LYV,Live Nation Entertainment,core,Movies & Entertainment,コミュニケーション・サービス,0.862,-0.43,11185377,12969249,0.013,0.038,-0.025,178.8,+2.30
+PNC,PNC Financial Services,core,Diversified Banks,金融,0.858,-0.37,16165868,18851879,0.019,0.059,-0.040,229.3,+2.99
+INTR,Inter & Co. Inc.,hot,,不明,0.850,-0.58,4302872,5060518,0.005,0.017,-0.012,4.0,-44.67
+PGR,Progressive Corporation,core,Property & Casualty Insurance,金融,0.849,-0.41,16541369,19491224,0.020,0.055,-0.035,232.1,+4.30
+APO,Apollo Global Management,core,Asset Management & Custody Banks,金融,0.849,-0.41,13569873,15992055,0.016,0.044,-0.027,117.0,+4.42
+BLK,BlackRock,core,Asset Management & Custody Banks,金融,0.848,-0.52,27498136,32418880,0.033,0.087,-0.054,1156.5,+2.55
+CGNX,Cognex Corporation,hot,,不明,0.847,-0.46,3180330,3755496,0.004,0.010,-0.006,56.0,-3.12
+PSN,Parsons Corporation,hot,,不明,0.845,-0.43,2205955,2609471,0.003,0.008,-0.006,49.8,+10.29
+ACHR,Archer Aviation Inc.,hot,,不明,0.844,-0.49,4233906,5014020,0.005,0.011,-0.006,4.2,+3.20
+BDX,Becton Dickinson,core,Health Care Equipment,ヘルスケア,0.833,-0.50,10595502,12712555,0.013,0.037,-0.025,197.9,+2.60
+DNTH,"Dianthus Therapeutics, Inc.",hot,,不明,0.830,-0.43,1399169,1684863,0.002,0.006,-0.005,81.4,+1.71
+FICO,Fair Isaac,core,Application Software,情報技術,0.830,-0.43,24751925,29832414,0.030,0.111,-0.082,704.9,-11.35
+WMB,Williams Companies,core,Oil & Gas Storage & Transportation,エネルギー,0.830,-0.49,21532865,25955507,0.026,0.071,-0.045,74.9,+5.20
+DECK,Deckers Brands,core,Footwear,一般消費財,0.824,-0.47,12534026,15214863,0.015,0.049,-0.034,81.9,-5.07
+SLS,"SELLAS Life Sciences Group, Inc",hot,,不明,0.821,-0.34,3661458,4460718,0.004,0.013,-0.008,9.6,-20.30
+SAIL,"SailPoint, Inc.",hot,,不明,0.817,-0.56,3040084,3723100,0.004,0.011,-0.007,21.1,+9.13
+CASY,Casey's,core,Food Retail,生活必需品,0.811,-0.55,12889623,15884429,0.015,0.043,-0.027,685.7,+0.69
+J,Jacobs Solutions,core,Construction & Engineering,資本財,0.810,-0.50,4293323,5300409,0.005,0.015,-0.010,154.0,+10.49
+WRB,W. R. Berkley Corporation,core,Property & Casualty Insurance,金融,0.806,-0.47,4980371,6179380,0.006,0.018,-0.012,73.8,+0.59
+LEU,Centrus Energy Corp.,hot,,不明,0.806,-0.43,3835703,4760458,0.005,0.014,-0.010,103.4,-7.98
+PATH,"UiPath, Inc.",hot,,不明,0.805,-0.38,17489561,21726085,0.021,0.059,-0.038,13.8,+2.88
+EXPD,Expeditors International,core,Air Freight & Logistics,資本財,0.803,-0.38,7832939,9758689,0.009,0.028,-0.019,198.9,+0.18
+FLEX,Flex Ltd.,core,Electronic Manufacturing Services,情報技術,0.801,-0.52,27009211,33708536,0.032,0.100,-0.068,87.7,-1.92
+PNW,Pinnacle West Capital,core,Multi-Utilities,公益事業,0.801,-0.47,3363381,4198164,0.004,0.015,-0.011,106.9,+3.29
+DKNG,DraftKings Inc.,hot,,不明,0.797,-0.56,8091948,10148491,0.010,0.028,-0.018,20.3,-0.64
+APTV,Aptiv,core,Automotive Parts & Equipment,一般消費財,0.796,-0.59,3958790,4973695,0.005,0.014,-0.009,44.2,-1.71
+GPI,"Group 1 Automotive, Inc.",hot,,不明,0.794,-0.53,2217365,2793014,0.003,0.008,-0.005,262.4,+5.18
+AXGN,"AxoGen, Inc.",hot,,不明,0.794,-0.42,2776940,3497965,0.003,0.017,-0.014,48.3,+33.46
+MSI,Motorola Solutions,core,Communications Equipment,情報技術,0.794,-0.47,15308379,19291968,0.018,0.055,-0.036,491.2,+4.81
+ORKA,"Oruka Therapeutics, Inc.",hot,,不明,0.793,-0.50,2992052,3773250,0.004,0.011,-0.008,95.6,+18.86
+ROK,Rockwell Automation,core,Electrical Components & Equipment,資本財,0.791,-0.52,11154980,14104041,0.013,0.045,-0.031,442.0,+2.29
+IQV,IQVIA,core,Life Sciences Tools & Services,ヘルスケア,0.789,-0.42,16319337,20683939,0.020,0.067,-0.048,268.6,+0.17
+DHI,D. R. Horton,core,Homebuilding,一般消費財,0.784,-0.54,15391711,19622719,0.018,0.057,-0.039,145.5,+4.08
+SBS,Companhia de saneamento Basico,hot,,不明,0.782,-0.34,3717589,4755558,0.004,0.021,-0.017,4.5,-30.08
+MXL,"MaxLinear, Inc",hot,,不明,0.782,-0.46,11323325,14486288,0.014,0.041,-0.027,66.4,-14.19
+LCID,"Lucid Group, Inc.",hot,,不明,0.777,-0.58,1505729,1939085,0.002,0.005,-0.003,3.1,-10.84
+PBLS,"Parabilis Medicines, Inc.",hot,,不明,0.775,-0.49,1333991,1722077,0.002,0.005,-0.003,28.2,+2.96
+RJF,Raymond James Financial,core,Investment Banking & Brokerage,金融,0.774,-0.53,6440437,8322134,0.008,0.025,-0.017,158.5,+1.58
+TPR,"Tapestry, Inc.",core,"Apparel, Accessories & Luxury Goods",一般消費財,0.772,-0.49,9986885,12938072,0.012,0.035,-0.023,118.8,+1.49
+BRO,Brown & Brown,core,Insurance Brokers,金融,0.769,-0.51,7662854,9962899,0.009,0.030,-0.021,68.9,-2.76
+KEEL,Keel Infrastructure Corp.,hot,,不明,0.767,-0.39,2292710,2987778,0.003,0.008,-0.006,2.1,-13.14
+ROL,"Rollins, Inc.",core,Environmental & Facilities Services,資本財,0.766,-0.34,9788942,12771953,0.012,0.044,-0.032,35.0,+5.17
+Z,"Zillow Group, Inc.",hot,,不明,0.766,-0.58,3825844,4997124,0.005,0.014,-0.010,31.0,-2.87
+D,Dominion Energy,core,Multi-Utilities,公益事業,0.765,-0.56,11080046,14476582,0.013,0.039,-0.026,66.4,+4.91
+APA,APA Corporation,core,Oil & Gas Exploration & Production,エネルギー,0.764,-0.64,10629877,13913569,0.013,0.038,-0.026,52.0,+4.50
+WAY,Waystar Holding Corp.,hot,,不明,0.760,-0.51,1414617,1860594,0.002,0.005,-0.004,28.0,-2.54
+DFTX,"Definium Therapeutics, Inc.",hot,,不明,0.757,-0.40,2389939,3158594,0.003,0.009,-0.006,36.3,+3.48
+EXR,Extra Space Storage,core,Self-Storage REITs,不動産,0.754,-0.49,5590460,7418249,0.007,0.022,-0.016,151.6,+7.57
+CDNS,Cadence Design Systems,leader,Application Software,情報技術,0.752,-0.57,37463487,49787169,0.045,0.133,-0.088,329.7,+1.77
+INSP,"Inspire Medical Systems, Inc.",hot,,不明,0.752,-0.59,943395,1254897,0.001,0.004,-0.003,70.0,-2.57
+SYRE,"Spyre Therapeutics, Inc.",hot,,不明,0.750,-0.62,2158680,2877050,0.003,0.008,-0.006,95.6,+2.49
+KRMN,Karman Holdings Inc.,hot,,不明,0.747,-0.60,3746562,5018037,0.004,0.013,-0.009,40.1,+11.49
+SNA,Snap-on,core,Industrial Machinery & Supplies & Components,資本財,0.745,-0.55,7060694,9474391,0.008,0.031,-0.022,358.0,-2.33
+CBRS,Cerebras Systems Inc.,hot,,不明,0.739,-0.47,51707567,70010666,0.062,0.195,-0.133,106.3,-11.61
+NRG,NRG Energy,core,Independent Power Producers & Energy Traders,公益事業,0.738,-0.48,9400017,12735952,0.011,0.038,-0.027,96.4,-3.17
+PWR,Quanta Services,core,Construction & Engineering,資本財,0.735,-0.43,37561725,51084986,0.045,0.139,-0.094,628.1,+2.76
+RITM,Rithm Capital Corp.,hot,,不明,0.734,-0.55,3006131,4095087,0.004,0.012,-0.008,9.4,+8.67
+MCO,Moody's Corporation,core,Financial Exchanges & Data,金融,0.733,-0.40,17311598,23631426,0.021,0.076,-0.056,492.8,+7.08
+RELY,"Remitly Global, Inc.",hot,,不明,0.732,-0.54,1589327,2172078,0.002,0.006,-0.004,24.1,-0.66
+LDOS,Leidos,core,Diversified Support Services,資本財,0.729,-0.56,3289013,4511493,0.004,0.012,-0.008,141.7,+10.46
+DGX,Quest Diagnostics,core,Health Care Services,ヘルスケア,0.722,-0.47,8697164,12039060,0.010,0.038,-0.028,253.6,+6.92
+STT,State Street Corporation,core,Asset Management & Custody Banks,金融,0.720,-0.63,7598865,10548385,0.009,0.029,-0.020,169.7,+0.78
+RMBS,"Rambus, Inc.",hot,,不明,0.718,-0.50,6862304,9551559,0.008,0.027,-0.019,85.5,-9.48
+RCL,Royal Caribbean Group,core,"Hotels, Resorts & Cruise Lines",一般消費財,0.718,-0.58,25535334,35559527,0.031,0.101,-0.070,304.7,+5.88
+CPAY,Corpay,core,Transaction & Payment Processing Services,金融,0.718,-0.55,4988018,6950848,0.006,0.021,-0.015,398.2,-2.62
+CNP,CenterPoint Energy,core,Multi-Utilities,公益事業,0.716,-0.55,10743154,14996092,0.013,0.043,-0.030,42.4,+5.07
+AAL,"American Airlines Group, Inc.",hot,,不明,0.715,-0.80,40034124,55962040,0.048,0.121,-0.073,12.4,+2.44
+IT,Gartner,core,IT Consulting & Other Services,情報技術,0.711,-0.57,7538912,10596021,0.009,0.028,-0.019,227.1,+4.46
+CTSH,Cognizant,core,IT Consulting & Other Services,情報技術,0.709,-0.61,15094698,21293744,0.018,0.060,-0.042,64.6,-5.20
+HON,Honeywell Technologies,leader,Industrial Conglomerates,資本財,0.708,-0.61,19536849,27579156,0.023,0.076,-0.052,220.8,+3.30
+MTB,M&T Bank,core,Regional Banks,金融,0.708,-0.60,5565281,7859090,0.007,0.021,-0.015,221.5,+1.05
+AIG,American International Group,core,Multi-line Insurance,金融,0.708,-0.64,8145139,11511582,0.010,0.037,-0.027,81.7,-0.27
+TDG,TransDigm Group,core,Aerospace & Defense,資本財,0.706,-0.45,15198335,21540034,0.018,0.074,-0.056,1164.9,+1.71
+GGB,Gerdau S.A.,hot,,不明,0.702,-0.61,4546022,6477657,0.005,0.016,-0.011,4.7,-11.10
+PHM,PulteGroup,core,Homebuilding,一般消費財,0.701,-0.61,9707849,13852915,0.012,0.038,-0.027,124.4,+9.38
+AEE,Ameren,core,Multi-Utilities,公益事業,0.694,-0.34,4188322,6033130,0.005,0.020,-0.015,110.9,+3.88
+CDE,"Coeur Mining, Inc.",hot,,不明,0.693,-0.80,23378780,33725979,0.028,0.075,-0.047,13.1,-14.79
+OII,"Oceaneering International, Inc.",hot,,不明,0.687,-0.65,1785923,2598179,0.002,0.008,-0.006,40.7,-8.70
+EXE,Expand Energy,core,Oil & Gas Exploration & Production,エネルギー,0.687,-0.58,10856692,15798804,0.013,0.041,-0.028,91.1,-0.53
+DOCS,"Doximity, Inc.",hot,,不明,0.687,-0.48,2224685,3238905,0.003,0.012,-0.010,33.2,-0.63
+LQDA,Liquidia Corporation,hot,,不明,0.686,-0.67,4854206,7070979,0.006,0.020,-0.014,44.8,+21.41
+VIRT,"Virtu Financial, Inc.",hot,,不明,0.674,-0.64,1340231,1987084,0.002,0.006,-0.004,52.7,-8.40
+SMR,NuScale Power Corporation,hot,,不明,0.673,-0.80,6751268,10034124,0.008,0.021,-0.013,5.5,-2.21
+MMED,"MiniMed Group, Inc.",hot,,不明,0.669,-0.54,5016868,7497023,0.006,0.021,-0.015,18.9,+9.07
+STEP,StepStone Group Inc.,hot,,不明,0.666,-0.56,711936,1068398,0.001,0.003,-0.002,43.1,+0.45
+CVI,CVR Energy Inc.,hot,,不明,0.666,-0.55,1424712,2140762,0.002,0.006,-0.005,58.1,-5.69
+VRSK,Verisk Analytics,core,Research & Consulting Services,資本財,0.665,-0.55,6646307,9997341,0.008,0.031,-0.023,196.9,+4.56
+ASND,Ascendis Pharma A/S,hot,,不明,0.665,-0.68,4501242,6772494,0.005,0.019,-0.014,251.3,+6.50
+TEL,TE Connectivity,core,Electronic Manufacturing Services,情報技術,0.661,-0.50,14601226,22100303,0.017,0.069,-0.052,215.5,+0.40
+UAL,United Airlines Holdings,core,Passenger Airlines,資本財,0.660,-0.72,18313460,27767817,0.022,0.077,-0.055,102.8,+6.10
+CLF,Cleveland-Cliffs Inc.,hot,,不明,0.657,-0.38,12034163,18328032,0.014,0.059,-0.045,14.1,+1.11
+MET,MetLife,core,Life & Health Insurance,金融,0.655,-0.55,7002497,10685994,0.008,0.038,-0.029,100.1,-1.96
+FIGS,"FIGS, Inc.",hot,,不明,0.655,-0.68,1905915,2911261,0.002,0.008,-0.006,21.1,+7.33
+AMT,American Tower,core,Telecom Tower REITs,不動産,0.653,-0.50,22502899,34470393,0.027,0.097,-0.070,188.5,+2.75
+PTGX,"Protagonist Therapeutics, Inc.",hot,,不明,0.648,-0.61,1768479,2727737,0.002,0.007,-0.005,143.0,+3.39
+SYY,Sysco,core,Food Distributors,生活必需品,0.647,-0.61,5989321,9260975,0.007,0.027,-0.019,82.6,-0.01
+APPN,Appian Corporation,hot,,不明,0.645,-0.47,2406104,3728671,0.003,0.010,-0.007,49.1,+10.18
+DTE,DTE Energy,core,Multi-Utilities,公益事業,0.645,-0.62,3819633,5923078,0.005,0.016,-0.012,135.2,+4.47
+FIZZ,National Beverage Corp.,hot,,不明,0.643,-0.60,300470,467171,0.000,0.001,-0.001,35.4,+1.84
+VOYG,"Voyager Technologies, Inc.",hot,,不明,0.643,-0.66,913648,1421151,0.001,0.005,-0.003,27.0,+9.20
+RXO,"RXO, Inc.",hot,,不明,0.641,-0.63,3380979,5274250,0.004,0.015,-0.011,27.5,-4.18
+BX,Blackstone Inc.,core,Asset Management & Custody Banks,金融,0.641,-0.62,21505919,33552061,0.026,0.095,-0.070,119.6,+8.09
+ESS,Essex Property Trust,core,Multi-Family Residential REITs,不動産,0.641,-0.54,5592236,8728257,0.007,0.024,-0.017,263.7,-3.88
+PTC,PTC Inc.,core,Application Software,情報技術,0.632,-0.68,10448663,16523957,0.012,0.042,-0.030,194.3,+0.53
+TTMI,"TTM Technologies, Inc.",hot,,不明,0.629,-0.65,18198693,28955686,0.022,0.086,-0.064,82.9,-17.04
+MAS,Masco,core,Building Products,資本財,0.628,-0.66,6148496,9791036,0.007,0.027,-0.020,80.5,+7.91
+SOLV,Solventum,core,Health Care Technology,ヘルスケア,0.628,-0.53,2484009,3956361,0.003,0.012,-0.009,82.1,-4.30
+SLGN,Silgan Holdings Inc.,hot,,不明,0.619,-0.62,1240943,2004352,0.001,0.006,-0.005,39.9,+0.58
+GL,Globe Life,core,Life & Health Insurance,金融,0.605,-0.54,2990661,4945609,0.004,0.017,-0.014,160.3,-5.57
+FLR,Fluor Corporation,hot,,不明,0.602,-0.55,2632895,4370255,0.003,0.014,-0.011,46.7,+2.03
+HLT,Hilton Worldwide,core,"Hotels, Resorts & Cruise Lines",一般消費財,0.599,-0.79,25415385,42400831,0.030,0.108,-0.078,356.7,-0.49
+IEX,IDEX Corporation,core,Industrial Machinery & Supplies & Components,資本財,0.590,-0.63,6235187,10570715,0.007,0.032,-0.024,237.1,+1.50
+COMP,"Compass, Inc.",hot,,不明,0.590,-0.58,3801651,6447654,0.005,0.020,-0.016,9.3,-5.50
+ICHR,Ichor Holdings,hot,,不明,0.586,-0.71,1018897,1737991,0.001,0.005,-0.004,39.2,-10.02
+KMI,Kinder Morgan,core,Oil & Gas Storage & Transportation,エネルギー,0.585,-0.72,16938842,28965645,0.020,0.083,-0.063,34.1,+1.02
+PPG,PPG Industries,core,Specialty Chemicals,素材,0.582,-0.59,4806390,8251784,0.006,0.032,-0.026,119.5,+10.06
+HWM,Howmet Aerospace,core,Aerospace & Defense,資本財,0.577,-0.64,30510741,52858380,0.036,0.147,-0.110,203.8,-4.04
+BBD,Banco Bradesco Sa,hot,,不明,0.576,-0.69,9381294,16295788,0.011,0.041,-0.030,2.6,-37.21
+VYLR,Vylor Inc.,hot,,不明,0.574,-0.63,4438640,7735629,0.005,0.026,-0.021,72.5,-1.91
+BR,Broadridge Financial Solutions,core,Data Processing & Outsourced Services,資本財,0.573,-0.70,3648458,6368927,0.004,0.017,-0.012,179.6,+0.46
+WAB,Wabtec,core,Construction Machinery & Heavy Transportation Equipment,資本財,0.561,-0.66,7973149,14214191,0.010,0.047,-0.038,283.2,+1.38
+ARE,Alexandria Real Estate Equities,core,Office REITs,不動産,0.552,-0.67,3285258,5955180,0.004,0.018,-0.014,39.7,-7.28
+IONS,"Ionis Pharmaceuticals, Inc.",hot,,不明,0.550,-0.60,2223247,4039195,0.003,0.014,-0.011,43.8,-3.89
+ALLE,Allegion,core,Building Products,資本財,0.543,-0.68,7380836,13586088,0.009,0.040,-0.032,187.3,+19.28
+REXR,"Rexford Industrial Realty, Inc.",hot,,不明,0.542,-0.65,2953481,5448361,0.004,0.017,-0.013,38.4,+2.91
+ZLAB,Zai Lab Limited,hot,,不明,0.542,-0.64,860457,1588731,0.001,0.005,-0.004,22.0,-13.80
+LUV,Southwest Airlines,core,Passenger Airlines,資本財,0.538,-0.80,7450492,13847434,0.009,0.040,-0.031,42.4,+6.81
+HL,Hecla Mining Company,hot,,不明,0.534,-0.63,14588094,27307198,0.017,0.074,-0.057,13.6,-10.57
+CLDX,"Celldex Therapeutics, Inc.",hot,,不明,0.530,-0.71,532979,1004779,0.001,0.003,-0.002,29.3,-3.84
+TDW,Tidewater Inc.,hot,,不明,0.530,-0.68,1157755,2184596,0.001,0.006,-0.005,86.0,+7.38
+STLD,Steel Dynamics,core,Steel,素材,0.530,-0.64,6193555,11689824,0.007,0.033,-0.026,250.7,+2.87
+TECH,Bio-Techne,core,Life Sciences Tools & Services,ヘルスケア,0.528,-0.73,6110921,11576234,0.007,0.027,-0.020,72.7,+0.19
+MMYT,MakeMyTrip Limited,hot,,不明,0.509,-0.74,906301,1779809,0.001,0.005,-0.004,42.0,-6.83
+HAS,Hasbro,core,Leisure Products,一般消費財,0.495,-0.65,7593704,15345462,0.009,0.043,-0.034,118.5,+7.67
+RAPP,"Rapport Therapeutics, Inc.",hot,,不明,0.484,-0.62,927456,1917565,0.001,0.007,-0.006,24.2,-18.01
+VEON,VEON Ltd.,hot,,不明,0.482,-0.62,414910,861221,0.000,0.002,-0.002,87.0,+6.12
+RNG,"Ringcentral, Inc.",hot,,不明,0.475,-0.65,3978512,8371955,0.005,0.029,-0.024,81.8,-0.79
+FRVO,Fervo Energy Company,hot,,不明,0.474,-0.99,1513345,3191925,0.002,0.008,-0.006,8.6,-10.27
+NE,Noble Corporation plc A,hot,,不明,0.468,-0.71,1810191,3867585,0.002,0.011,-0.009,48.4,+12.96
+HUBB,Hubbell Incorporated,core,Industrial Machinery & Supplies & Components,資本財,0.465,-0.66,9118948,19600391,0.011,0.057,-0.046,429.9,-7.75
+PCG,PG&E Corporation,core,Multi-Utilities,公益事業,0.461,-0.75,10531824,22839179,0.013,0.061,-0.049,13.1,-0.42
+JBS,JBS N.V.,hot,,不明,0.455,-0.76,2372156,5208548,0.003,0.014,-0.011,12.4,-1.63
+PKG,Packaging Corporation of America,core,Paper & Plastic Packaging Products & Materials,素材,0.448,-0.74,4244650,9482179,0.005,0.028,-0.023,255.0,+6.40
+NSC,Norfolk Southern,core,Rail Transportation,資本財,0.446,-0.72,5135187,11506400,0.006,0.034,-0.028,341.1,+4.49
+FCNCA,"First Citizens BancShares, Inc.",hot,,不明,0.445,-0.73,5564305,12498165,0.007,0.041,-0.034,2357.4,+10.14
+CUBI,"Customers Bancorp, Inc",hot,,不明,0.444,-0.65,583954,1315605,0.001,0.004,-0.003,85.6,+12.05
+HURN,Huron Consulting Group Inc.,hot,,不明,0.429,-0.99,2096042,4880343,0.003,0.012,-0.010,195.9,+9.52
+AIZ,Assurant,core,Multi-line Insurance,金融,0.427,-0.49,1457018,3409445,0.002,0.012,-0.010,293.5,+2.82
+AMR,"Alpha Metallurgical Resources,",hot,,不明,0.396,-0.86,703703,1775426,0.001,0.005,-0.004,160.7,+0.92
+PCVX,"Vaxcyte, Inc.",hot,,不明,0.340,-0.92,2422895,7123530,0.003,0.019,-0.016,61.7,-7.86
+NICE,NICE Ltd,hot,,不明,0.326,-0.90,943175,2890061,0.001,0.009,-0.008,114.6,+0.58
+PAGS,PagSeguro Digital Ltd.,hot,,不明,0.326,-0.70,828901,2540359,0.001,0.009,-0.008,8.0,-31.31
+IRON,"Disc Medicine, Inc.",hot,,不明,0.295,-0.46,1219382,4127234,0.001,0.015,-0.013,80.8,+5.14
+YMM,Full Truck Alliance Co. Ltd.,hot,,不明,0.281,-0.78,1041660,3710726,0.001,0.011,-0.010,8.3,-4.56
+MOH,Molina Healthcare Inc,hot,,不明,0.265,-0.94,2347963,8875381,0.003,0.026,-0.023,198.4,-10.29
+WFRD,Weatherford International plc,hot,,不明,0.254,-0.93,1579332,6223398,0.002,0.017,-0.015,89.7,+7.53
+TDS,"Telephone and Data Systems, Inc",hot,,不明,0.247,-0.74,917378,3708928,0.001,0.011,-0.010,34.1,-0.26
+DPC,DPC Holdings PLC,hot,,不明,0.131,-0.64,307568,2350092,0.000,0.007,-0.007,27.0,-10.06
+DAO,"Youdao, Inc.",hot,,不明,0.087,-0.79,2222,25573,0.000,0.000,-0.000,19.5,+4.78
 HYPMY,Hypera SA,hot,,不明,0.005,-0.56,12,2210,0.000,0.000,-0.000,4.0,-25.66
