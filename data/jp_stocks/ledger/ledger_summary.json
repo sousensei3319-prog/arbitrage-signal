@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-09T07:59:16+00:00",
+ "generated_at": "2026-11-10T08:02:38+00:00",
  "flag_surge": 2.0,
  "near_surge": 1.5,
  "prereg": {
@@ -18,90 +18,90 @@
  "groups": {
   "candidate": {
    "h1": {
-    "n": 1358,
-    "n_days": 22,
-    "mean_ret": -0.00682,
-    "mean_ex": -0.00495,
-    "n_ex": 1358,
-    "win_rate_ex": 0.439
+    "n": 1417,
+    "n_days": 23,
+    "mean_ret": -0.00605,
+    "mean_ex": -0.00435,
+    "n_ex": 1417,
+    "win_rate_ex": 0.447
    },
    "h5": {
-    "n": 935,
-    "n_days": 18,
-    "mean_ret": -0.03075,
-    "mean_ex": -0.01343,
-    "n_ex": 935,
-    "win_rate_ex": 0.445
+    "n": 987,
+    "n_days": 19,
+    "mean_ret": -0.02959,
+    "mean_ex": -0.01311,
+    "n_ex": 987,
+    "win_rate_ex": 0.447
    },
    "h20": {
-    "n": 152,
-    "n_days": 4,
-    "mean_ret": -0.14318,
-    "mean_ex": -0.11624,
-    "n_ex": 152,
-    "win_rate_ex": 0.23
+    "n": 193,
+    "n_days": 5,
+    "mean_ret": -0.13292,
+    "mean_ex": -0.10695,
+    "n_ex": 193,
+    "win_rate_ex": 0.238
    }
   },
   "near": {
    "h1": {
-    "n": 1430,
-    "n_days": 22,
-    "mean_ret": -0.00105,
-    "mean_ex": -0.00048,
-    "n_ex": 1430,
-    "win_rate_ex": 0.498
+    "n": 1493,
+    "n_days": 23,
+    "mean_ret": -0.00081,
+    "mean_ex": -0.00035,
+    "n_ex": 1493,
+    "win_rate_ex": 0.5
    },
    "h5": {
-    "n": 904,
-    "n_days": 18,
-    "mean_ret": -0.02082,
-    "mean_ex": -0.00672,
-    "n_ex": 904,
-    "win_rate_ex": 0.504
+    "n": 948,
+    "n_days": 19,
+    "mean_ret": -0.02008,
+    "mean_ex": -0.00658,
+    "n_ex": 948,
+    "win_rate_ex": 0.503
    },
    "h20": {
-    "n": 169,
-    "n_days": 4,
-    "mean_ret": -0.08687,
-    "mean_ex": -0.05714,
-    "n_ex": 169,
-    "win_rate_ex": 0.426
+    "n": 221,
+    "n_days": 5,
+    "mean_ret": -0.08573,
+    "mean_ex": -0.05773,
+    "n_ex": 221,
+    "win_rate_ex": 0.403
    }
   },
   "other": {
    "h1": {
-    "n": 10935,
-    "n_days": 22,
-    "mean_ret": -0.00224,
-    "mean_ex": -0.00026,
-    "n_ex": 10935,
-    "win_rate_ex": 0.506
-   },
-   "h5": {
-    "n": 9412,
-    "n_days": 18,
-    "mean_ret": -0.01359,
-    "mean_ex": -0.0064,
-    "n_ex": 9412,
+    "n": 11414,
+    "n_days": 23,
+    "mean_ret": -0.002,
+    "mean_ex": -0.00019,
+    "n_ex": 11414,
     "win_rate_ex": 0.505
    },
+   "h5": {
+    "n": 9919,
+    "n_days": 19,
+    "mean_ret": -0.01342,
+    "mean_ex": -0.00653,
+    "n_ex": 9919,
+    "win_rate_ex": 0.504
+   },
    "h20": {
-    "n": 2145,
-    "n_days": 4,
-    "mean_ret": -0.04598,
-    "mean_ex": -0.01969,
-    "n_ex": 2145,
-    "win_rate_ex": 0.524
+    "n": 2676,
+    "n_days": 5,
+    "mean_ret": -0.04398,
+    "mean_ex": -0.01847,
+    "n_ex": 2676,
+    "win_rate_ex": 0.527
    }
   }
  },
  "note": "入口=記録時刻より後の最初の寄り (判定日から日本1・米国2営業日より前にはしない)。ex=同日の記録銘柄の中央値との差。判定日の当日以降に話題枠へ追加された銘柄と、一部の銘柄だけで記録された日 (partial_dates) は除外。評価日前の数字は参考 (判断に使わない)",
  "first_date": "2026-09-29",
- "last_date": "2026-11-09",
- "n_days": 28,
+ "last_date": "2026-11-10",
+ "n_days": 29,
  "partial_dates": [],
  "primary_progress": {
-  "n_days": 18,
+  "n_days": 19,
   "target_days": 120,
   "evaluable": false
  }
